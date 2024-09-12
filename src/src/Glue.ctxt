@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=Glue
+comment1.params=row\ col
+comment1.target=Glue(int,\ int)
+comment2.params=
+comment2.target=int\ getRow()
+comment3.params=
+comment3.target=int\ getCol()
+numComments=4
