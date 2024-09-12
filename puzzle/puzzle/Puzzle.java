@@ -46,7 +46,7 @@ public class Puzzle {
     public Puzzle(char[][] starting, char[][] ending) {
         this.tileSize = 50;  // Tamaño de cada tile
         this.margin = 10;    // Margen entre tiles
-        this.padding = 5;    // Padding interno
+        this.padding = 10;    // Padding interno
         this.rows = starting.length;
         this.cols = starting[0].length;
         this.starting = starting;
@@ -57,8 +57,10 @@ public class Puzzle {
         for (int row = 0; row < starting.length; row++) {
             for (int col = 0; col < starting[row].length; col++) {
                 char label = starting[row][col];
-                int xPosition = 100 + (col * (tileSize + margin));  // Ajustar la posición horizontal
-                int yPosition = 50 + (row * (tileSize + margin));   // Ajustar la posición vertical
+                // xPosition + 5 to left maring 150 -->155
+                int xPosition = 105 + (col * (tileSize + margin));  // Ajustar la posición horizontal
+                // yPosition + 5 to upper maring 50 --> 55
+                int yPosition = 55 + (row * (tileSize + margin));   // Ajustar la posición vertical
 
                 // Crear la pieza y agregarla a la lista
                 Tile tile = new Tile(tileSize, label, xPosition, yPosition, padding);
@@ -70,8 +72,10 @@ public class Puzzle {
         for (int row = 0; row < ending.length; row++) {
             for (int col = 0; col < ending[row].length; col++) {
                 char label = ending[row][col];
-                int xPosition = (rows * (tileSize + margin)) + 150 + (col * (tileSize + margin)); // Ajustar la posición horizontal
-                int yPosition = 50 + (row * (tileSize + margin));   // Ajustar la posición vertical
+                // xPosition + 5 to left maring 150 -->155
+                int xPosition = (rows * (tileSize + margin)) + 155 + (col * (tileSize + margin)); // Ajustar la posición horizontal
+                // yPosition + 5 to upper maring 50 --> 55
+                int yPosition = 55 + (row * (tileSize + margin));   // Ajustar la posición vertical
 
                 // Crear la pieza y agregarla a la lista
                 Tile tile = new Tile(tileSize, label, xPosition, yPosition, padding);
@@ -83,29 +87,17 @@ public class Puzzle {
     public static void main(String[] args) {
         // Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
         char[][] starting = {
-            {'r', 'r', 'b', 'y'},
-            {'y', 'b', 'r', 'r'},
-            {'b', 'y', 'r', 'b'},
-            {'r', 'b', 'y', 'y'},
-            {'y', 'r', 'b', 'r'},
-            {'b', 'y', 'y', 'r'},
-            {'r', 'b', 'r', 'y'},
-            {'y', 'r', 'b', 'b'}
+            {'y', 'r'},
+            {'b', 'b'}
         };
 
         char[][] ending = {
-            {'r', 'r', 'b', 'y'},
-            {'y', 'b', 'r', 'r'},
-            {'b', 'y', 'r', 'b'},
-            {'r', 'b', 'y', 'y'},
-            {'y', 'r', 'b', 'r'},
-            {'b', 'y', 'y', 'r'},
-            {'r', 'b', 'r', 'y'},
-            {'y', 'r', 'b', 'b'}
+            {'r', 'r'},
+            {'y', 'b'}
         };
 
         // Instanciar los objetos de Puzzle
-        Puzzle pz1 = new Puzzle(8, 4); // Tablero sin matrices
+        Puzzle pz1 = new Puzzle(2, 2); // Tablero sin matrices
         Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
     }
 }
