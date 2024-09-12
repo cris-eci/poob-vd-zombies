@@ -39,4 +39,8 @@ public class Tile extends Rectangle {
         this.moveVertical(yPosition);
         this.makeVisible();
     }
+    
+    public Color getColor(){
+        return color;
+    }
 }
