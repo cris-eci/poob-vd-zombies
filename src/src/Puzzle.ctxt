@@ -1,9 +1,0 @@
-#BlueJ class context
-comment0.target=Puzzle
-comment1.params=rows\ cols
-comment1.target=Puzzle(int,\ int)
-comment2.params=starting\ ending
-comment2.target=Puzzle(char[][],\ char[][])
-comment3.params=args
-comment3.target=void\ main(java.lang.String[])
-numComments=4

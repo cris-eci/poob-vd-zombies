@@ -1,16 +1,16 @@
 #BlueJ package file
-dependency1.from=Rectangle
-dependency1.to=Canvas
+dependency1.from=Puzzle
+dependency1.to=Rectangle
 dependency1.type=UsesDependency
 dependency2.from=Puzzle
-dependency2.to=Rectangle
+dependency2.to=Tile
 dependency2.type=UsesDependency
-dependency3.from=Puzzle
-dependency3.to=Tile
+dependency3.from=Rectangle
+dependency3.to=Canvas
 dependency3.type=UsesDependency
-editor.fx.0.height=1039
-editor.fx.0.width=974
-editor.fx.0.x=953
+editor.fx.0.height=0
+editor.fx.0.width=0
+editor.fx.0.x=0
 editor.fx.0.y=0
 objectbench.height=93
 objectbench.width=451
