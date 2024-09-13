@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class Puzzle {
     private int tileSize;
@@ -89,13 +90,22 @@ public class Puzzle {
     }
     
    
-    public void addTile(int row, int column, Color color){
-        Tile previousTile = tiles.get(row).get(column);
+    public void addTile(int row, int column, Color color){        
         // Usa equals para comparar colores
-        if (previousTile.getColor().equals(lightBrown)){
-            previousTile.changeColor(color);            
-        }    
+        if (row >= rows || column >= cols){
+            JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space"); 
+        }
+        
+        Tile previousTile = tiles.get(row).get(column);
+        
+        if(previousTile.getColor().equals(lightBrown)) {
+             previousTile.changeColor(color);        
+        } else {
+            JOptionPane.showMessageDialog(null, "There is a tile here now.");
+        }                                                    
     }
+    
+    //public void 
     
 
     public static void main(String[] args) {
@@ -115,7 +125,7 @@ public class Puzzle {
         Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
         
         pz2.addTile(0,1,Color.RED);
-        pz2.addTile(1,1,Color.BLUE);
+        pz2.addTile(3,2,Color.BLUE);
         pz2.addTile(0,0,Color.BLACK);
     }
 }
