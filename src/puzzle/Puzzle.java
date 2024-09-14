@@ -89,7 +89,7 @@ public class Puzzle {
         }
     }
     
-    public void addTile(int row, int column, Color color){                
+    public void addTile(int row, int column, char label){                
         if (row >= rows || column >= cols){
             JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space.", "Error", JOptionPane.ERROR_MESSAGE); 
         }
@@ -97,8 +97,11 @@ public class Puzzle {
         Tile previousTile = tiles.get(row).get(column);
 
         // Usa equals para comparar colores
-        if(previousTile.getColor().equals(lightBrown)) {
-            previousTile.changeColor(color);        
+        if(previousTile.getTileColor().equals(lightBrown)) {
+            //previousTile.getLabel();
+            previousTile.setTileColor(label);
+            System.out.println("Color cambiado a: " + previousTile.getTileColor());
+            System.out.println("neo");
         } else {
             JOptionPane.showMessageDialog(null, "There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
         }                                                    
@@ -112,8 +115,8 @@ public class Puzzle {
         Tile previousTile = tiles.get(row).get(column);
 
         // Usa equals para comparar colores
-        if(!previousTile.getColor().equals(lightBrown)) {
-            previousTile.changeColor(lightBrown);        
+        if(!previousTile.getTileColor().equals(lightBrown)) {
+            previousTile.setTileColor('n');        
         } else {
             JOptionPane.showMessageDialog(null, "There is no a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -143,15 +146,15 @@ public class Puzzle {
         Tile fromTile = tiles.get(fromRow).get(fromCol);
         Tile toTile = tiles.get(toRow).get(toCol);
         
-        if(fromTile.getColor().equals(lightBrown)){
+        if(fromTile.getTileColor().equals(lightBrown)){
             JOptionPane.showMessageDialog(null,"you cannot move a non-existent tile", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if(!toTile.getColor().equals(lightBrown)){
+        } else if(!toTile.getTileColor().equals(lightBrown)){
             JOptionPane.showMessageDialog(null,"There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
         } else{
-            Color fromColor = fromTile.getColor();
-            Color toColor = toTile.getColor();
-            fromTile.changeColor(toColor);
-            toTile.changeColor(fromColor);
+            char fromLabel = fromTile.getLabel();
+            char toLabel = toTile.getLabel();            
+            fromTile.setTileColor(fromLabel);
+            toTile.setTileColor(toLabel);
         }            
     }
 
@@ -171,7 +174,7 @@ public class Puzzle {
         Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
 
         // addTile manual tests
-        //pz2.addTile(0,1,Color.RED); // should addTile - ok
+        pz2.addTile(0,1,'r'); // should addTile - ok
         //pz2.addTile(10,10,Color.BLUE); // should not addTile - ok
         //pz2.addTile(0,0,Color.BLACK); // should not addTile (It exist a tile in this index) -ok
 
@@ -199,6 +202,8 @@ public class Puzzle {
         // relocateTile manual tests
         int[] from5 = {0,0};
         int[] to5   = {1,0};        
-        pz2.relocateTile(from5,to5); // should not pass, there is a tile there
+        //pz2.relocateTile(from5,to5); // should not pass, there is a tile there
+        pz2.relocateTile(from,to); // shouldn't pass, relocate a tile with other tile
+        
     }
 }

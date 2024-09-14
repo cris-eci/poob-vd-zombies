@@ -2,6 +2,10 @@
 comment0.target=Tile
 comment1.params=size\ label\ xPosition\ yPosition\ padding
 comment1.target=Tile(int,\ char,\ int,\ int,\ int)
-comment2.params=
-comment2.target=java.awt.Color\ getColor()
-numComments=3
+comment2.params=label
+comment2.target=void\ setTileColor(char)
+comment3.params=
+comment3.target=java.awt.Color\ getTileColor()
+comment4.params=
+comment4.target=char\ getLabel()
+numComments=5
