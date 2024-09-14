@@ -1,4 +1,4 @@
-import java.awt.Color;
+    import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -93,7 +93,7 @@ public class Puzzle {
     public void addTile(int row, int column, Color color){        
         // Usa equals para comparar colores
         if (row >= rows || column >= cols){
-            JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space"); 
+            JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space.", "Error", JOptionPane.ERROR_MESSAGE); 
         }
         
         Tile previousTile = tiles.get(row).get(column);
@@ -101,11 +101,12 @@ public class Puzzle {
         if(previousTile.getColor().equals(lightBrown)) {
              previousTile.changeColor(color);        
         } else {
-            JOptionPane.showMessageDialog(null, "There is a tile here now.");
+            JOptionPane.showMessageDialog(null, "There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
         }                                                    
     }
     
-    //public void 
+    public void relocateTile(int[] from, int[] to){
+    }
     
 
     public static void main(String[] args) {
@@ -124,8 +125,8 @@ public class Puzzle {
         Puzzle pz1 = new Puzzle(2, 2); // Tablero sin matrices
         Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
         
-        pz2.addTile(0,1,Color.RED);
-        pz2.addTile(3,2,Color.BLUE);
-        pz2.addTile(0,0,Color.BLACK);
+        //pz2.addTile(0,1,Color.RED);
+        pz2.addTile(10,10,Color.BLUE);
+        //pz2.addTile(0,0,Color.BLACK);
     }
 }
