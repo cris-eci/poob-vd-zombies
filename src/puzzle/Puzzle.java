@@ -40,7 +40,7 @@ public class Puzzle {
         endingBoard.changeSize(rows * (tileSize + margin), cols * (tileSize + margin));
         endingBoard.changeColor(color);
         endingBoard.makeVisible();
-        endingBoard.moveHorizontal(rows * (tileSize + margin) + 150);
+        endingBoard.moveHorizontal(rows * (tileSize + margin) + 350);
         endingBoard.moveVertical(50);
 
     }
@@ -78,7 +78,7 @@ public class Puzzle {
             List<Tile> rowList = new ArrayList<>();
             for (int col = 0; col < ending[row].length; col++) {
                 char label = ending[row][col];
-                int xPosition = (rows * (tileSize + margin)) + 155 + (col * (tileSize + margin)); // Ajustar la posición horizontal
+                int xPosition = (rows * (tileSize + margin)) + 355 + (col * (tileSize + margin)); // Ajustar la posición horizontal
                 int yPosition = 55 + (row * (tileSize + margin));   // Ajustar la posición vertical
 
                 // Crear la pieza y agregarla a la lista
@@ -203,7 +203,7 @@ public class Puzzle {
         int[] from5 = {0,0};
         int[] to5   = {1,0};        
         //pz2.relocateTile(from5,to5); // should not pass, there is a tile there
-        //pz2.relocateTile(from,to); // shouldn't pass, relocate a tile with other tile
+        pz2.relocateTile(from,to); // shouldn't pass, relocate an origin tile with a new tile
         
     }
 }
