@@ -92,33 +92,33 @@ public class Puzzle {
     public void addTile(int row, int column, char label){                
         if (row >= rows || column >= cols){
             JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space.", "Error", JOptionPane.ERROR_MESSAGE); 
+        } else {
+            Tile previousTile = tiles.get(row).get(column);
+
+            // Usa equals para comparar colores
+            if(previousTile.getTileColor().equals(lightBrown)) {
+                //previousTile.getLabel();
+                previousTile.setTileColor(label);
+            } else {
+                JOptionPane.showMessageDialog(null, "There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
+            }                                                    
         }
 
-        Tile previousTile = tiles.get(row).get(column);
 
-        // Usa equals para comparar colores
-        if(previousTile.getTileColor().equals(lightBrown)) {
-            //previousTile.getLabel();
-            previousTile.setTileColor(label);
-            System.out.println("Color cambiado a: " + previousTile.getTileColor());
-            System.out.println("neo");
-        } else {
-            JOptionPane.showMessageDialog(null, "There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
-        }                                                    
     }
 
     public void deleteTile(int row, int column){
         if (row >= rows || column >= cols){
             JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space.", "Error", JOptionPane.ERROR_MESSAGE); 
-        }
-
-        Tile previousTile = tiles.get(row).get(column);
-
-        // Usa equals para comparar colores
-        if(!previousTile.getTileColor().equals(lightBrown)) {
-            previousTile.setTileColor('n');        
         } else {
-            JOptionPane.showMessageDialog(null, "There is no a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
+            Tile previousTile = tiles.get(row).get(column);
+    
+            // Usa equals para comparar colores
+            if(!previousTile.getTileColor().equals(lightBrown)) {
+                previousTile.setTileColor('n');        
+            } else {
+                JOptionPane.showMessageDialog(null, "There is no a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
+            }        
         }
     }
 
@@ -179,7 +179,7 @@ public class Puzzle {
         //pz2.addTile(0,0,Color.BLACK); // should not addTile (It exist a tile in this index) -ok
 
         // deleteTile manual tests
-        //pz2.deleteTile(10,10); // should not delete (out of index) - ok
+        pz2.deleteTile(10,10); // should not delete (out of index) - ok
         //pz2.deleteTile(1,1); // should not delete (THere is not a tile in this index)) - ok
         //pz2.deleteTile(1,0); // should delete a tile - ok
         
@@ -203,7 +203,7 @@ public class Puzzle {
         int[] from5 = {0,0};
         int[] to5   = {1,0};        
         //pz2.relocateTile(from5,to5); // should not pass, there is a tile there
-        pz2.relocateTile(from,to); // shouldn't pass, relocate a tile with other tile
+        //pz2.relocateTile(from,to); // shouldn't pass, relocate a tile with other tile
         
     }
 }
