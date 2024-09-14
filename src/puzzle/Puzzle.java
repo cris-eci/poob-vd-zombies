@@ -1,4 +1,4 @@
-    import java.awt.Color;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -42,7 +42,7 @@ public class Puzzle {
         endingBoard.makeVisible();
         endingBoard.moveHorizontal(rows * (tileSize + margin) + 150);
         endingBoard.moveVertical(50);
-        
+
     }
 
     // Constructor para inicializar los tableros con matrices
@@ -56,7 +56,7 @@ public class Puzzle {
         this.ending = ending;
         this.tiles = new ArrayList<>();
         this.referingTiles = new ArrayList<>();
-       
+
         // Crear las piezas del puzzle inicial    
         for (int row = 0; row < starting.length; row++) {
             List<Tile> rowList = new ArrayList<>();
@@ -88,45 +88,66 @@ public class Puzzle {
             referingTiles.add(rowList);            
         }
     }
-    
-   
-    public void addTile(int row, int column, Color color){        
-        // Usa equals para comparar colores
+
+    public void addTile(int row, int column, Color color){                
         if (row >= rows || column >= cols){
             JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space.", "Error", JOptionPane.ERROR_MESSAGE); 
         }
-        
+
         Tile previousTile = tiles.get(row).get(column);
-        
+
+        // Usa equals para comparar colores
         if(previousTile.getColor().equals(lightBrown)) {
-             previousTile.changeColor(color);        
+            previousTile.changeColor(color);        
         } else {
             JOptionPane.showMessageDialog(null, "There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
         }                                                    
     }
-    
+
+    public void deleteTile(int row, int column){
+        if (row >= rows || column >= cols){
+            JOptionPane.showMessageDialog(null,"You have exceeded the puzzle space.", "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+
+        Tile previousTile = tiles.get(row).get(column);
+
+        // Usa equals para comparar colores
+        if(!previousTile.getColor().equals(lightBrown)) {
+            previousTile.changeColor(lightBrown);        
+        } else {
+            JOptionPane.showMessageDialog(null, "There is no a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     public void relocateTile(int[] from, int[] to){
     }
-    
 
     public static void main(String[] args) {
         // Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
         char[][] starting = {
-            {'y', '*'},
-            {'b', '*'}
-        };
+                {'y', '*'},
+                {'b', '*'}
+            };
 
         char[][] ending = {
-            {'y', '*'},
-            {'*', 'b'}
-        };
+                {'y', '*'},
+                {'*', 'b'}
+            };
 
         // Instanciar los objetos de Puzzle
         Puzzle pz1 = new Puzzle(2, 2); // Tablero sin matrices
         Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
+
+        // addTile manual tests
+        //pz2.addTile(0,1,Color.RED); // should addTile - ok
+        //pz2.addTile(10,10,Color.BLUE); // should not addTile - ok
+        //pz2.addTile(0,0,Color.BLACK); // should not addTile (It exist a tile in this index) -ok
+
+        // deleteTile manual tests
+        //pz2.deleteTile(10,10); // should not delete (out of index) - ok
+        //pz2.deleteTile(1,1); // should not delete (THere is not a tile in this index)) - ok
+        //pz2.deleteTile(1,0); // should delete a tile - ok
         
-        //pz2.addTile(0,1,Color.RED);
-        pz2.addTile(10,10,Color.BLUE);
-        //pz2.addTile(0,0,Color.BLACK);
+
     }
 }
