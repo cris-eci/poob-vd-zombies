@@ -162,7 +162,88 @@ public class Puzzle {
         return tile.getTileColor().equals(lightBrown);
     }    
 
+    
+    public void tilt(char direction) {
+    switch (direction) {
+        case 'd': // Tilt down
+            for (int col = 0; col < cols; col++) {
+                tiltDown(0, col);
+            }
+            break;
+        case 'u': // Tilt up
+            for (int col = 0; col < cols; col++) {
+                tiltUp(rows - 1, col);
+            }
+            break;
+        case 'r': // Tilt right
+            for (int row = 0; row < rows; row++) {
+                tiltRight(row, 0);
+            }
+            break;
+        case 'l': // Tilt left
+            for (int row = 0; row < rows; row++) {
+                tiltLeft(row, cols - 1);
+            }
+            break;
+        default:
+            JOptionPane.showMessageDialog(null, "Invalid direction.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 
+    // Tilt down starting from the top row recursively
+    private void tiltDown(int row, int col) {
+        if (row >= rows - 1) return; // Caso base: hemos llegado al fondo
+    
+        int[] currentPos = {row, col};
+        int[] nextPos = {row + 1, col};
+    
+        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
+            relocateTile(currentPos, nextPos); // Mueve la tile hacia abajo
+            tiltDown(row + 1, col); // Llama recursivamente
+        }
+    }
+    
+    // Tilt up starting from the bottom row recursively
+    private void tiltUp(int row, int col) {
+        if (row <= 0) return; // Caso base: hemos llegado al tope
+    
+        int[] currentPos = {row, col};
+        int[] nextPos = {row - 1, col};
+    
+        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
+            relocateTile(currentPos, nextPos); // Mueve la tile hacia arriba
+            tiltUp(row - 1, col); // Llama recursivamente
+        }
+    }
+    
+    // Tilt right starting from the left column recursively
+    private void tiltRight(int row, int col) {
+        if (col >= cols - 1) return; // Caso base: hemos llegado al extremo derecho
+    
+        int[] currentPos = {row, col};
+        int[] nextPos = {row, col + 1};
+    
+        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
+            relocateTile(currentPos, nextPos); // Mueve la tile hacia la derecha
+            tiltRight(row, col + 1); // Llama recursivamente
+        }
+    }
+    
+    // Tilt left starting from the right column recursively
+    private void tiltLeft(int row, int col) {
+        if (col <= 0) return; // Caso base: hemos llegado al extremo izquierdo
+    
+        int[] currentPos = {row, col};
+        int[] nextPos = {row, col - 1};
+    
+        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
+            relocateTile(currentPos, nextPos); // Mueve la tile hacia la izquierda
+            tiltLeft(row, col - 1); // Llama recursivamente
+        }
+    }
+
+    
+    
     public static void main(String[] args) {
         // Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
         char[][] starting = {
@@ -179,16 +260,16 @@ public class Puzzle {
         Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
 
         // addTile manual tests
-        pz2.addTile(0,1,'r'); // should addTile - ok
+        //pz2.addTile(0,1,'r'); // should addTile - ok
         //pz2.addTile(10,10,Color.BLUE); // should not addTile - ok
         //pz2.addTile(0,0,Color.BLACK); // should not addTile (It exist a tile in this index) -ok
 
         // deleteTile manual tests
         //pz2.deleteTile(10,10); // should not delete (out of index) - ok
-        pz2.deleteTile(0,0); // should not delete (THere is not a tile in this index)) - ok
+        //pz2.deleteTile(0,0); // should not delete (THere is not a tile in this index)) - ok
         //pz2.deleteTile(1,0); // should delete a tile - ok
         
-        pz2.addTile(0,0,'b');
+        //pz2.addTile(0,0,'b');
         // relocateTile manual tests
         int[] from = {0,1};
         int[] to   = {1,1};        
@@ -212,9 +293,12 @@ public class Puzzle {
         //pz2.relocateTile(from5,to5); // shouldn't pass, relocate an origin tile with a new tile
         //pz2.relocateTile(to5,from5);
         
-        pz2.deleteTile(0,1);
+        //pz2.deleteTile(0,1);
         int[] from6 = {0,1};
         int[] to6   = {0,0};
         //pz2.relocateTile(from2,to2); // should not pass wrong from column   
+        
+        pz2.tilt('r');
+        pz2.tilt('l');
     }
 }
