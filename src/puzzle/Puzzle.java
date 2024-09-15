@@ -206,7 +206,7 @@ public class Puzzle {
             JOptionPane.showMessageDialog(null, "Invalid direction.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
-
+    /**
     // Tilt down starting from the top row recursively
     private void tiltDown(int row, int col) {
         if (row >= rows - 1) return; // Caso base: hemos llegado al fondo
@@ -277,24 +277,101 @@ public class Puzzle {
             tiltLeft(row, col - 1); // Llama recursivamente
         }
     }
+    **/
+    
+    // Tilt down starting from the top row recursively
+    private void tiltDown(int row, int col) {
+        for (int i = rows - 2; i >= 0; i--) { // Comienza desde la penúltima fila hacia arriba
+            for (int j = i; j < rows - 1; j++) { // Intenta mover la ficha lo más abajo posible
+                int[] currentPos = {j, col};
+                int[] nextPos = {j + 1, col};
+    
+                Tile fromTile = tiles.get(currentPos[0]).get(currentPos[1]);
+                Tile toTile = tiles.get(nextPos[0]).get(nextPos[1]);
+    
+                if (isTileEmpty(toTile) && !isTileEmpty(fromTile)) {
+                    relocateTileMovement(fromTile, toTile, currentPos, nextPos); // Mueve la tile hacia abajo
+                }
+            }
+        }
+    }
+    
+    // Tilt up starting from the bottom row recursively
+    private void tiltUp(int row, int col) {
+        for (int i = 1; i < rows; i++) { // Comienza desde la segunda fila hacia abajo
+            for (int j = i; j > 0; j--) { // Intenta mover la ficha lo más arriba posible
+                int[] currentPos = {j, col};
+                int[] nextPos = {j - 1, col};
+    
+                Tile fromTile = tiles.get(currentPos[0]).get(currentPos[1]);
+                Tile toTile = tiles.get(nextPos[0]).get(nextPos[1]);
+    
+                if (isTileEmpty(toTile) && !isTileEmpty(fromTile)) {
+                    relocateTileMovement(fromTile, toTile, currentPos, nextPos); // Mueve la tile hacia arriba
+                }
+            }
+        }
+    }
+    
+    // Tilt right starting from the left column recursively
+    private void tiltRight(int row, int col) {
+        for (int i = cols - 2; i >= 0; i--) { // Comienza desde la penúltima columna hacia la izquierda
+            for (int j = i; j < cols - 1; j++) { // Intenta mover la ficha lo más a la derecha posible
+                int[] currentPos = {row, j};
+                int[] nextPos = {row, j + 1};
+    
+                Tile fromTile = tiles.get(currentPos[0]).get(currentPos[1]);
+                Tile toTile = tiles.get(nextPos[0]).get(nextPos[1]);
+    
+                if (isTileEmpty(toTile) && !isTileEmpty(fromTile)) {
+                    relocateTileMovement(fromTile, toTile, currentPos, nextPos); // Mueve la tile hacia la derecha
+                }
+            }
+        }
+    }
+    
+    // Tilt left starting from the right column recursively
+    private void tiltLeft(int row, int col) {
+        for (int i = 1; i < cols; i++) { // Comienza desde la segunda columna hacia la derecha
+            for (int j = i; j > 0; j--) { // Intenta mover la ficha lo más a la izquierda posible
+                int[] currentPos = {row, j};
+                int[] nextPos = {row, j - 1};
+    
+                Tile fromTile = tiles.get(currentPos[0]).get(currentPos[1]);
+                Tile toTile = tiles.get(nextPos[0]).get(nextPos[1]);
+    
+                if (isTileEmpty(toTile) && !isTileEmpty(fromTile)) {
+                    relocateTileMovement(fromTile, toTile, currentPos, nextPos); // Mueve la tile hacia la izquierda
+                }
+            }
+        }
+    }
 
     
     
     public static void main(String[] args) {
         // Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
-        char[][] starting = {
-                {'*', 'r'},
-                {'b', '*'}
-            };
-
+// Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
+        char[][] starting = {            
+            {'b', 'b','*','*'},
+            {'r', '*','r','*'},
+            {'g','r','*','*'} 
+        };
+ 
         char[][] ending = {
-                {'y', '*'},
-                {'*', 'b'}
-            };                            
+            {'y', '*','*','r'},
+            {'*', 'b','g','b'},
+            {'*','g','y','*'}
+        };
+ 
         // Instanciar los objetos de Puzzle
-        Puzzle pz1 = new Puzzle(2, 2); // Tablero sin matrices
-        Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
-
+        Puzzle pz1 = new Puzzle(3, 4); // Tablero sin matrices
+        Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices             
+        // Instanciar los objetos de Puzzle
+        //Puzzle pz1 = new Puzzle(2, 2); // Tablero sin matrices
+        //Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
+    
+        pz2.tilt('r');
         // addTile manual tests
         //pz2.addTile(0,1,'r'); // should addTile - ok
         //pz2.addTile(10,10,Color.BLUE); // should not addTile - ok
@@ -335,9 +412,8 @@ public class Puzzle {
         //pz2.relocateTile(from2,to2); // should not pass wrong from column   
         
         // Tilt tests
-        pz2.tilt('l'); // should pass - tilt even when the start tile is empty
-        //pz2.tilt('l');
-        
+        //pz2.tilt('l'); // should pass - tilt even when the start tile is empty
+        //pz2.tilt('l');        
         
     }
 }
