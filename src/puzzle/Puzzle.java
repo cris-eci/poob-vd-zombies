@@ -103,8 +103,6 @@ public class Puzzle {
                 JOptionPane.showMessageDialog(null, "There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
             }                                                    
         }
-
-
     }
 
     public void deleteTile(int row, int column){
@@ -115,48 +113,55 @@ public class Puzzle {
     
             // Usa equals para comparar colores
             if(!previousTile.getTileColor().equals(lightBrown)) {
-                previousTile.setTileColor('n');        
+                previousTile.setTileColor('*');        
             } else {
                 JOptionPane.showMessageDialog(null, "There is no a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
             }        
         }
     }
 
-    public void relocateTile(int[] from, int[] to){                        
-        if (from.length != 2){
-            JOptionPane.showMessageDialog(null, "You just should give row and column for from", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (to.length != 2){
-            JOptionPane.showMessageDialog(null, "You just should give row and column for to", "Error", JOptionPane.ERROR_MESSAGE);
-        }         
-        
-        int fromRow = from[0];   
-        int fromCol = from[1];
-        
-        if (fromRow >= rows || fromCol >= cols){
-            JOptionPane.showMessageDialog(null,"Wrong row position, you have exceeded the puzzle space in from [].", "Error", JOptionPane.ERROR_MESSAGE);
+    public void relocateTile(int[] from, int[] to) {
+        // Validar las coordenadas de entrada
+        if (!areValidCoordinates(from) || !areValidCoordinates(to)) {
+            JOptionPane.showMessageDialog(null, "Invalid coordinates.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-                
-        int toRow = to[0];   
-        int toCol = to[1];
-        
-        if (toRow >= rows || toCol >= cols){
-            JOptionPane.showMessageDialog(null,"Wrong row position, you have exceeded the puzzle space in to [].", "Error", JOptionPane.ERROR_MESSAGE);
+    
+        Tile fromTile = tiles.get(from[0]).get(from[1]);
+        Tile toTile = tiles.get(to[0]).get(to[1]);
+    
+        // Validar existencia de la tile de origen y disponibilidad de la tile de destino
+        if (isTileEmpty(fromTile)) {
+            JOptionPane.showMessageDialog(null, "You cannot move a non-existent tile.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (!isTileEmpty(toTile)) {
+            JOptionPane.showMessageDialog(null, "There is already a tile at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            // Mover la instancia de la tile visualmente
+            fromTile.slowMoveHorizontal(to[1] * (tileSize + margin) - from[1] * (tileSize + margin));
+            fromTile.slowMoveVertical(to[0] * (tileSize + margin) - from[0] * (tileSize + margin));            
+            // Mover la instancia de la tile visualmente desde "to" a "from"
+            toTile.moveHorizontal(from[1] * (tileSize + margin) - to[1] * (tileSize + margin));
+            toTile.moveVertical(from[0] * (tileSize + margin) - to[0] * (tileSize + margin));
+            // Actualizar la lista de tiles: intercambiar las posiciones de las fichas
+            tiles.get(to[0]).set(to[1], fromTile);  // Mover la baldosa a la nueva posición
+            tiles.get(from[0]).set(from[1], toTile);  // La ficha original ahora es la nueva ficha vacía
+    
+            // Cambiar el color de la ficha que ahora está vacía
+            toTile.setTileColor('*');
         }
-        
-        Tile fromTile = tiles.get(fromRow).get(fromCol);
-        Tile toTile = tiles.get(toRow).get(toCol);
-        
-        if(fromTile.getTileColor().equals(lightBrown)){
-            JOptionPane.showMessageDialog(null,"you cannot move a non-existent tile", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if(!toTile.getTileColor().equals(lightBrown)){
-            JOptionPane.showMessageDialog(null,"There is a tile here now.", "Error", JOptionPane.ERROR_MESSAGE);
-        } else{
-            char fromLabel = fromTile.getLabel();
-            char toLabel = toTile.getLabel();            
-            fromTile.setTileColor(fromLabel);
-            toTile.setTileColor(toLabel);
-        }            
     }
+
+    
+    // Método para validar si las coordenadas son correctas
+    private boolean areValidCoordinates(int[] coords) {
+        return coords.length == 2 && coords[0] < rows && coords[1] < cols;
+    }
+    
+    // Método para verificar si una Tile está vacía (es de color lightBrown)
+    private boolean isTileEmpty(Tile tile) {
+        return tile.getTileColor().equals(lightBrown);
+    }    
+
 
     public static void main(String[] args) {
         // Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
@@ -179,13 +184,14 @@ public class Puzzle {
         //pz2.addTile(0,0,Color.BLACK); // should not addTile (It exist a tile in this index) -ok
 
         // deleteTile manual tests
-        pz2.deleteTile(10,10); // should not delete (out of index) - ok
-        //pz2.deleteTile(1,1); // should not delete (THere is not a tile in this index)) - ok
+        //pz2.deleteTile(10,10); // should not delete (out of index) - ok
+        pz2.deleteTile(0,0); // should not delete (THere is not a tile in this index)) - ok
         //pz2.deleteTile(1,0); // should delete a tile - ok
         
+        pz2.addTile(0,0,'b');
         // relocateTile manual tests
-        int[] from = {0,0};
-        int[] to   = {0,1};        
+        int[] from = {0,1};
+        int[] to   = {1,1};        
         //pz2.relocateTile(from,to); // should pass     
         int[] from1 = {10,0};
         int[] to1   = {0,1};
@@ -200,10 +206,15 @@ public class Puzzle {
         int[] to4   = {0,10};
         //pz2.relocateTile(from2,to2); // should not pass wrong from column   
         // relocateTile manual tests
-        int[] from5 = {0,0};
-        int[] to5   = {1,0};        
+        int[] from5 = {1,1};
+        int[] to5   = {0,1};        
         //pz2.relocateTile(from5,to5); // should not pass, there is a tile there
-        pz2.relocateTile(from,to); // shouldn't pass, relocate an origin tile with a new tile
+        //pz2.relocateTile(from5,to5); // shouldn't pass, relocate an origin tile with a new tile
+        //pz2.relocateTile(to5,from5);
         
+        pz2.deleteTile(0,1);
+        int[] from6 = {0,1};
+        int[] to6   = {0,0};
+        //pz2.relocateTile(from2,to2); // should not pass wrong from column   
     }
 }
