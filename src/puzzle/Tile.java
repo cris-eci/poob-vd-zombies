@@ -8,6 +8,9 @@ public class Tile extends Rectangle {
     Color lightBrown = new Color(207, 126, 60);
     private int xPosition;
     private int yPosition;
+    
+    private boolean hasGlue; // Si tiene pegamento
+    private boolean isStuck; // Si está pegada a otras fichas
 
     public Tile(int size, char label, int xPosition, int yPosition, int padding) {
         this.size = size;
@@ -22,6 +25,8 @@ public class Tile extends Rectangle {
         this.setTileColor(this.label);
         this.moveHorizontal(xPosition);
         this.moveVertical(yPosition);
+        this.hasGlue = false; // Inicialmente no tiene pegamento
+        this.isStuck = false; // Inicialmente no está pegada a otras tiles
         if (!this.getTileColor().equals(lightBrown)){
             this.makeVisible();
         } else {
@@ -70,5 +75,23 @@ public class Tile extends Rectangle {
     public int getYposition(){
         return yPosition;
     }
+    
+        // Nuevos getters y setters para hasGlue e isStuck
+    public boolean hasGlue() {
+        return hasGlue;
+    }
+
+    public void setHasGlue(boolean hasGlue) {
+        this.hasGlue = hasGlue;
+    }
+
+    public boolean isStuck() {
+        return isStuck;
+    }
+
+    public void setStuck(boolean stuck) {
+        this.isStuck = stuck;
+    }
+    
     
 }
