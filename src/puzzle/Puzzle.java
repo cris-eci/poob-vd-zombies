@@ -28,20 +28,8 @@ public class Puzzle {
         this.rows = rows;
         this.cols = cols;
         this.color = lightBrown;
-
-        startingBoard = new Rectangle();
-        startingBoard.changeSize(rows * (tileSize + margin), cols * (tileSize + margin));
-        startingBoard.changeColor(color);
-        startingBoard.makeVisible();
-        startingBoard.moveHorizontal(100);
-        startingBoard.moveVertical(50);
-
-        endingBoard = new Rectangle();
-        endingBoard.changeSize(rows * (tileSize + margin), cols * (tileSize + margin));
-        endingBoard.changeColor(color);
-        endingBoard.makeVisible();
-        endingBoard.moveHorizontal(rows * (tileSize + margin) + 350);
-        endingBoard.moveVertical(50);
+        startingBoard = new Rectangle(rows * (tileSize + margin), cols * (tileSize + margin), color,100,50);
+        endingBoard = new Rectangle(rows * (tileSize + margin), cols * (tileSize + margin),color, rows * (tileSize + margin) + 350, 50);
     }
 
     // Constructor para inicializar los tableros con matrices

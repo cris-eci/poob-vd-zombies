@@ -21,18 +21,21 @@ public class Rectangle{
     private boolean isVisible;
 
     /**
-     * Create a new rectangle at default position with default color.
+     * Class extention. Create a default board rectangle
      */
-    /*
+    
     public Rectangle(){
-        height = 30;
-        width = 40;
-        xPosition = 70;
-        yPosition = 15;
-        color = "magenta";
-        isVisible = false;
     }
-    */
+    
+    public Rectangle(int height, int width, Color color, int xPosition, int yPosition){
+        this.width = width;
+        this.height = height;
+        this.color = color;
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
+        this.makeVisible();
+    }
+    
 
     /**
      * Make this rectangle visible. If it was already visible, do nothing.
