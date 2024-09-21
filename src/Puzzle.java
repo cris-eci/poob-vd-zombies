@@ -424,68 +424,6 @@ public class Puzzle {
     
     public static void main(String[] args) {
         
-        /**
-         * FIRST TEST
-         */
-        
-        /**
-        // Crear matrices de caracteres de ejemplo con 8 filas y 4 columnas
-        char[][] starting = {
-            {'b', 'b','y','b'},
-            {'y', '*','r','y'},
-            {'g','*','g','b'} 
-        };
-
-        char[][] ending = {
-            {'y', '*','*','r'},
-            {'*', 'b','g','b'},
-            {'*','g','y','*'}
-        };
-
-        // Instanciar los objetos de Puzzle
-        Puzzle pz1 = new Puzzle(3, 4); // Tablero sin matrices
-        Puzzle pz2 = new Puzzle(starting, ending); // Tablero con matrices
-        
-        //pz2.addTile(77,81,'b');
-        //pz2.addTile(0,1,'r');
-        //pz2.addTile(2,3,'b');
-        //pz2.addTile(1,1,'g');
-        
-        //pz2.addTile(0,0,Color.BLACK);
-        
-        //pz2.addGlue(0,0);
-        //pz2.addGlue(1,2);
-        
-        //pz2.removeGlue(1,2);
-        
-        //pz2.deleteTile(8,0);
-        //pz2.deleteTile(1,1);
-        
-        int[] from = {0,1};
-        int[] to   = {1,2};  
-        //pz2.relocateTile(from, to);
-        
-        int[] from1 = {2,3};
-        int[] to1   = {0,1};  
-        //pz2.relocateTile(from1, to1);
-        
-        int[] from2 = {4124,414};
-        int[] to2   = {0,131};  
-        //pz2.relocateTile(from2, to2);
-        
-        int[] from3 = {2,0};
-        int[] to3   = {0,2};  
-        //pz2.relocateTile(from3, to3);
-        
-        //pz2.tilt('r');
-        //pz2.tilt('l');
-        //pz2.tilt('u');
-        //pz2.tilt('d');
-        
-        **/
-        
-        
-        
          //SECOND TEST
         char[][] starting1 = {
         {'y', 'g', 'y', 'b', 'r', 'g', 'b', 'y', 'r', 'b'},
@@ -533,7 +471,6 @@ public class Puzzle {
         //pz4.relocateTile(from2,to2);
     
         //pz4.tilt('l');
-        //pz4.tilt('g');
-        
+        //pz4.tilt('g');                
     }
 }
