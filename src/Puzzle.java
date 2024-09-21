@@ -30,23 +30,6 @@ public class Puzzle {
         this.rows = rows;
         this.cols = cols;
         this.color = lightBrown;
-        
-        /**
-        startingBoard = new Rectangle();
-        startingBoard.changeSize(rows * (tileSize + margin), cols * (tileSize + margin));
-        startingBoard.changeColor(color);
-        startingBoard.makeVisible();
-        startingBoard.moveHorizontal(100);
-        startingBoard.moveVertical(50);
-
-        endingBoard = new Rectangle();
-        endingBoard.changeSize(rows * (tileSize + margin), cols * (tileSize + margin));
-        endingBoard.changeColor(color);
-        endingBoard.makeVisible();
-        endingBoard.moveHorizontal(rows * (tileSize + margin) + 350);
-        endingBoard.moveVertical(50);
-        **/
-        
         startingBoard = new Rectangle(rows * (tileSize + margin), cols * (tileSize + margin), color,100,50);
         endingBoard = new Rectangle(rows * (tileSize + margin), cols * (tileSize + margin),color, rows * (tileSize + margin) + 350, 50);
     }
@@ -171,19 +154,6 @@ public class Puzzle {
             showMessage("There is already a tile at the destination.", "Error");
             this.ok = false; //Error message
         } else {
-            /**
-            // Mover la instancia de la tile visualmente
-            fromTile.slowMoveHorizontal(to[1] * (tileSize + margin) - from[1] * (tileSize + margin));
-            fromTile.slowMoveVertical(to[0] * (tileSize + margin) - from[0] * (tileSize + margin));            
-            // Mover la instancia de la tile visualmente desde "to" a "from"
-            toTile.moveHorizontal(from[1] * (tileSize + margin) - to[1] * (tileSize + margin));
-            toTile.moveVertical(from[0] * (tileSize + margin) - to[0] * (tileSize + margin));
-            // Actualizar la lista de tiles: intercambiar las posiciones de las fichas
-            tiles.get(to[0]).set(to[1], fromTile);  // Mover la baldosa a la nueva posición
-            tiles.get(from[0]).set(from[1], toTile);  // La ficha original ahora es la nueva ficha vacía    
-            // Cambiar el color de la ficha que ahora está vacía
-            toTile.setTileColor('*');
-            **/
             this.relocateTileMovement(fromTile, toTile, from, to);
             this.ok = true; //Acciòn exitosa
         }        
@@ -229,62 +199,8 @@ public class Puzzle {
             this.ok = false; //Error message
     }
 }
-    //YA NO SE HACE DE FORMA RECURRENTE
-    /**
-    // Tilt down starting from the top row recursively
-    private void tiltDown(int row, int col) {
-        if (row >= rows - 1) return; // Caso base: hemos llegado al fondo
+
     
-        int[] currentPos = {row, col};
-        int[] nextPos = {row + 1, col};
-    
-        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
-            relocateTile(currentPos, nextPos); // Mueve la tile hacia abajo
-            tiltDown(row + 1, col); // Llama recursivamente
-        }
-    }
-    
-    // Tilt up starting from the bottom row recursively
-    private void tiltUp(int row, int col) {
-        if (row <= 0) return; // Caso base: hemos llegado al tope
-    
-        int[] currentPos = {row, col};
-        int[] nextPos = {row - 1, col};
-    
-        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
-            relocateTile(currentPos, nextPos); // Mueve la tile hacia arriba
-            tiltUp(row - 1, col); // Llama recursivamente
-        }
-    }
-    
-    // Tilt right starting from the left column recursively
-    private void tiltRight(int row, int col) {
-        if (col >= cols - 1) return; // Caso base: hemos llegado al extremo derecho
-    
-        int[] currentPos = {row, col};
-        int[] nextPos = {row, col + 1};
-    
-        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
-            relocateTile(currentPos, nextPos); // Mueve la tile hacia la derecha
-            tiltRight(row, col + 1); // Llama recursivamente
-        }
-    }
-    
-    // Tilt left starting from the right column recursively
-    private void tiltLeft(int row, int col) {
-        if (col <= 0) return; // Caso base: hemos llegado al extremo izquierdo
-    
-        int[] currentPos = {row, col};
-        int[] nextPos = {row, col - 1};
-    
-        if (isTileEmpty(tiles.get(nextPos[0]).get(nextPos[1]))) {
-            relocateTile(currentPos, nextPos); // Mueve la tile hacia la izquierda
-            tiltLeft(row, col - 1); // Llama recursivamente
-        }
-    }
-    **/
-        
-    //AHORA DE FORMA ITERATIVA
     
     // Tilt down starting from the top row recursively
     private void tiltDown(int row, int col) {
