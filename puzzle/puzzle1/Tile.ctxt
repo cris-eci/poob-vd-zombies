@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Tile
+comment1.params=size\ label\ xPosition\ yPosition\ padding\ row\ col
+comment1.target=Tile(int,\ char,\ int,\ int,\ int,\ int,\ int)
+comment2.params=label
+comment2.target=void\ setTileColor(char)
+comment3.params=
+comment3.target=java.awt.Color\ getTileColor()
+comment4.params=
+comment4.target=int\ getRow()
+comment5.params=
+comment5.target=int\ getCol()
+comment6.params=
+comment6.target=char\ getLabel()
+comment7.params=
+comment7.target=void\ applyGlue()
+comment8.params=
+comment8.target=void\ removeGlue()
+comment9.params=
+comment9.target=boolean\ isGlueApplied()
+numComments=10
