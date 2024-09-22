@@ -7,17 +7,21 @@ public class Tile extends Rectangle {
     private int padding; // Padding interno
     private int row; // Fila de la baldosa
     private int col; // Columna de la baldosa
-    private boolean glueApplied;   // Indica si el pegante está aplicado
+    private boolean hasGlue = false;
+    private boolean isStuck = false;
+    private boolean visited = false; // For tracking during tilt
+    private Color originalColor;
     
     
     
     public Tile(int size, char label, int xPosition, int yPosition, int padding, int row, int col) {
+        //super(size, size, Color.WHITE, xPosition, yPosition);
         this.size = size;
         this.padding = padding; // Inicializa el padding
         this.label = label;
         this.row = row;
         this.col = col;
-        this.glueApplied = false;  // Inicializa sin pegante
+      
         int effectiveSize = size - 2 * padding; // Tamaño efectivo después de aplicar padding
 
         // Cambia el tamaño del rectángulo para reflejar el padding
@@ -32,7 +36,7 @@ public class Tile extends Rectangle {
     
     public void setTileColor(char label){
         Color lightBrown = new Color(207, 126, 60);
-        
+
         switch (label) {
             case 'r':
                 color = Color.RED;
@@ -48,12 +52,12 @@ public class Tile extends Rectangle {
                 break;
             case 'n':
                 color = lightBrown;
-                break;                
+                break;
             default:
                 color = lightBrown;
-                
         }
-        
+
+        this.originalColor = color;
         this.changeColor(this.color);
     }
     
@@ -61,7 +65,41 @@ public class Tile extends Rectangle {
         return this.color;
     }
     
-    // Métodos getter para fila y columna
+    // New method to set the color directly
+    public void setTileColor(Color newColor) {
+        this.color = newColor;
+        this.changeColor(newColor);
+    }
+
+    // Methods to manage glue and stuck states
+    public boolean hasGlue() {
+        return hasGlue;
+    }
+
+    public void setHasGlue(boolean hasGlue) {
+        this.hasGlue = hasGlue;
+    }
+
+    public boolean isStuck() {
+        return isStuck;
+    }
+
+    public void setIsStuck(boolean isStuck) {
+        this.isStuck = isStuck;
+    }
+
+    public Color getOriginalColor() {
+        return originalColor;
+    }
+
+    public void setRow(int newRow) {
+        this.row = newRow;
+    }
+
+    public void setCol(int newCol) {
+        this.col = newCol;
+    }
+
     public int getRow() {
         return row;
     }
@@ -73,30 +111,17 @@ public class Tile extends Rectangle {
     public char getLabel() {
         return label;
     }
-    
-    
-    // Método para aplicar pegante
-    public void applyGlue() {
-        if (!this.glueApplied) {
-            this.glueApplied = true;
-            this.changeColor(Color.GRAY);  // Cambia el color a gris para mostrar que tiene pegante
-        } else {
-            System.out.println("La baldosa ya tiene pegamento.");
-        }
+
+    public void setLabel(char newLabel) {
+        this.label = newLabel;
     }
 
-    // Método para remover pegante, solo si está aplicado
-    public void removeGlue() {
-        if (this.glueApplied) {
-            this.glueApplied = false;   // Quita el estado de pegante
-            this.changeColor(this.color);  // Restaura el color original de la baldosa
-        } else {
-            System.out.println("No hay pegamento aplicado.");
-        }
+    // For tracking during tilt
+    public boolean isVisited() {
+        return visited;
     }
 
-    // Método para verificar si el pegante está aplicado
-    public boolean isGlueApplied() {
-        return glueApplied;
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }
