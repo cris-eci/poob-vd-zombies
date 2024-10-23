@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.target=PuzzleCC2Test
+comment0.text=\r\n\ Unit\ test\ class\ for\ the\ Puzzle\ class.\r\n\ Robust\ tests\ covering\ all\ cycle\ 2\ methods.\r\n\ \r\n\ @version\r\n
+comment1.params=
+comment1.target=void\ setUp()
+comment2.params=
+comment2.target=void\ testPuzzleConstructorWithDimensions()
+comment2.text=\r\n\ Robust\ test\ for\ the\ Puzzle(int\ h,\ int\ w)\ constructor.\r\n\ This\ test\ covers\ all\ cycle\ 2\ methods.\r\n
+comment3.params=
+comment3.target=void\ testPuzzleConstructorWithStartingAndEndingMatrices()
+comment3.text=\r\n\ Robust\ test\ for\ the\ Puzzle(char[][]\ starting,\ char[][]\ ending)\ constructor.\r\n\ This\ test\ covers\ all\ cycle\ 2\ methods.\r\n
+comment4.params=
+comment4.target=void\ testPuzzleConstructorWithEndingMatrix()
+comment4.text=\r\n\ Robust\ test\ for\ the\ Puzzle(char[][]\ ending)\ constructor.\r\n\ This\ test\ covers\ all\ cycle\ 2\ methods.\r\n
+numComments=5
