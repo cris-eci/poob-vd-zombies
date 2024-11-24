@@ -1,0 +1,17 @@
+-- winner attribute - who is the winner. in controller class. 
+-- Board class - amount of rows and columns
+-- counter attribute to count the amount of points
+
+
+
+
+-- rounds attribute to count the amount of rounds
+
+git commit -m "Delete Difficulty attribute from POOBvsZombies, add winner attribute to it. 
+
+
+Add resource counter to handle sun amount and character's suns amount within. 
+
+
+
+Al principio, 
