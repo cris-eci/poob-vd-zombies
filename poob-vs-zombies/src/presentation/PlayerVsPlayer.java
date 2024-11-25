@@ -3,7 +3,6 @@ import java.awt.*;
 import java.net.URL;
 import javax.swing.*;
 
-
 public class PlayerVsPlayer extends JFrame {
 
     public PlayerVsPlayer() {
@@ -15,7 +14,57 @@ public class PlayerVsPlayer extends JFrame {
 
         // Establecer el fondo con la imagen
         BackgroundPanel backgroundPanel = new BackgroundPanel();
+        backgroundPanel.setLayout(null); // Para poder posicionar los componentes de forma absoluta
         setContentPane(backgroundPanel);
+
+        // Crear y agregar los labels y text fields necesarios
+        addComponents(backgroundPanel);
+    }
+
+    private void addComponents(JPanel panel) {
+        // Label "Player One"
+        JLabel playerOneLabel = new JLabel("Player One");
+        playerOneLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        playerOneLabel.setForeground(Color.WHITE);
+        playerOneLabel.setBounds(200, 250, 150, 30);
+        panel.add(playerOneLabel);
+
+        // Text Field para el nombre del Jugador Uno
+        JTextField playerOneName = new JTextField();
+        playerOneName.setBounds(200, 290, 200, 30);
+        panel.add(playerOneName);
+
+        // Label "Player Two"
+        JLabel playerTwoLabel = new JLabel("Player Two");
+        playerTwoLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        playerTwoLabel.setForeground(Color.WHITE);
+        playerTwoLabel.setBounds(500, 250, 150, 30);
+        panel.add(playerTwoLabel);
+
+        // Text Field para el nombre del Jugador Dos
+        JTextField playerTwoName = new JTextField();
+        playerTwoName.setBounds(500, 290, 200, 30);
+        panel.add(playerTwoName);
+
+        // Botón para empezar
+        JButton startButton = new JButton("¡START!");
+        startButton.setFont(new Font("Arial", Font.BOLD, 20));
+        startButton.setBounds(375, 400, 150, 50);
+        panel.add(startButton);
+
+        // Label "Select your plants" para Player One
+        JLabel selectPlantsLabel = new JLabel("Select your plants");
+        selectPlantsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        selectPlantsLabel.setForeground(Color.WHITE);
+        selectPlantsLabel.setBounds(100, 150, 150, 30);
+        panel.add(selectPlantsLabel);
+
+        // Label "Select your zombies" para Player Two
+        JLabel selectZombiesLabel = new JLabel("Select your zombies");
+        selectZombiesLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        selectZombiesLabel.setForeground(Color.WHITE);
+        selectZombiesLabel.setBounds(700, 150, 150, 30);
+        panel.add(selectZombiesLabel);
     }
 
     // Panel personalizado para pintar la imagen de fondo
