@@ -32,6 +32,23 @@ public class PlayerVsPlayer extends JFrame {
         playerOneName.setBackground(new Color(228, 206, 171));
         playerOneName.setForeground(new Color(134, 119, 94)); // Color del texto
         panel.add(playerOneName);
+        // Añadir un FocusListener para el JTextField de nombre del Jugador Uno
+        playerOneName.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (playerOneName.getText().equals("Name player one")) {
+                    playerOneName.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (playerOneName.getText().isEmpty()) {
+                    playerOneName.setText("Name player one");
+                }
+            }
+        });
+
 
         // Text Field para el nombre del Jugador Dos
         JTextField playerTwoName = new JTextField("Name player two");
@@ -41,6 +58,23 @@ public class PlayerVsPlayer extends JFrame {
         playerTwoName.setBackground(new Color(228, 206, 171));
         playerTwoName.setForeground(new Color(134, 119, 94)); // Color del texto
         panel.add(playerTwoName);
+        
+        // Añadir un FocusListener para el JTextField de nombre del Jugador Dos
+        playerTwoName.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (playerTwoName.getText().equals("Name player two")) {
+                    playerTwoName.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (playerTwoName.getText().isEmpty()) {
+                    playerTwoName.setText("Name player two");
+                }
+            }
+        });
 
         // Text Field para el tiempo de la partida
         JTextField matchTime = new JTextField("Time");
@@ -50,7 +84,22 @@ public class PlayerVsPlayer extends JFrame {
         matchTime.setBackground(new Color(228, 206, 171));
         matchTime.setForeground(new Color(134, 119, 94)); // Color del texto
         panel.add(matchTime);
+        // Añadir un FocusListener para el JTextField de tiempo de partida
+        matchTime.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+            if (matchTime.getText().equals("Time")) {
+                matchTime.setText("");
+            }
+            }
 
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+            if (matchTime.getText().isEmpty()) {
+                matchTime.setText("Time");
+            }
+            }
+        });
         // Botón para empezar
         JButton startButton = new JButton("¡START!");
         startButton.setBounds(462, 449, 160, 30);
@@ -220,6 +269,22 @@ public class PlayerVsPlayer extends JFrame {
         setSunsField.setForeground(Color.WHITE); // Asegúrate de que el texto sea legible
         setSunsField.setBorder(null); // Eliminar borde
         panel.add(setSunsField);
+        // Añadir un FocusListener para el JTextField de soles
+        setSunsField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+            if (setSunsField.getText().equals("Amount of suns")) {
+                setSunsField.setText("");
+            }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+            if (setSunsField.getText().isEmpty()) {
+                setSunsField.setText("Amount of suns");
+            }
+            }
+        });
 
         // Botón "Set Initial amount of brains" para Player Two
         // Botón "Set Initial amount of brains" convertido en JTextField para Player Two
@@ -230,6 +295,22 @@ public class PlayerVsPlayer extends JFrame {
         setBrainsField.setForeground(Color.WHITE); // Texto en blanco
         setBrainsField.setBorder(null); // Eliminar borde
         panel.add(setBrainsField);
+        // Añadir un FocusListener para el JTextField de cerebros
+        setBrainsField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (setBrainsField.getText().equals("Amount of brains")) {
+                    setBrainsField.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (setBrainsField.getText().isEmpty()) {
+                    setBrainsField.setText("Amount of brains");
+                }
+            }
+        });
 
     }
 
