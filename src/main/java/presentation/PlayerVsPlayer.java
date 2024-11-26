@@ -1,8 +1,18 @@
 package presentation;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
 
-import java.awt.*;
-import java.net.URL;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class PlayerVsPlayer extends JFrame {
 
@@ -119,67 +129,65 @@ public class PlayerVsPlayer extends JFrame {
         selectPlantsLabel.setBounds(46, 405, 150, 30);
         panel.add(selectPlantsLabel);
 
-        // Crear un panel para contener los JPanels de las plantas
+        // Reemplaza la sección que agrega las plantas y zombies en tu código `PlayerVsPlayer` con lo siguiente:
+
+        // Crear y agregar los JPanels para las plantas
         JPanel plantsPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 filas, 2 columnas, espacio de 10px
         plantsPanel.setBounds(65, 440, 100, 160); // Ajusta la posición y tamaño según sea necesario
         plantsPanel.setOpaque(false); // Hacer el panel transparente para ver el fondo
 
-        // Rutas de las imágenes de las plantas
         String[] plantImages = {
-            "/presentation/img/entities/characters/plants/Sunflower.jpg",
-            "/presentation/img/entities/characters/plants/Peashooter.jpg",
-            "/presentation/img/entities/characters/plants/Wall-nut.jpg",
-            "/presentation/img/entities/characters/plants/Potato_Mine.jpg",
-            "/presentation/img/entities/characters/plants/ECIPlant.png"            
-            
+            "resources/images/plants/Sunflower/Sunflower.jpg",
+            "resources/images/plants/Peashooter/Peashooter.jpg",
+            "resources/images/plants/WallNut/Wall-nut.jpg",
+            "resources/images/plants/PotatoMine/Potato_Mine.jpg",
+            "resources/images/plants/ECIPlant/ECIPlant.png"
         };
 
-        // Crear y agregar los 5 JPanels con la imagen de fondo
+        // Crear y agregar los JPanels con imágenes de las plantas
         for (String imagePath : plantImages) {
             JPanel plantPanel = new JPanel() {
-            private Image backgroundImage;
-            private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
+                private Image backgroundImage;
+                private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido inicial
 
-            {
-                // Cargar la imagen desde la ruta especificada
-                URL imageUrl = getClass().getResource(imagePath);
-                if (imageUrl != null) {
-                ImageIcon icon = new ImageIcon(imageUrl);
-                backgroundImage = icon.getImage();
+                {
+                    // Cargar la imagen desde la ruta especificada
+                    ImageIcon icon = new ImageIcon(imagePath);
+                    backgroundImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+                    // Añadir un MouseListener para alternar el color al hacer clic
+                    addMouseListener(new java.awt.event.MouseAdapter() {
+                        @Override
+                        public void mouseClicked(java.awt.event.MouseEvent e) {
+                            if (overlayColor.equals(new Color(255, 0, 0, 128))) {
+                                overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
+                            } else {
+                                overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
+                            }
+                            repaint(); // Repintar para actualizar el color
+                        }
+                    });
                 }
 
-                // Añadir un MouseListener para cambiar el color al hacer clic
-                addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    if (overlayColor.equals(new Color(255, 0, 0, 128))) {
-                    overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
-                    } else {
-                    overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    // Dibujar la imagen de fondo
+                    if (backgroundImage != null) {
+                        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
                     }
-                    repaint();
+                    // Dibujar el rectángulo translúcido
+                    g.setColor(overlayColor);
+                    g.fillRect(0, 0, getWidth(), getHeight());
                 }
-                });
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // Dibujar la imagen en todo el fondo del panel
-                if (backgroundImage != null) {
-                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                }
-                // Dibujar el rectángulo translúcido
-                g.setColor(overlayColor);
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
             };
-            plantPanel.setPreferredSize(new Dimension(50, 50)); // Ajustar el tamaño de cada panel
-            plantPanel.setOpaque(false); // Hacer el panel transparente para ver el fondo
-            plantsPanel.add(plantPanel);
-        }
 
+            plantPanel.setPreferredSize(new Dimension(50, 50));
+            plantPanel.setOpaque(false); // Transparente para ver el fondo
+            plantsPanel.add(plantPanel); // Agregar el panel al contenedor de plantas
+        }
         panel.add(plantsPanel);
+
 
         // Label "Select your zombies" para Player Two
         JLabel selectZombiesLabel = new JLabel("Select your zombies");
@@ -204,61 +212,58 @@ public class PlayerVsPlayer extends JFrame {
         zombiesPanel.setBounds(710, 440, 100, 160); // Ajusta la posición y tamaño según sea necesario
         zombiesPanel.setOpaque(false); // Hacer el panel transparente para ver el fondo
 
-        // Rutas de las imágenes de los zombies
         String[] zombieImages = {
-            "/presentation/img/entities/characters/zombies/Basic.jpg",            
-            "/presentation/img/entities/characters/zombies/Conehead.jpg",
-            "/presentation/img/entities/characters/zombies/Buckethead.jpg",                                    
-            "/presentation/img/entities/characters/zombies/ECIZombie.png",
-            "/presentation/img/entities/characters/zombies/brainsteinGarden.jpeg"
+            "resources/images/zombies/Basic/Basic.jpg",
+            "resources/images/zombies/Conehead/Conehead.jpg",
+            "resources/images/zombies/BucketHead/Buckethead.jpg",
+            "resources/images/zombies/ECIZombie/ECIZombie.png",
+            "resources/images/zombies/Brainstein/brainsteinGarden.jpeg"
         };
 
-        // Crear y agregar los 5 JPanels con la imagen de fondo
+        // Crear y agregar los JPanels con imágenes de los zombies
         for (String imagePath : zombieImages) {
             JPanel zombiePanel = new JPanel() {
-            private Image backgroundImage;
-            private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
+                private Image backgroundImage;
+                private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido inicial
 
-            {
-                // Cargar la imagen desde la ruta especificada
-                URL imageUrl = getClass().getResource(imagePath);
-                if (imageUrl != null) {
-                ImageIcon icon = new ImageIcon(imageUrl);
-                backgroundImage = icon.getImage();
+                {
+                    // Cargar la imagen desde la ruta especificada
+                    ImageIcon icon = new ImageIcon(imagePath);
+                    backgroundImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+                    // Añadir un MouseListener para alternar el color al hacer clic
+                    addMouseListener(new java.awt.event.MouseAdapter() {
+                        @Override
+                        public void mouseClicked(java.awt.event.MouseEvent e) {
+                            if (overlayColor.equals(new Color(255, 0, 0, 128))) {
+                                overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
+                            } else {
+                                overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
+                            }
+                            repaint();
+                        }
+                    });
                 }
 
-                // Añadir un MouseListener para cambiar el color al hacer clic
-                addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    if (overlayColor.equals(new Color(255, 0, 0, 128))) {
-                    overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
-                    } else {
-                    overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    // Dibujar la imagen de fondo
+                    if (backgroundImage != null) {
+                        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
                     }
-                    repaint();
+                    // Dibujar el rectángulo translúcido
+                    g.setColor(overlayColor);
+                    g.fillRect(0, 0, getWidth(), getHeight());
                 }
-                });
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // Dibujar la imagen en todo el fondo del panel
-                if (backgroundImage != null) {
-                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                }
-                // Dibujar el rectángulo translúcido
-                g.setColor(overlayColor);
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
             };
-            zombiePanel.setPreferredSize(new Dimension(50, 50)); // Ajustar el tamaño de cada panel
-            zombiePanel.setOpaque(false); // Hacer el panel transparente para ver el fondo
+
+            zombiePanel.setPreferredSize(new Dimension(50, 50));
+            zombiePanel.setOpaque(false);
             zombiesPanel.add(zombiePanel);
         }
-
         panel.add(zombiesPanel);
+
 
         // Botón "Set Initial amount of suns" para Player One
         // Crear un JTextField para ingresar el monto inicial de soles
@@ -320,17 +325,14 @@ public class PlayerVsPlayer extends JFrame {
 
         public BackgroundPanel() {
             // Cargar la imagen desde la ruta especificada
-            URL imageUrl = getClass().getResource("/presentation/img/pvsp.png");
-            if (imageUrl != null) {
-                ImageIcon icon = new ImageIcon(imageUrl);
-                backgroundImage = icon.getImage();
-            }
+            backgroundImage = new ImageIcon("resources/images/menu/PlayerVsPlayerMenu.png").getImage();
+            setLayout(null); // Configurar el layout del panel
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            // Dibujar la imagen en todo el fondo del panel
+            // Dibujar la imagen en el fondo del panel
             if (backgroundImage != null) {
                 g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
             }
