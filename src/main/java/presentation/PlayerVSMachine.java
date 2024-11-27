@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,7 +16,7 @@ import javax.swing.SwingUtilities;
 public class PlayerVSMachine extends JFrame {
     private JButton playerNameButton, timeButton, numberButton;
     private JButton startButton;
-    private JButton[] plantButtons;
+    private JPanel[] plantPanels; // Array para almacenar los paneles de plantas
 
     public PlayerVSMachine() {
         // Configurar el JFrame
@@ -39,30 +38,23 @@ public class PlayerVSMachine extends JFrame {
         };
         panel.setLayout(null);
 
-
-
         // Crear un JLabel para el texto con saltos de línea
         JLabel infoLabel = new JLabel("<html>"
-        + "Machine will adopt its original<br>"
-        + "behavior from PvsZ original game.<br>"
-        + "You can configure your name, hordes <br>"
-        + "duration and number. You can also <br>"
-        + "select your plants to play. Have fun!"
-        + "</html>");
-
-        // Configurar posición y estilo del JLabel
-        infoLabel.setBounds(485, 215, 500, 100); // Ajustar posición y tamaño
-        infoLabel.setForeground(Color.WHITE); // Texto blanco
+                + "Machine will adopt its original<br>"
+                + "behavior from PvsZ original game.<br>"
+                + "You can configure your name, hordes <br>"
+                + "duration and number. You can also <br>"
+                + "select your plants to play. Have fun!"
+                + "</html>");
+        infoLabel.setBounds(485, 215, 500, 100);
+        infoLabel.setForeground(Color.WHITE);
         infoLabel.setFont(new Font("Arial", Font.PLAIN, 10));
 
-
-        //Crear Select Plant text
+        // Crear texto "SELECT PLANTS"
         JLabel selectPlant = new JLabel("<html>SELECT PLANTS</html>");
-
-        selectPlant.setBounds(385,525,500,100);
+        selectPlant.setBounds(385, 525, 500, 100);
         selectPlant.setForeground(Color.WHITE);
-        selectPlant.setFont(new Font("Arial",Font.PLAIN,9));
-
+        selectPlant.setFont(new Font("Arial", Font.PLAIN, 9));
 
         // PlayerName
         JLabel playerNameLabel = new JLabel("PlayerName:");
@@ -96,6 +88,23 @@ public class PlayerVSMachine extends JFrame {
         startButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Game Starting!\nPlayer: " + playerNameButton.getText() +
                     "\nTime: " + timeButton.getText() + "\nNumber: " + numberButton.getText());
+
+            // Crear una lista para las plantas seleccionadas
+            java.util.List<String> selectedPlants = new java.util.ArrayList<>();
+
+            // Recorrer los paneles de selección de plantas para identificar los seleccionados
+            for (int i = 0; i < plantPanels.length; i++) {
+                PlantPanel plantPanel = (PlantPanel) plantPanels[i];
+                if (plantPanel.isSelected()) {
+                    selectedPlants.add(plantPanel.getPlantPath());
+                }
+            }
+
+            // Abrir el menú del jardín con las plantas seleccionadas
+            new GardenMenu(selectedPlants.toArray(new String[0])).setVisible(true);
+
+            // Cerrar el menú actual
+            dispose();
         });
 
         // FlowLayout para las plantas
@@ -106,68 +115,25 @@ public class PlayerVSMachine extends JFrame {
 
         // Ruta específica para cada botón de planta
         String[] plantImages = {
-            "resources/images/plants/Sunflower/Sunflower.jpg",
-            "resources/images/plants/Peashooter/Peashooter.jpg",
-            "resources/images/plants/WallNut/Wall-nut.jpg",
-            "resources/images/plants/PotatoMine/Potato_Mine.jpg",
-            "resources/images/plants/ECIPlant/ECIPlant.png"
+                "resources/images/plants/Sunflower/Sunflower.jpg",
+                "resources/images/plants/Peashooter/Peashooter.jpg",
+                "resources/images/plants/WallNut/Wall-nut.jpg",
+                "resources/images/plants/PotatoMine/Potato_Mine.jpg",
+                "resources/images/plants/ECIPlant/ECIPlant.png"
         };
 
-        // Inicializar el array de botones
-        plantButtons = new JButton[5];
+        // Inicializar el array de paneles de plantas
+        plantPanels = new PlantPanel[5];
 
         // Asignar imágenes específicas a cada botón
-        for (int i = 0; i < 5; i++) {
-            // Declarar una variable final para capturar el valor de i
-            final int index = i;
-
-            // Crear un JPanel personalizado para cada planta
-            JPanel plantPanel = new JPanel() {
-                private Image plantImage;
-                private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido inicial
-
-                {
-                    // Cargar la imagen desde la ruta especificada
-                    ImageIcon icon = new ImageIcon(plantImages[index]);
-                    plantImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Escalar imagen
-
-                    // Añadir un MouseListener para alternar el color al hacer clic
-                    addMouseListener(new java.awt.event.MouseAdapter() {
-                        @Override
-                        public void mouseClicked(java.awt.event.MouseEvent e) {
-                            if (overlayColor.equals(new Color(255, 0, 0, 128))) {
-                                overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
-                            } else {
-                                overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
-                            }
-                            repaint(); // Repintar el panel para reflejar el cambio
-                        }
-                    });
-                }
-
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    // Dibujar la imagen en el fondo del panel
-                    if (plantImage != null) {
-                        g.drawImage(plantImage, 0, 0, getWidth(), getHeight(), this);
-                    }
-                    // Dibujar el rectángulo translúcido superpuesto
-                    g.setColor(overlayColor);
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                }
-            };
-
-            plantPanel.setPreferredSize(new Dimension(50, 50)); // Tamaño de cada panel
-            plantPanel.setOpaque(false); // Transparencia para mostrar la imagen
-            plantSelectionPanel.add(plantPanel); // Agregar el panel al contenedor de selección
+        for (int i = 0; i < plantImages.length; i++) {
+            // Crear panel personalizado de planta
+            PlantPanel plantPanel = new PlantPanel(plantImages[i]);
+            plantPanels[i] = plantPanel; // Guardar en el array para uso posterior
+            plantSelectionPanel.add(plantPanel); // Agregar al contenedor principal
         }
 
-
-
-
-
-        // Agregar componentes al panel
+        // Agregar componentes al panel principal
         panel.add(infoLabel);
         panel.add(selectPlant);
         panel.add(playerNameLabel);
@@ -229,6 +195,44 @@ public class PlayerVSMachine extends JFrame {
         startButton.setEnabled(allFieldsFilled);
     }
 
+    // Clase PlantPanel que representa cada panel de planta y maneja su selección
+    class PlantPanel extends JPanel {
+        private boolean selected = false;
+        private Image plantImage;
+        private String plantPath;
+
+        public PlantPanel(String imagePath) {
+            this.plantPath = imagePath;
+            plantImage = new ImageIcon(imagePath).getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+            setPreferredSize(new Dimension(50, 50));
+            setOpaque(false);
+
+            // Cambiar el estado de selección al hacer clic
+            addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    selected = !selected; // Alternar estado
+                    repaint();
+                }
+            });
+        }
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public String getPlantPath() {
+            return plantPath;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(plantImage, 0, 0, getWidth(), getHeight(), this);
+            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255, 0, 0, 128));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

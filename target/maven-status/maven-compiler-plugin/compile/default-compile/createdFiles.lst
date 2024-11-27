@@ -1,9 +1,9 @@
-presentation\PlayerVSMachine$2.class
 presentation\PlayerVsPlayer$5.class
 presentation\MainMenu$1.class
 presentation\PlayerVsPlayer$BackgroundPanel.class
 presentation\PlayerVSMachine$1.class
 presentation\PlayerVsPlayer$4$1.class
+presentation\GardenMenu.class
 presentation\PlayerVsPlayer$3.class
 presentation\PlayerVsPlayer$5$1.class
 presentation\PlayerVsPlayer$4.class
@@ -13,6 +13,8 @@ presentation\PlayerVsPlayer$2.class
 presentation\PlayerVsPlayer.class
 presentation\PlayerVSMachine.class
 presentation\PlayerVsPlayer$7.class
+presentation\PlayerVSMachine$PlantPanel$1.class
+presentation\PlayerVSMachine$PlantPanel.class
 presentation\PlayerVsPlayer$1.class
-presentation\PlayerVSMachine$2$1.class
+presentation\GardenMenu$1.class
 presentation\PlayerVsPlayer$6.class
