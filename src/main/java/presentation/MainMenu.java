@@ -1,4 +1,5 @@
 package presentation;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -12,21 +13,21 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
-public class MainMenu {
+public class MainMenu extends JFrame {
 
-    public static void main(String[] args) {
-        // Create the main frame
-        JFrame frame = new JFrame("POOBvsZombies");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 700);
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null); // Center the window on the screen
+    public MainMenu() {
+        setTitle("POOBvsZombies");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(900, 700);
+        setResizable(false);
+        setLocationRelativeTo(null); // Center the window on the screen
 
         // Custom panel with background image
         JPanel panel = new JPanel() {
             Image backgroundImage = new ImageIcon("resources/images/menu/modalityMenu.png").getImage();
- 
+
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -45,32 +46,27 @@ public class MainMenu {
         panel.add(playerVsMachineButton);
         panel.add(machineVsMachineButton);
 
-        
         // Add action listeners for each button
         PlayerVsPlayerButton.addActionListener(e -> {
             // Open Player vs Player Menu
             PlayerVsPlayer PlayerVsPlayerMenu = new PlayerVsPlayer();
             PlayerVsPlayerMenu.setVisible(true);
-            frame.dispose(); 
-            // Aquí podrías abrir el menú correspondiente
+            dispose(); 
         });
-
 
         playerVsMachineButton.addActionListener(e -> {
             // Open Player vs Machine Menu
             PlayerVSMachine playerVsMachineMenu = new PlayerVSMachine();
             playerVsMachineMenu.setVisible(true);
-            frame.dispose(); // Close the main menu
+            dispose(); // Close the main menu
         });
 
         machineVsMachineButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, "Opening Machine vs Machine Menu");
-            // Aquí podrías abrir el menú correspondiente
+            JOptionPane.showMessageDialog(this, "Opening Machine vs Machine Menu");
         });
 
         // Add panel to frame
-        frame.add(panel);
-        frame.setVisible(true);
+        add(panel);
     }
 
     // Helper method to create buttons with consistent styling
@@ -102,5 +98,10 @@ public class MainMenu {
         return button;
     }
 
-    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            MainMenu mainMenu = new MainMenu();
+            mainMenu.setVisible(true);
+        });
+    }
 }

@@ -18,6 +18,7 @@ public class GardenMenu extends JFrame {
         this.selectedPlants = selectedPlants;
         setTitle("Garden Menu");
         setSize(900, 700);
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -44,6 +45,9 @@ public class GardenMenu extends JFrame {
 
         // Añadir el botón "Use Shovel" debajo de la pala
         addUseShovelButton(panel);
+
+        //Añadir las imágenes para regresar al menú principal, back, save and export
+        addTopRightButtons(panel);
 
         add(panel);
     }
@@ -149,7 +153,7 @@ public class GardenMenu extends JFrame {
                 JPanel cellPanel = new JPanel(new BorderLayout());
                 cellPanel.setPreferredSize(new Dimension(80, 80));
                 cellPanel.setOpaque(false);
-                cellPanel.setBorder(new LineBorder(Color.BLACK, 1)); // Añadir borde negro a cada celda
+                cellPanel.setBorder(new LineBorder(new Color(0,0,0,0), 1)); // Añadir borde negro a cada celda
 
                 if (col == 0) {
                     // Añadir la podadora a la primera columna de cada fila
@@ -203,7 +207,7 @@ public class GardenMenu extends JFrame {
 
     private void addUseShovelButton(JPanel panel) {
         JButton useShovelButton = new JButton("Use Shovel");
-        useShovelButton.setBounds(580, 28, 100, 50);
+        useShovelButton.setBounds(580, 55, 100, 30);
         useShovelButton.addActionListener(e -> {
             // Mostrar el JOptionPane para ingresar fila y columna
             JTextField rowField = new JTextField(2);
@@ -246,6 +250,50 @@ public class GardenMenu extends JFrame {
         panel.add(useShovelButton);
     }
 
+    private void addTopRightButtons(JPanel panel) {
+        String[] buttonImagePaths = {
+            "resources/images/buttons/export-icon.png",     // Exportar
+            "resources/images/buttons/save-icon.png",       // Salvar
+            "resources/images/buttons/return-icon.png",     // Regresar
+            "resources/images/buttons/home-icon.png"        // Volver al menú principal
+        };
+    
+        int x = 660;
+        int y = 5;
+        int buttonSize = 40;
+    
+        for (String imagePath : buttonImagePaths) {
+            ImageIcon icon = new ImageIcon(imagePath);
+            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+            button.setBounds(x, y, buttonSize, buttonSize);
+            button.setContentAreaFilled(false);
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+    
+            // Añadir eventos de acción a los botones
+            if (imagePath.contains("return-icon")) {
+                button.addActionListener(e -> {
+                    // Volver al menú de "Player vs Machine"
+                    dispose(); // Cierra la ventana actual
+                    PlayerVSMachine pvmMenu = new PlayerVSMachine(); // Abre la ventana de "Player vs Machine"
+                    pvmMenu.setVisible(true);
+                });
+            } 
+            
+            if (imagePath.contains("home-icon")) {
+                button.addActionListener(e -> {
+                    // Volver al menú principal
+                    dispose(); // Cierra la ventana actual
+                    MainMenu mainMenu = new MainMenu(); // Abre la ventana principal
+                    mainMenu.setVisible(true);
+                });
+            }
+    
+            panel.add(button);
+            x += 60; // Ajustar la posición X para el siguiente botón
+        }
+    }
+    
     // Clase auxiliar para manejar el objeto Transferable de tipo imagen
     private class ImageSelection implements Transferable {
         private ImageIcon image;
