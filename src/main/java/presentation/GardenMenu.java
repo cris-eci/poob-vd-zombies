@@ -12,6 +12,7 @@ public class GardenMenu extends JFrame {
     private String[] selectedPlants;
     private JLabel shovelLabel;
     private Point originalShovelPosition;
+    private JPanel[][] gridCells = new JPanel[5][10];
 
     public GardenMenu(String[] selectedPlants) {
         this.selectedPlants = selectedPlants;
@@ -41,6 +42,9 @@ public class GardenMenu extends JFrame {
         // Añadir el GridLayout de 5x10 para las celdas
         addGridLayout(panel);
 
+        // Añadir el botón "Use Shovel" debajo de la pala
+        addUseShovelButton(panel);
+
         add(panel);
     }
 
@@ -58,7 +62,7 @@ public class GardenMenu extends JFrame {
         String[] plantDragImages = {
             "resources/images/plants/Sunflower/sunflowerAnimated.gif",
             "resources/images/plants/Peashooter/peashooterAnimated.gif",
-            "resources/images/plants/WallNut/Wall-nut.jpg",
+            "resources/images/plants/WallNut/Wall-nut.png",
             "resources/images/plants/PotatoMine/beforePotatoMine.png",
             "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
         };
@@ -127,43 +131,6 @@ public class GardenMenu extends JFrame {
         shovelLabel.setBounds(520, 28, 50, 50); // Colocar en la esquina superior derecha
         originalShovelPosition = shovelLabel.getLocation();
 
-        // Añadir funcionalidad de arrastrar manualmente la pala
-        shovelLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                shovelLabel.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                shovelLabel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                Rectangle shovelBounds = shovelLabel.getBounds();
-                Component component = SwingUtilities.getDeepestComponentAt(getContentPane(), shovelBounds.x + shovelBounds.width / 2, shovelBounds.y + shovelBounds.height / 2);
-
-                if (component instanceof JPanel) {
-                    JPanel cell = (JPanel) component;
-                    if (cell.getComponentCount() > 0) {
-                        // Si hay una planta, eliminarla
-                        cell.removeAll();
-                        cell.revalidate();
-                        cell.repaint();
-                    }
-                }
-                // Devolver la pala a su posición original
-                shovelLabel.setLocation(originalShovelPosition);
-            }
-        });
-
-        shovelLabel.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Point location = shovelLabel.getLocation();
-                int x = location.x + e.getX() - shovelLabel.getWidth() / 2;
-                int y = location.y + e.getY() - shovelLabel.getHeight() / 2;
-                shovelLabel.setLocation(x, y);
-            }
-        });
-
         panel.add(shovelLabel);
     }
 
@@ -226,11 +193,57 @@ public class GardenMenu extends JFrame {
                     });
                 }
 
+                gridCells[row][col] = cellPanel; // Guardar la referencia de la celda
                 gridPanel.add(cellPanel);
             }
         }
 
         panel.add(gridPanel);
+    }
+
+    private void addUseShovelButton(JPanel panel) {
+        JButton useShovelButton = new JButton("Use Shovel");
+        useShovelButton.setBounds(580, 28, 100, 50);
+        useShovelButton.addActionListener(e -> {
+            // Mostrar el JOptionPane para ingresar fila y columna
+            JTextField rowField = new JTextField(2);
+            JTextField colField = new JTextField(2);
+            JPanel inputPanel = new JPanel();
+            inputPanel.add(new JLabel("Row (0-4):"));
+            inputPanel.add(rowField);
+            inputPanel.add(Box.createHorizontalStrut(15)); // Espacio entre campos
+            inputPanel.add(new JLabel("Column (1-9):"));
+            inputPanel.add(colField);
+
+            int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    int row = Integer.parseInt(rowField.getText());
+                    int col = Integer.parseInt(colField.getText());
+
+                    // Validar los límites y condiciones
+                    if (row < 0 || row > 4 || col < 1 || col > 9) {
+                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else if (col == 0) {
+                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JPanel targetPanel = gridCells[row][col];
+                        if (targetPanel.getComponentCount() == 0) {
+                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            // Remover la planta
+                            targetPanel.removeAll();
+                            targetPanel.revalidate();
+                            targetPanel.repaint();
+                        }
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        panel.add(useShovelButton);
     }
 
     // Clase auxiliar para manejar el objeto Transferable de tipo imagen

@@ -117,8 +117,8 @@ public class PlayerVSMachine extends JFrame {
         String[] plantImages = {
                 "resources/images/plants/Sunflower/Sunflower.jpg",
                 "resources/images/plants/Peashooter/Peashooter.jpg",
-                "resources/images/plants/WallNut/Wall-nut.jpg",
-                "resources/images/plants/PotatoMine/Potato_Mine.jpg",
+                "resources/images/plants/WallNut/Wall-nutGrass.jpg",
+                "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
                 "resources/images/plants/ECIPlant/ECIPlant.png"
         };
 
