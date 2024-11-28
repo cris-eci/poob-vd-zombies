@@ -1,21 +1,14 @@
 package presentation;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 public class MainMenu extends JFrame {
+
+    private Thread audioThread;
 
     public MainMenu() {
         setTitle("POOBvsZombies");
@@ -51,6 +44,7 @@ public class MainMenu extends JFrame {
             // Open Player vs Player Menu
             PlayerVsPlayer PlayerVsPlayerMenu = new PlayerVsPlayer();
             PlayerVsPlayerMenu.setVisible(true);
+            stopAudio();
             dispose(); 
         });
 
@@ -58,6 +52,7 @@ public class MainMenu extends JFrame {
             // Open Player vs Machine Menu
             PlayerVSMachine playerVsMachineMenu = new PlayerVSMachine();
             playerVsMachineMenu.setVisible(true);
+            stopAudio();
             dispose(); // Close the main menu
         });
 
@@ -67,6 +62,20 @@ public class MainMenu extends JFrame {
 
         // Add panel to frame
         add(panel);
+
+        // Start background music
+        startBackgroundMusic("resources/sound/pvzSound.mp3");
+    }
+
+    private void startBackgroundMusic(String filePath) {
+        audioThread = new Thread(new Sound(filePath));
+        audioThread.start();
+    }
+
+    private void stopAudio() {
+        if (audioThread != null && audioThread.isAlive()) {
+            audioThread.interrupt();
+        }
     }
 
     // Helper method to create buttons with consistent styling

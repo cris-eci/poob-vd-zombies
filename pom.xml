@@ -14,6 +14,13 @@
             <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JLayer (para reproducir audio MP3) -->
+        <dependency>
+            <groupId>javazoom</groupId>
+            <artifactId>jlayer</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -24,15 +31,15 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
-             <!-- Plugin para ejecutar la aplicación con Maven -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>3.0.0</version>
-            <configuration>
-                <mainClass>presentation.MainMenu</mainClass> <!-- Cambia esto al nombre completo de tu clase principal -->
-            </configuration>
-        </plugin>
+            <!-- Plugin para ejecutar la aplicación con Maven -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>presentation.MainMenu</mainClass> <!-- Cambia esto al nombre completo de tu clase principal -->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
