@@ -64,12 +64,12 @@ public class GardenMenu extends JFrame {
         // Añadir el botón "Use Shovel" debajo de la pala
         addUseShovelButton(panel);
 
-        //Añadir las imágenes para regresar al menú principal, back, save and export
+        // Añadir las imágenes para regresar al menú principal, back, save and export
         addTopRightButtons(panel);
 
-        addBrainIcon(panel); // Add this line to call the new method
-        addZombieCards(panel); // Add this line to call the new method
-        addZombieTable(panel); // Add this line to call the new method
+        addBrainIcon(panel);
+        addZombieCards(panel);
+        addZombieTable(panel);
 
         add(panel);
     }
@@ -109,7 +109,7 @@ public class GardenMenu extends JFrame {
                     @Override
                     protected Transferable createTransferable(JComponent c) {
                         ImageIcon icon = new ImageIcon(dragImagePath);
-                        return new ImageSelection(icon);
+                        return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
                     }
 
                     @Override
@@ -169,14 +169,13 @@ public class GardenMenu extends JFrame {
         // Ruta de la podadora
         String lawnMowerImagePath = "resources/images/Lawnmower.jpg";
 
-        // Añadir celdas al grid con la podadora en la primera columna
+        // Añadir celdas al grid con restricciones específicas para plantas y zombies
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 10; col++) {
                 JPanel cellPanel = new JPanel(new BorderLayout());
                 cellPanel.setPreferredSize(new Dimension(50, 50));
                 cellPanel.setOpaque(false);
-                cellPanel.setBorder(new LineBorder(new Color(0,0,0,0), 1)); // Añadir borde negro a cada celda
-
+                cellPanel.setBorder(new LineBorder(new Color(0, 0, 0, 0), 1)); // Añadir borde transparente a cada celda
 
                 if (col == 0) {
                     // Añadir la podadora a la primera columna de cada fila
@@ -184,17 +183,31 @@ public class GardenMenu extends JFrame {
                     Image scaledMowerImage = mowerIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
                     JLabel mowerLabel = new JLabel(new ImageIcon(scaledMowerImage));
                     cellPanel.add(mowerLabel, BorderLayout.CENTER);
-                } else if (col > 0 && col < 9) {
-                    // Añadir funcionalidad para permitir arrastrar y soltar en las celdas del GridLayout
+                } else if (col >= 1 && col <= 8) {
+                    // Permitir arrastrar y soltar plantas solo en las columnas de 1 a 8
                     cellPanel.setTransferHandler(new TransferHandler("icon") {
                         @Override
                         public boolean canImport(TransferSupport support) {
+                            if (!support.isDrop()) {
+                                return false;
+                            }
+                            if (!support.isDataFlavorSupported(ImageTransferable.IMAGE_FLAVOR)) {
+                                return false;
+                            }
+
                             // Validar si la celda ya tiene una planta
                             JPanel targetPanel = (JPanel) support.getComponent();
                             if (targetPanel.getComponentCount() > 0) {
                                 return false; // Ya hay una planta en esta celda
                             }
-                            return support.isDataFlavorSupported(DataFlavor.imageFlavor);
+
+                            try {
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                return "plant".equals(transferable.getType()); // Solo aceptar plantas
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return false;
                         }
 
                         @Override
@@ -204,7 +217,57 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                Image image = (Image) support.getTransferable().getTransferData(DataFlavor.imageFlavor);
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                Image image = transferable.getImage();
+                                JLabel label = new JLabel(new ImageIcon(image));
+                                label.setHorizontalAlignment(JLabel.CENTER);
+                                JPanel targetPanel = (JPanel) support.getComponent();
+                                targetPanel.add(label);
+                                targetPanel.revalidate();
+                                targetPanel.repaint();
+                                return true;
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            return false;
+                        }
+                    });
+                } else if (col == 9) {
+                    // Permitir arrastrar y soltar zombies solo en la última columna
+                    cellPanel.setTransferHandler(new TransferHandler("icon") {
+                        @Override
+                        public boolean canImport(TransferSupport support) {
+                            if (!support.isDrop()) {
+                                return false;
+                            }
+                            if (!support.isDataFlavorSupported(ImageTransferable.IMAGE_FLAVOR)) {
+                                return false;
+                            }
+
+                            // Validar si la celda ya tiene un zombie
+                            JPanel targetPanel = (JPanel) support.getComponent();
+                            if (targetPanel.getComponentCount() > 0) {
+                                return false; // Ya hay un zombie en esta celda
+                            }
+
+                            try {
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                return "zombie".equals(transferable.getType()); // Solo aceptar zombies
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public boolean importData(TransferSupport support) {
+                            if (!canImport(support)) {
+                                return false;
+                            }
+
+                            try {
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                Image image = transferable.getImage();
                                 JLabel label = new JLabel(new ImageIcon(image));
                                 label.setHorizontalAlignment(JLabel.CENTER);
                                 JPanel targetPanel = (JPanel) support.getComponent();
@@ -227,9 +290,6 @@ public class GardenMenu extends JFrame {
 
         panel.add(gridPanel);
     }
-
-
-    
 
     private void addUseShovelButton(JPanel panel) {
         JButton useShovelButton = new JButton("Use Shovel");
@@ -283,11 +343,11 @@ public class GardenMenu extends JFrame {
             "resources/images/buttons/return-icon.png",     // Regresar
             "resources/images/buttons/home-icon.png"        // Volver al menú principal
         };
-    
+
         int x = 660;
         int y = 5;
         int buttonSize = 40;
-    
+
         for (String imagePath : buttonImagePaths) {
             ImageIcon icon = new ImageIcon(imagePath);
             JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
@@ -295,7 +355,7 @@ public class GardenMenu extends JFrame {
             button.setContentAreaFilled(false);
             button.setBorderPainted(false);
             button.setFocusPainted(false);
-    
+
             // Añadir eventos de acción a los botones
             if (imagePath.contains("return-icon")) {
                 button.addActionListener(e -> {
@@ -304,8 +364,8 @@ public class GardenMenu extends JFrame {
                     PlayerVSMachine pvmMenu = new PlayerVSMachine(); // Abre la ventana de "Player vs Machine"
                     pvmMenu.setVisible(true);
                 });
-            } 
-            
+            }
+
             if (imagePath.contains("home-icon")) {
                 button.addActionListener(e -> {
                     // Volver al menú principal
@@ -314,40 +374,50 @@ public class GardenMenu extends JFrame {
                     mainMenu.setVisible(true);
                 });
             }
-    
+
             panel.add(button);
             x += 60; // Ajustar la posición X para el siguiente botón
         }
     }
-    
-    // Clase auxiliar para manejar el objeto Transferable de tipo imagen
-    private class ImageSelection implements Transferable {
-        private ImageIcon image;
 
-        public ImageSelection(ImageIcon image) {
+    // Clase auxiliar para manejar el objeto Transferable de tipo imagen con tipo (planta o zombie)
+    private static class ImageTransferable implements Transferable {
+        public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
+        private Image image;
+        private String type; // "plant" or "zombie"
+
+        public ImageTransferable(Image image, String type) {
             this.image = image;
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public Image getImage() {
+            return image;
         }
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[]{DataFlavor.imageFlavor};
+            return new DataFlavor[]{IMAGE_FLAVOR};
         }
 
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return DataFlavor.imageFlavor.equals(flavor);
+            return flavor.equals(IMAGE_FLAVOR);
         }
 
         @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            if (!isDataFlavorSupported(flavor)) {
+            if (flavor.equals(IMAGE_FLAVOR)) {
+                return this;
+            } else {
                 throw new UnsupportedFlavorException(flavor);
             }
-            return image.getImage();
         }
     }
-
-
 
     private void addZombieCards(JPanel panel) {
         // Rutas de las cartas correspondientes a los zombies
@@ -383,7 +453,7 @@ public class GardenMenu extends JFrame {
                 @Override
                 protected Transferable createTransferable(JComponent c) {
                     ImageIcon icon = new ImageIcon(dragImagePath);
-                    return new ImageSelection(icon);
+                    return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
                 }
 
                 @Override
@@ -406,6 +476,7 @@ public class GardenMenu extends JFrame {
             x += 70; // Mover la posición en X para la siguiente carta
         }
     }
+
     private void addZombieTable(JPanel panel) {
         // Ruta de la imagen de la tabla de zombies
         String zombieTableImagePath = "resources/images/zombie-table.png";
@@ -420,6 +491,7 @@ public class GardenMenu extends JFrame {
 
         panel.add(zombieTableLabel);
     }
+
     private void addBrainIcon(JPanel panel) {
         // Ruta de la imagen del cerebro
         String brainImagePath = "resources/images/brain.png";
@@ -441,6 +513,7 @@ public class GardenMenu extends JFrame {
         panel.add(brainLabel);
         panel.add(textLabel);
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             String[] selectedPlants = {
