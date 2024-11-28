@@ -362,7 +362,7 @@ public class GardenMenu extends JFrame {
         // Rutas de los GIFs o PNGs de los zombies para arrastrar
         String[] zombieDragImages = {
             "resources/images/zombies/Basic/BasicDinamic.gif",
-            "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
+            "resources/images/zombies/Brainstein/brainsteinAnimated.gif",
             "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
             "resources/images/zombies/Conehead/ConeheadAnimated.gif",
             "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
