@@ -95,8 +95,8 @@ public class GardenMenu extends JFrame {
         String[] plantDragImages = {
             "resources/images/plants/Sunflower/sunflowerAnimated.gif",
             "resources/images/plants/Peashooter/peashooterAnimated.gif",
-            "resources/images/plants/WallNut/Wall-nut.png",
-            "resources/images/plants/PotatoMine/beforePotatoMine.png",
+            "resources/images/plants/WallNut/wall-nutAnimated.gif",
+            "resources/images/plants/PotatoMine/before-potato-mineAnimated.gif",
             "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
         };
 
