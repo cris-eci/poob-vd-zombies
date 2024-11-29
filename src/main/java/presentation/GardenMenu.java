@@ -436,7 +436,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addZombieCards(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state) && selectedZombies != null) {
+        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state) && selectedZombies != null) {
             // Paths of the cards corresponding to the zombies
             String[] zombieCards = {
                 "resources/images/cards/Zombies/card_basic_zombie.png",
@@ -511,7 +511,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addZombieTable(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state)) {
+        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
             // Path of the zombie table image
             String zombieTableImagePath = "resources/images/zombie-table.png";
 
@@ -528,7 +528,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addBrainIcon(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state)) {
+        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
             // Path of the brain image
             String brainImagePath = "resources/images/brain.png";
 

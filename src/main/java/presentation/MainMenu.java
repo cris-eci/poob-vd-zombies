@@ -62,7 +62,10 @@ public class MainMenu extends JFrame {
         });
 
         machineVsMachineButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Opening Machine vs Machine Menu");
+            //Open Machine vs Machine menu
+            MachineVSMachine machineVSMachineMenu = new MachineVSMachine();
+            machineVSMachineMenu.setVisible(true);
+            dispose();
         });
 
         // Add panel to frame
