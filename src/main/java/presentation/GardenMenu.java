@@ -28,13 +28,15 @@ import javax.swing.border.LineBorder;
 
 public class GardenMenu extends JFrame {
     private String[] selectedPlants;
+    private String[] selectedZombies;
     private String state; // "PlayerVsPlayer" or "PlayerVsMachine"
     private JLabel shovelLabel;
     private Point originalShovelPosition;
     private JPanel[][] gridCells = new JPanel[5][10];
 
-    public GardenMenu(String[] selectedPlants, String state) {
+    public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state) {
         this.selectedPlants = selectedPlants;
+        this.selectedZombies = selectedZombies;
         this.state = state;
         setTitle("Garden Menu");
         setSize(900, 700);
@@ -102,39 +104,42 @@ public class GardenMenu extends JFrame {
         int y = -25; // Initial Y position
         for (int i = 0; i < selectedPlants.length; i++) {
             if (selectedPlants[i] != null) { // Only if it's a valid plant
-                // Display the card
-                ImageIcon icon = new ImageIcon(plantCards[getPlantIndex(selectedPlants[i])]);
-                JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
-                cardLabel.setBounds(x, y, 100, 150);
-                panel.add(cardLabel);
+                int plantIndex = getPlantIndex(selectedPlants[i]);
+                if (plantIndex != -1) {
+                    // Display the card
+                    ImageIcon icon = new ImageIcon(plantCards[plantIndex]);
+                    JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
+                    cardLabel.setBounds(x, y, 100, 150);
+                    panel.add(cardLabel);
 
-                // Add drag functionality
-                String dragImagePath = plantDragImages[getPlantIndex(selectedPlants[i])];
-                cardLabel.setTransferHandler(new TransferHandler("icon") {
-                    @Override
-                    protected Transferable createTransferable(JComponent c) {
-                        ImageIcon icon = new ImageIcon(dragImagePath);
-                        return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
-                    }
-
-                    @Override
-                    public int getSourceActions(JComponent c) {
-                        return COPY;
-                    }
-                });
-
-                cardLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        JComponent comp = (JComponent) e.getSource();
-                        TransferHandler handler = comp.getTransferHandler();
-                        if (handler != null) {
-                            handler.exportAsDrag(comp, e, TransferHandler.COPY);
+                    // Add drag functionality
+                    String dragImagePath = plantDragImages[plantIndex];
+                    cardLabel.setTransferHandler(new TransferHandler("icon") {
+                        @Override
+                        protected Transferable createTransferable(JComponent c) {
+                            ImageIcon icon = new ImageIcon(dragImagePath);
+                            return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
                         }
-                    }
-                });
 
-                x += 70; // Move X position for the next card
+                        @Override
+                        public int getSourceActions(JComponent c) {
+                            return COPY;
+                        }
+                    });
+
+                    cardLabel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            JComponent comp = (JComponent) e.getSource();
+                            TransferHandler handler = comp.getTransferHandler();
+                            if (handler != null) {
+                                handler.exportAsDrag(comp, e, TransferHandler.COPY);
+                            }
+                        }
+                    });
+
+                    x += 70; // Move X position for the next card
+                }
             }
         }
     }
@@ -431,7 +436,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addZombieCards(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state)) {
+        if ("PlayerVsPlayer".equals(state) && selectedZombies != null) {
             // Paths of the cards corresponding to the zombies
             String[] zombieCards = {
                 "resources/images/cards/Zombies/card_basic_zombie.png",
@@ -452,42 +457,57 @@ public class GardenMenu extends JFrame {
 
             int x = 85; // Initial X position
             int y = 625; // Initial Y position
-            for (int i = 0; i < zombieCards.length; i++) {
-                // Display the card
-                ImageIcon icon = new ImageIcon(zombieCards[i]);
-                JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
-                cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
-                panel.add(cardLabel);
+            for (int i = 0; i < selectedZombies.length; i++) {
+                if (selectedZombies[i] != null) {
+                    int zombieIndex = getZombieIndex(selectedZombies[i]);
+                    if (zombieIndex != -1) {
+                        // Display the card
+                        ImageIcon icon = new ImageIcon(zombieCards[zombieIndex]);
+                        JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
+                        cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
+                        panel.add(cardLabel);
 
-                // Add drag functionality
-                String dragImagePath = zombieDragImages[i];
-                cardLabel.setTransferHandler(new TransferHandler("icon") {
-                    @Override
-                    protected Transferable createTransferable(JComponent c) {
-                        ImageIcon icon = new ImageIcon(dragImagePath);
-                        return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                        // Add drag functionality
+                        String dragImagePath = zombieDragImages[zombieIndex];
+                        cardLabel.setTransferHandler(new TransferHandler("icon") {
+                            @Override
+                            protected Transferable createTransferable(JComponent c) {
+                                ImageIcon icon = new ImageIcon(dragImagePath);
+                                return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                            }
+
+                            @Override
+                            public int getSourceActions(JComponent c) {
+                                return COPY;
+                            }
+                        });
+
+                        cardLabel.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mousePressed(MouseEvent e) {
+                                JComponent comp = (JComponent) e.getSource();
+                                TransferHandler handler = comp.getTransferHandler();
+                                if (handler != null) {
+                                    handler.exportAsDrag(comp, e, TransferHandler.COPY);
+                                }
+                            }
+                        });
+
+                        x += 70; // Move X position for the next card
                     }
-
-                    @Override
-                    public int getSourceActions(JComponent c) {
-                        return COPY;
-                    }
-                });
-
-                cardLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        JComponent comp = (JComponent) e.getSource();
-                        TransferHandler handler = comp.getTransferHandler();
-                        if (handler != null) {
-                            handler.exportAsDrag(comp, e, TransferHandler.COPY);
-                        }
-                    }
-                });
-
-                x += 70; // Move X position for the next card
+                }
             }
         }
+    }
+
+    private int getZombieIndex(String zombiePath) {
+        // Map zombies to their indices
+        if (zombiePath.contains("Basic")) return 0;
+        if (zombiePath.contains("Brainstein")) return 1;
+        if (zombiePath.contains("BucketHead")) return 2;
+        if (zombiePath.contains("Conehead")) return 3;
+        if (zombiePath.contains("ECIZombie")) return 4;
+        return -1; // Not found
     }
 
     private void addZombieTable(JPanel panel) {
@@ -540,7 +560,14 @@ public class GardenMenu extends JFrame {
                 "PotatoMine",
                 "ECIPlant"
             };
-            GardenMenu frame = new GardenMenu(selectedPlants, "PlayerVsPlayer");
+            String[] selectedZombies = {
+                "Basic",
+                "Conehead",
+                "BucketHead",
+                "ECIZombie",
+                "Brainstein"
+            };
+            GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");
             frame.setVisible(true);
         });
     }

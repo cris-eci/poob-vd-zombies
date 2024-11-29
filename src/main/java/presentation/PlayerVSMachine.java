@@ -100,7 +100,7 @@ public class PlayerVSMachine extends JFrame {
             }
 
             // Open the garden menu with the selected plants
-            new GardenMenu(selectedPlants.toArray(new String[0]), "PlayerVsMachine").setVisible(true);
+            new GardenMenu(selectedPlants.toArray(new String[0]), null, "PlayerVsMachine").setVisible(true);
 
             // Close the current menu
             dispose();
@@ -143,8 +143,10 @@ public class PlayerVSMachine extends JFrame {
         panel.add(numberButton);
         panel.add(startButton);
         panel.add(plantSelectionPanel);
+        
 
         add(panel); // Add the panel to the JFrame
+        addTopRightButtons(panel);
     }
 
     // Method to create an input button
@@ -186,13 +188,52 @@ public class PlayerVSMachine extends JFrame {
         }
     }
 
-    // Method to enable the START button if all fields have values
+    // Method to enable the START button if all fields have values and at least one plant is selected
     private void checkFields() {
         boolean allFieldsFilled = !playerNameButton.getText().isEmpty() &&
                 !timeButton.getText().isEmpty() &&
                 !numberButton.getText().isEmpty();
-        startButton.setEnabled(allFieldsFilled);
+
+        boolean atLeastOnePlantSelected = false;
+        for (int i = 0; i < plantPanels.length; i++) {
+            PlantPanel plantPanel = (PlantPanel) plantPanels[i];
+            if (plantPanel.isSelected()) {
+                atLeastOnePlantSelected = true;
+                break;
+            }
+        }
+
+        startButton.setEnabled(allFieldsFilled && atLeastOnePlantSelected);
     }
+
+
+    private void addTopRightButtons(JPanel panel) {
+        String buttonImagePath = "resources/images/buttons/return-icon.png";     // Return;
+
+        int x = 830;
+        int y = 5;
+        int buttonSize = 40;
+
+        ImageIcon icon = new ImageIcon(buttonImagePath);
+        JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+        button.setBounds(x, y, buttonSize, buttonSize);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+
+
+        if (buttonImagePath.contains("return-icon")) {
+            button.addActionListener(e -> {
+            // Back to main menu
+            dispose(); // Close the current window
+            MainMenu mainMenu = new MainMenu(); // Open the main menu
+            mainMenu.setVisible(true);
+        });
+    }
+
+        panel.add(button);
+    }
+
 
     // PlantPanel class that represents each plant panel and handles its selection
     class PlantPanel extends JPanel {
@@ -212,6 +253,7 @@ public class PlayerVSMachine extends JFrame {
                 public void mouseClicked(java.awt.event.MouseEvent e) {
                     selected = !selected; // Toggle state
                     repaint();
+                    checkFields();
                 }
             });
         }

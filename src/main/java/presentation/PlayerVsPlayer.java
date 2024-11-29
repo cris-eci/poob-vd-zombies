@@ -20,10 +20,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import java.util.*;
 
-
 public class PlayerVsPlayer extends JFrame {
     private List<PlantPanel> plantPanelsList = new ArrayList<>();
     private List<ZombiePanel> zombiePanelsList = new ArrayList<>();
+    private JTextField playerOneName, playerTwoName, matchTime, setSunsField, setBrainsField;
+    private JButton startButton;
 
     public PlayerVsPlayer() {
         // Basic window configuration
@@ -39,12 +40,13 @@ public class PlayerVsPlayer extends JFrame {
 
         // Create and add the necessary labels and text fields
         addComponents(backgroundPanel);
+        addTopRightButtons(backgroundPanel);
     }
 
     private void addComponents(JPanel panel) {
 
         // Text Field for Player One Name
-        JTextField playerOneName = new JTextField("Name player one");
+        playerOneName = new JTextField("Name player one");
         playerOneName.setFont(new Font("Arial", Font.BOLD, 13)); // Bold text, size 13
         playerOneName.setBounds(270, 380, 150, 30);
         playerOneName.setBorder(null); // Remove border
@@ -65,11 +67,12 @@ public class PlayerVsPlayer extends JFrame {
                 if (playerOneName.getText().isEmpty()) {
                     playerOneName.setText("Name player one");
                 }
+                checkFields();
             }
         });
 
         // Text Field for Player Two Name
-        JTextField playerTwoName = new JTextField("Name player two");
+        playerTwoName = new JTextField("Name player two");
         playerTwoName.setFont(new Font("Arial", Font.BOLD, 13)); // Bold text, size 13
         playerTwoName.setBorder(null); // Remove border
         playerTwoName.setBounds(465, 380, 150, 30);
@@ -91,11 +94,12 @@ public class PlayerVsPlayer extends JFrame {
                 if (playerTwoName.getText().isEmpty()) {
                     playerTwoName.setText("Name player two");
                 }
+                checkFields();
             }
         });
 
         // Text Field for match time
-        JTextField matchTime = new JTextField("Time");
+        matchTime = new JTextField("Time");
         matchTime.setFont(new Font("Arial", Font.BOLD, 11)); // Bold text, size 13
         matchTime.setBounds(350, 455, 40, 20); // Position below playerOneName and slightly to the right
         matchTime.setBorder(null); // Remove border
@@ -116,14 +120,16 @@ public class PlayerVsPlayer extends JFrame {
                 if (matchTime.getText().isEmpty()) {
                     matchTime.setText("Time");
                 }
+                checkFields();
             }
         });
 
         // Start button
-        JButton startButton = new JButton("¡START!");
+        startButton = new JButton("¡START!");
         startButton.setBounds(462, 449, 160, 30);
         startButton.setBackground(Color.ORANGE);
         startButton.setForeground(Color.WHITE); // Set text color to white
+        startButton.setEnabled(false); // Initially disabled
         panel.add(startButton);
 
         // Add action listener to the start button
@@ -146,8 +152,8 @@ public class PlayerVsPlayer extends JFrame {
                 }
             }
 
-            // Now, open the GardenMenu with the selected plants and state
-            new GardenMenu(selectedPlants.toArray(new String[0]), "PlayerVsPlayer").setVisible(true);
+            // Now, open the GardenMenu with the selected plants and zombies
+            new GardenMenu(selectedPlants.toArray(new String[0]), selectedZombies.toArray(new String[0]), "PlayerVsPlayer").setVisible(true);
 
             // Close the current window
             dispose();
@@ -221,7 +227,7 @@ public class PlayerVsPlayer extends JFrame {
         panel.add(zombiesPanel);
 
         // JTextField for setting initial amount of suns for Player One
-        JTextField setSunsField = new JTextField("Amount of suns");
+        setSunsField = new JTextField("Amount of suns");
         setSunsField.setFont(new Font("Arial", Font.BOLD, 12));
         setSunsField.setBounds(82, 613, 90, 20); // Same dimensions as the button
         setSunsField.setBackground(new Color(253, 210, 1)); // Custom background color
@@ -242,11 +248,12 @@ public class PlayerVsPlayer extends JFrame {
                 if (setSunsField.getText().isEmpty()) {
                     setSunsField.setText("Amount of suns");
                 }
+                checkFields();
             }
         });
 
         // JTextField for setting initial amount of brains for Player Two
-        JTextField setBrainsField = new JTextField("Amount of brains");
+        setBrainsField = new JTextField("Amount of brains");
         setBrainsField.setFont(new Font("Arial", Font.BOLD, 12)); // Bold text
         setBrainsField.setBounds(730, 613, 100, 20); // Same dimensions as the button
         setBrainsField.setBackground(new Color(240, 162, 198)); // Custom background color
@@ -267,9 +274,67 @@ public class PlayerVsPlayer extends JFrame {
                 if (setBrainsField.getText().isEmpty()) {
                     setBrainsField.setText("Amount of brains");
                 }
+                checkFields();
             }
         });
 
+        // Initially disable the start button
+        startButton.setEnabled(false);
+    }
+
+    // Method to enable the START button if all fields have values and at least one plant and zombie are selected
+    private void checkFields() {
+        boolean atLeastOnePlantSelected = false;
+        for (PlantPanel plantPanel : plantPanelsList) {
+            if (plantPanel.isSelected()) {
+                atLeastOnePlantSelected = true;
+                break;
+            }
+        }
+
+        boolean atLeastOneZombieSelected = false;
+        for (ZombiePanel zombiePanel : zombiePanelsList) {
+            if (zombiePanel.isSelected()) {
+                atLeastOneZombieSelected = true;
+                break;
+            }
+        }
+
+        boolean playerOneNameFilled = !playerOneName.getText().isEmpty() && !playerOneName.getText().equals("Name player one");
+        boolean playerTwoNameFilled = !playerTwoName.getText().isEmpty() && !playerTwoName.getText().equals("Name player two");
+        boolean matchTimeFilled = !matchTime.getText().isEmpty() && !matchTime.getText().equals("Time");
+        boolean sunsFilled = !setSunsField.getText().isEmpty() && !setSunsField.getText().equals("Amount of suns");
+        boolean brainsFilled = !setBrainsField.getText().isEmpty() && !setBrainsField.getText().equals("Amount of brains");
+
+        startButton.setEnabled(atLeastOnePlantSelected && atLeastOneZombieSelected && playerOneNameFilled && playerTwoNameFilled && matchTimeFilled && sunsFilled && brainsFilled);
+    }
+
+
+    private void addTopRightButtons(JPanel panel) {
+        String buttonImagePath = "resources/images/buttons/return-icon.png";     // Return;
+
+        int x = 830;
+        int y = 5;
+        int buttonSize = 40;
+
+        ImageIcon icon = new ImageIcon(buttonImagePath);
+        JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+        button.setBounds(x, y, buttonSize, buttonSize);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+
+
+        if (buttonImagePath.contains("return-icon")) {
+            button.addActionListener(e -> {
+            // Back to main menu
+            dispose(); // Close the current window
+            MainMenu mainMenu = new MainMenu(); // Open the main menu
+            mainMenu.setVisible(true);
+        });
+    }
+
+        panel.add(button);
     }
 
     // Custom panel to paint the background image
@@ -310,6 +375,7 @@ public class PlayerVsPlayer extends JFrame {
                 public void mouseClicked(MouseEvent e) {
                     selected = !selected; // Toggle state
                     repaint();
+                    checkFields();
                 }
             });
         }
@@ -350,9 +416,10 @@ public class PlayerVsPlayer extends JFrame {
             // Change selection state on click
             addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
+                public void mouseClicked(MouseEvent e) {
                     selected = !selected; // Toggle state
                     repaint();
+                    checkFields();
                 }
             });
         }
