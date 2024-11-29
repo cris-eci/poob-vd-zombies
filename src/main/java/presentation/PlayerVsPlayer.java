@@ -1,10 +1,15 @@
 package presentation;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,128 +18,152 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import java.util.*;
+
 
 public class PlayerVsPlayer extends JFrame {
+    private List<PlantPanel> plantPanelsList = new ArrayList<>();
+    private List<ZombiePanel> zombiePanelsList = new ArrayList<>();
 
     public PlayerVsPlayer() {
-        // Configuración básica de la ventana
+        // Basic window configuration
         setTitle("Player vs Player");
         setSize(900, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Para centrar la ventana en la pantalla
+        setLocationRelativeTo(null); // Center the window on the screen
 
-        // Establecer el fondo con la imagen
+        // Set the background with the image
         BackgroundPanel backgroundPanel = new BackgroundPanel();
-        backgroundPanel.setLayout(null); // Para poder posicionar los componentes de forma absoluta
+        backgroundPanel.setLayout(null); // To position components absolutely
         setContentPane(backgroundPanel);
 
-        // Crear y agregar los labels y text fields necesarios
+        // Create and add the necessary labels and text fields
         addComponents(backgroundPanel);
     }
 
     private void addComponents(JPanel panel) {
 
-        // Text Field para el nombre del Jugador Uno
+        // Text Field for Player One Name
         JTextField playerOneName = new JTextField("Name player one");
-        playerOneName.setFont(new Font("Arial", Font.BOLD, 13)); // Texto en negrita y tamaño 13
+        playerOneName.setFont(new Font("Arial", Font.BOLD, 13)); // Bold text, size 13
         playerOneName.setBounds(270, 380, 150, 30);
-        playerOneName.setBorder(null); // Eliminar borde
+        playerOneName.setBorder(null); // Remove border
         playerOneName.setBackground(new Color(228, 206, 171));
-        playerOneName.setForeground(new Color(134, 119, 94)); // Color del texto
+        playerOneName.setForeground(new Color(134, 119, 94)); // Text color
         panel.add(playerOneName);
-        // Añadir un FocusListener para el JTextField de nombre del Jugador Uno
-        playerOneName.addFocusListener(new java.awt.event.FocusAdapter() {
+        // Add a FocusListener for the Player One Name JTextField
+        playerOneName.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 if (playerOneName.getText().equals("Name player one")) {
                     playerOneName.setText("");
                 }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 if (playerOneName.getText().isEmpty()) {
                     playerOneName.setText("Name player one");
                 }
             }
         });
 
-
-        // Text Field para el nombre del Jugador Dos
+        // Text Field for Player Two Name
         JTextField playerTwoName = new JTextField("Name player two");
-        playerTwoName.setFont(new Font("Arial", Font.BOLD, 13)); // Texto en negrita y tamaño 13
-        playerTwoName.setBorder(null); // Eliminar borde
+        playerTwoName.setFont(new Font("Arial", Font.BOLD, 13)); // Bold text, size 13
+        playerTwoName.setBorder(null); // Remove border
         playerTwoName.setBounds(465, 380, 150, 30);
         playerTwoName.setBackground(new Color(228, 206, 171));
-        playerTwoName.setForeground(new Color(134, 119, 94)); // Color del texto
+        playerTwoName.setForeground(new Color(134, 119, 94)); // Text color
         panel.add(playerTwoName);
-        
-        // Añadir un FocusListener para el JTextField de nombre del Jugador Dos
-        playerTwoName.addFocusListener(new java.awt.event.FocusAdapter() {
+
+        // Add a FocusListener for the Player Two Name JTextField
+        playerTwoName.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 if (playerTwoName.getText().equals("Name player two")) {
                     playerTwoName.setText("");
                 }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 if (playerTwoName.getText().isEmpty()) {
                     playerTwoName.setText("Name player two");
                 }
             }
         });
 
-        // Text Field para el tiempo de la partida
+        // Text Field for match time
         JTextField matchTime = new JTextField("Time");
-        matchTime.setFont(new Font("Arial", Font.BOLD, 11)); // Texto en negrita y tamaño 13
-        matchTime.setBounds(350, 455, 40, 20); // Posición abajo de playerOneName y un poco más a la derecha
-        matchTime.setBorder(null); // Eliminar borde
+        matchTime.setFont(new Font("Arial", Font.BOLD, 11)); // Bold text, size 13
+        matchTime.setBounds(350, 455, 40, 20); // Position below playerOneName and slightly to the right
+        matchTime.setBorder(null); // Remove border
         matchTime.setBackground(new Color(228, 206, 171));
-        matchTime.setForeground(new Color(134, 119, 94)); // Color del texto
+        matchTime.setForeground(new Color(134, 119, 94)); // Text color
         panel.add(matchTime);
-        // Añadir un FocusListener para el JTextField de tiempo de partida
-        matchTime.addFocusListener(new java.awt.event.FocusAdapter() {
+        // Add a FocusListener for the match time JTextField
+        matchTime.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
-            if (matchTime.getText().equals("Time")) {
-                matchTime.setText("");
-            }
+            public void focusGained(FocusEvent e) {
+                if (matchTime.getText().equals("Time")) {
+                    matchTime.setText("");
+                }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-            if (matchTime.getText().isEmpty()) {
-                matchTime.setText("Time");
-            }
+            public void focusLost(FocusEvent e) {
+                if (matchTime.getText().isEmpty()) {
+                    matchTime.setText("Time");
+                }
             }
         });
-        // Botón para empezar
+
+        // Start button
         JButton startButton = new JButton("¡START!");
         startButton.setBounds(462, 449, 160, 30);
-
         startButton.setBackground(Color.ORANGE);
-
-        startButton.setForeground(Color.WHITE); // Establecer el color del texto a blanco
-
-        panel.add(startButton);
-        startButton.setBackground(Color.ORANGE);
+        startButton.setForeground(Color.WHITE); // Set text color to white
         panel.add(startButton);
 
-        // Label "Select your plants" para Player One
+        // Add action listener to the start button
+        startButton.addActionListener(e -> {
+            // Gather selected plants and zombies
+            List<String> selectedPlants = new ArrayList<>();
+            List<String> selectedZombies = new ArrayList<>();
+
+            // Iterate over plant panels
+            for (PlantPanel plantPanel : plantPanelsList) {
+                if (plantPanel.isSelected()) {
+                    selectedPlants.add(plantPanel.getPlantPath());
+                }
+            }
+
+            // Iterate over zombie panels
+            for (ZombiePanel zombiePanel : zombiePanelsList) {
+                if (zombiePanel.isSelected()) {
+                    selectedZombies.add(zombiePanel.getZombiePath());
+                }
+            }
+
+            // Now, open the GardenMenu with the selected plants and state
+            new GardenMenu(selectedPlants.toArray(new String[0]), "PlayerVsPlayer").setVisible(true);
+
+            // Close the current window
+            dispose();
+        });
+
+        // Label "Select your plants" for Player One
         JLabel selectPlantsLabel = new JLabel("Select your plants");
         selectPlantsLabel.setFont(new Font("Arial", Font.BOLD, 16));
         selectPlantsLabel.setForeground(Color.WHITE);
         selectPlantsLabel.setBounds(46, 405, 150, 30);
         panel.add(selectPlantsLabel);
 
-        // Reemplaza la sección que agrega las plantas y zombies en tu código `PlayerVsPlayer` con lo siguiente:
-
-        // Crear y agregar los JPanels para las plantas
-        JPanel plantsPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 filas, 2 columnas, espacio de 10px
-        plantsPanel.setBounds(65, 440, 100, 160); // Ajusta la posición y tamaño según sea necesario
-        plantsPanel.setOpaque(false); // Hacer el panel transparente para ver el fondo
+        // Create and add the JPanels for plants
+        JPanel plantsPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 rows, 2 columns, 10px spacing
+        plantsPanel.setBounds(65, 440, 100, 160); // Adjust position and size as needed
+        plantsPanel.setOpaque(false); // Make the panel transparent to see the background
 
         String[] plantImages = {
             "resources/images/plants/Sunflower/Sunflower.jpg",
@@ -144,52 +173,15 @@ public class PlayerVsPlayer extends JFrame {
             "resources/images/plants/ECIPlant/ECIPlant.png"
         };
 
-        // Crear y agregar los JPanels con imágenes de las plantas
+        // Create and add the JPanels with plant images
         for (String imagePath : plantImages) {
-            JPanel plantPanel = new JPanel() {
-                private Image backgroundImage;
-                private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido inicial
-
-                {
-                    // Cargar la imagen desde la ruta especificada
-                    ImageIcon icon = new ImageIcon(imagePath);
-                    backgroundImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-
-                    // Añadir un MouseListener para alternar el color al hacer clic
-                    addMouseListener(new java.awt.event.MouseAdapter() {
-                        @Override
-                        public void mouseClicked(java.awt.event.MouseEvent e) {
-                            if (overlayColor.equals(new Color(255, 0, 0, 128))) {
-                                overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
-                            } else {
-                                overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
-                            }
-                            repaint(); // Repintar para actualizar el color
-                        }
-                    });
-                }
-
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    // Dibujar la imagen de fondo
-                    if (backgroundImage != null) {
-                        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                    }
-                    // Dibujar el rectángulo translúcido
-                    g.setColor(overlayColor);
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                }
-            };
-
-            plantPanel.setPreferredSize(new Dimension(50, 50));
-            plantPanel.setOpaque(false); // Transparente para ver el fondo
-            plantsPanel.add(plantPanel); // Agregar el panel al contenedor de plantas
+            PlantPanel plantPanel = new PlantPanel(imagePath);
+            plantPanelsList.add(plantPanel);
+            plantsPanel.add(plantPanel); // Add the panel to the plants container
         }
         panel.add(plantsPanel);
 
-
-        // Label "Select your zombies" para Player Two
+        // Label "Select your zombies" for Player Two
         JLabel selectZombiesLabel = new JLabel("Select your zombies");
         selectZombiesLabel.setFont(new Font("Arial", Font.BOLD, 16));
         selectZombiesLabel.setForeground(Color.WHITE);
@@ -204,13 +196,13 @@ public class PlayerVsPlayer extends JFrame {
                 "</div></html>");
         gameModeLabel.setFont(new Font("Arial", Font.BOLD, 12));
         gameModeLabel.setForeground(Color.WHITE);
-        gameModeLabel.setBounds(245, 520, 380, 100); // Ajusta la altura
+        gameModeLabel.setBounds(245, 520, 380, 100); // Adjust height
         panel.add(gameModeLabel);
 
-        // Crear un panel para contener los JPanels de los zombies
-        JPanel zombiesPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 filas, 2 columnas, espacio de 10px
-        zombiesPanel.setBounds(710, 440, 100, 160); // Ajusta la posición y tamaño según sea necesario
-        zombiesPanel.setOpaque(false); // Hacer el panel transparente para ver el fondo
+        // Create a panel to contain the JPanels of zombies
+        JPanel zombiesPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 rows, 2 columns, 10px spacing
+        zombiesPanel.setBounds(710, 440, 100, 160); // Adjust position and size as needed
+        zombiesPanel.setOpaque(false); // Make the panel transparent to see the background
 
         String[] zombieImages = {
             "resources/images/zombies/Basic/Basic.jpg",
@@ -220,97 +212,58 @@ public class PlayerVsPlayer extends JFrame {
             "resources/images/zombies/Brainstein/brainsteinGarden.jpeg"
         };
 
-        // Crear y agregar los JPanels con imágenes de los zombies
+        // Create and add the JPanels with zombie images
         for (String imagePath : zombieImages) {
-            JPanel zombiePanel = new JPanel() {
-                private Image backgroundImage;
-                private Color overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido inicial
-
-                {
-                    // Cargar la imagen desde la ruta especificada
-                    ImageIcon icon = new ImageIcon(imagePath);
-                    backgroundImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-
-                    // Añadir un MouseListener para alternar el color al hacer clic
-                    addMouseListener(new java.awt.event.MouseAdapter() {
-                        @Override
-                        public void mouseClicked(java.awt.event.MouseEvent e) {
-                            if (overlayColor.equals(new Color(255, 0, 0, 128))) {
-                                overlayColor = new Color(0, 255, 0, 128); // Verde translúcido
-                            } else {
-                                overlayColor = new Color(255, 0, 0, 128); // Rojo translúcido
-                            }
-                            repaint();
-                        }
-                    });
-                }
-
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    // Dibujar la imagen de fondo
-                    if (backgroundImage != null) {
-                        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                    }
-                    // Dibujar el rectángulo translúcido
-                    g.setColor(overlayColor);
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                }
-            };
-
-            zombiePanel.setPreferredSize(new Dimension(50, 50));
-            zombiePanel.setOpaque(false);
+            ZombiePanel zombiePanel = new ZombiePanel(imagePath);
+            zombiePanelsList.add(zombiePanel);
             zombiesPanel.add(zombiePanel);
         }
         panel.add(zombiesPanel);
 
-
-        // Botón "Set Initial amount of suns" para Player One
-        // Crear un JTextField para ingresar el monto inicial de soles
+        // JTextField for setting initial amount of suns for Player One
         JTextField setSunsField = new JTextField("Amount of suns");
         setSunsField.setFont(new Font("Arial", Font.BOLD, 12));
-        setSunsField.setBounds(82, 613, 90, 20); // Mismas dimensiones que el botón
-        setSunsField.setBackground(new Color(253, 210, 1)); // Color de fondo personalizado
-        setSunsField.setForeground(Color.WHITE); // Asegúrate de que el texto sea legible
-        setSunsField.setBorder(null); // Eliminar borde
+        setSunsField.setBounds(82, 613, 90, 20); // Same dimensions as the button
+        setSunsField.setBackground(new Color(253, 210, 1)); // Custom background color
+        setSunsField.setForeground(Color.WHITE); // Ensure the text is readable
+        setSunsField.setBorder(null); // Remove border
         panel.add(setSunsField);
-        // Añadir un FocusListener para el JTextField de soles
-        setSunsField.addFocusListener(new java.awt.event.FocusAdapter() {
+        // Add a FocusListener for the suns JTextField
+        setSunsField.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
-            if (setSunsField.getText().equals("Amount of suns")) {
-                setSunsField.setText("");
-            }
+            public void focusGained(FocusEvent e) {
+                if (setSunsField.getText().equals("Amount of suns")) {
+                    setSunsField.setText("");
+                }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-            if (setSunsField.getText().isEmpty()) {
-                setSunsField.setText("Amount of suns");
-            }
+            public void focusLost(FocusEvent e) {
+                if (setSunsField.getText().isEmpty()) {
+                    setSunsField.setText("Amount of suns");
+                }
             }
         });
 
-        // Botón "Set Initial amount of brains" para Player Two
-        // Botón "Set Initial amount of brains" convertido en JTextField para Player Two
+        // JTextField for setting initial amount of brains for Player Two
         JTextField setBrainsField = new JTextField("Amount of brains");
-        setBrainsField.setFont(new Font("Arial", Font.BOLD, 12)); // Texto en negrita
-        setBrainsField.setBounds(730, 613, 100, 20); // Mismas dimensiones que el botón
-        setBrainsField.setBackground(new Color(240, 162, 198)); // Color de fondo personalizado
-        setBrainsField.setForeground(Color.WHITE); // Texto en blanco
-        setBrainsField.setBorder(null); // Eliminar borde
+        setBrainsField.setFont(new Font("Arial", Font.BOLD, 12)); // Bold text
+        setBrainsField.setBounds(730, 613, 100, 20); // Same dimensions as the button
+        setBrainsField.setBackground(new Color(240, 162, 198)); // Custom background color
+        setBrainsField.setForeground(Color.WHITE); // White text
+        setBrainsField.setBorder(null); // Remove border
         panel.add(setBrainsField);
-        // Añadir un FocusListener para el JTextField de cerebros
-        setBrainsField.addFocusListener(new java.awt.event.FocusAdapter() {
+        // Add a FocusListener for the brains JTextField
+        setBrainsField.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 if (setBrainsField.getText().equals("Amount of brains")) {
                     setBrainsField.setText("");
                 }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 if (setBrainsField.getText().isEmpty()) {
                     setBrainsField.setText("Amount of brains");
                 }
@@ -319,28 +272,114 @@ public class PlayerVsPlayer extends JFrame {
 
     }
 
-    // Panel personalizado para pintar la imagen de fondo
+    // Custom panel to paint the background image
     private class BackgroundPanel extends JPanel {
         private Image backgroundImage;
 
         public BackgroundPanel() {
-            // Cargar la imagen desde la ruta especificada
+            // Load the image from the specified path
             backgroundImage = new ImageIcon("resources/images/menu/PlayerVsPlayerMenu.png").getImage();
-            setLayout(null); // Configurar el layout del panel
+            setLayout(null); // Configure the panel's layout
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            // Dibujar la imagen en el fondo del panel
+            // Draw the image in the background of the panel
             if (backgroundImage != null) {
                 g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
             }
         }
     }
 
+    // PlantPanel class that represents each plant panel and handles its selection
+    class PlantPanel extends JPanel {
+        private boolean selected = false;
+        private Image plantImage;
+        private String plantPath;
+
+        public PlantPanel(String imagePath) {
+            this.plantPath = imagePath;
+            plantImage = new ImageIcon(imagePath).getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+            setPreferredSize(new Dimension(50, 50));
+            setOpaque(false);
+
+            // Change selection state on click
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    selected = !selected; // Toggle state
+                    repaint();
+                }
+            });
+        }
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public String getPlantPath() {
+            return plantPath;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Draw the background image
+            if (plantImage != null) {
+                g.drawImage(plantImage, 0, 0, getWidth(), getHeight(), this);
+            }
+            // Draw the translucent rectangle
+            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255, 0, 0, 128));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+
+    // ZombiePanel class that represents each zombie panel and handles its selection
+    class ZombiePanel extends JPanel {
+        private boolean selected = false;
+        private Image zombieImage;
+        private String zombiePath;
+
+        public ZombiePanel(String imagePath) {
+            this.zombiePath = imagePath;
+            zombieImage = new ImageIcon(imagePath).getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+            setPreferredSize(new Dimension(50, 50));
+            setOpaque(false);
+
+            // Change selection state on click
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    selected = !selected; // Toggle state
+                    repaint();
+                }
+            });
+        }
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public String getZombiePath() {
+            return zombiePath;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Draw the background image
+            if (zombieImage != null) {
+                g.drawImage(zombieImage, 0, 0, getWidth(), getHeight(), this);
+            }
+            // Draw the translucent rectangle
+            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255, 0, 0, 128));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+
     public static void main(String[] args) {
-        // Crear y mostrar la ventana
+        // Create and display the window
         SwingUtilities.invokeLater(() -> {
             PlayerVsPlayer frame = new PlayerVsPlayer();
             frame.setVisible(true);
