@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -70,6 +69,7 @@ public class MainMenu extends JFrame {
 
         // Add panel to frame
         add(panel);
+        addTopRightButtons(panel);
     }
 
     // Helper method to create buttons with consistent styling
@@ -99,6 +99,31 @@ public class MainMenu extends JFrame {
         });
 
         return button;
+    }
+
+    private void addTopRightButtons(JPanel panel) {
+        String[] buttonImagePaths = {
+            "resources/images/buttons/import-icon.png",     // Import
+            "resources/images/buttons/open-icon.png"      // Open
+        };
+
+        int x = 40;
+        int y = 5;
+        int buttonSize = 40;
+
+        for (String imagePath : buttonImagePaths) {
+            ImageIcon icon = new ImageIcon(imagePath);
+            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+            button.setBounds(x, y, buttonSize, buttonSize);
+            button.setContentAreaFilled(false);
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+
+            // Add action events to buttons
+
+            panel.add(button);
+            x += 60; // Adjust X position for the next button
+        }
     }
 
     public static void main(String[] args) {

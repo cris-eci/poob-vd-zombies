@@ -72,7 +72,7 @@ public class GardenMenu extends JFrame {
         addTopRightButtons(panel);
 
         // Add zombie components only if in "PlayerVsPlayer" mode
-        if ("PlayerVsPlayer".equals(state)) {
+        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
@@ -378,6 +378,10 @@ public class GardenMenu extends JFrame {
                     } else if ("PlayerVsPlayer".equals(state)) {
                         PlayerVsPlayer pvpMenu = new PlayerVsPlayer();
                         pvpMenu.setVisible(true);
+                    }
+                    else{
+                        MachineVSMachine mvsmMenu = new MachineVSMachine();
+                        mvsmMenu.setVisible(true);
                     }
                 });
             }
