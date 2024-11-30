@@ -2,6 +2,7 @@ package presentation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container; // Add this import
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -12,6 +13,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator; // Add this import
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -23,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.border.LineBorder;
 
@@ -33,6 +36,7 @@ public class GardenMenu extends JFrame {
     private JLabel shovelLabel;
     private Point originalShovelPosition;
     private JPanel[][] gridCells = new JPanel[5][10];
+    private java.util.List<JLabel> movingZombies = new java.util.ArrayList<>();
 
     public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state) {
         this.selectedPlants = selectedPlants;
@@ -79,25 +83,26 @@ public class GardenMenu extends JFrame {
         }
 
         add(panel);
+        startZombieMovement();
     }
 
     private void addCards(JPanel panel) {
         // Paths of the cards corresponding to the selected plants
         String[] plantCards = {
-            "resources/images/cards/Plants/card_sunflower.png",
-            "resources/images/cards/Plants/card_peashooter.png",
-            "resources/images/cards/Plants/card_wallnut.png",
-            "resources/images/cards/Plants/card_potatomine.png",
-            "resources/images/cards/Plants/card_ECIPlant.png"
+                "resources/images/cards/Plants/card_sunflower.png",
+                "resources/images/cards/Plants/card_peashooter.png",
+                "resources/images/cards/Plants/card_wallnut.png",
+                "resources/images/cards/Plants/card_potatomine.png",
+                "resources/images/cards/Plants/card_ECIPlant.png"
         };
 
         // Paths of the GIFs or PNGs of the plants to drag
         String[] plantDragImages = {
-            "resources/images/plants/Sunflower/sunflowerAnimated.gif",
-            "resources/images/plants/Peashooter/peashooterAnimated.gif",
-            "resources/images/plants/WallNut/Wall-nut.png",
-            "resources/images/plants/PotatoMine/beforePotatoMine.png",
-            "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
+                "resources/images/plants/Sunflower/sunflowerAnimated.gif",
+                "resources/images/plants/Peashooter/peashooterAnimated.gif",
+                "resources/images/plants/WallNut/Wall-nut.png",
+                "resources/images/plants/PotatoMine/beforePotatoMine.png",
+                "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
         };
 
         int x = 75; // Initial X position
@@ -108,7 +113,8 @@ public class GardenMenu extends JFrame {
                 if (plantIndex != -1) {
                     // Display the card
                     ImageIcon icon = new ImageIcon(plantCards[plantIndex]);
-                    JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
+                    JLabel cardLabel = new JLabel(
+                            new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                     cardLabel.setBounds(x, y, 100, 150);
                     panel.add(cardLabel);
 
@@ -146,11 +152,16 @@ public class GardenMenu extends JFrame {
 
     private int getPlantIndex(String plantPath) {
         // Map plants to their indices
-        if (plantPath.contains("Sunflower")) return 0;
-        if (plantPath.contains("Peashooter")) return 1;
-        if (plantPath.contains("WallNut")) return 2;
-        if (plantPath.contains("PotatoMine")) return 3;
-        if (plantPath.contains("ECIPlant")) return 4;
+        if (plantPath.contains("Sunflower"))
+            return 0;
+        if (plantPath.contains("Peashooter"))
+            return 1;
+        if (plantPath.contains("WallNut"))
+            return 2;
+        if (plantPath.contains("PotatoMine"))
+            return 3;
+        if (plantPath.contains("ECIPlant"))
+            return 4;
         return -1; // Not found
     }
 
@@ -212,7 +223,8 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                        .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                 return "plant".equals(transferable.getType()); // Only accept plants
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -227,12 +239,13 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                        .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                 Image image = transferable.getImage();
-                                JLabel label = new JLabel(new ImageIcon(image));
-                                label.setHorizontalAlignment(JLabel.CENTER);
+                                JLabel plantLabel = new JLabel(new ImageIcon(image));
+                                plantLabel.setHorizontalAlignment(JLabel.CENTER);
                                 JPanel targetPanel = (JPanel) support.getComponent();
-                                targetPanel.add(label);
+                                targetPanel.add(plantLabel);
                                 targetPanel.revalidate();
                                 targetPanel.repaint();
                                 return true;
@@ -241,6 +254,7 @@ public class GardenMenu extends JFrame {
                             }
                             return false;
                         }
+
                     });
                 } else if (col == 9) {
                     if ("PlayerVsPlayer".equals(state)) {
@@ -262,7 +276,8 @@ public class GardenMenu extends JFrame {
                                 }
 
                                 try {
-                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                            .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                     return "zombie".equals(transferable.getType()); // Only accept zombies
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -277,14 +292,25 @@ public class GardenMenu extends JFrame {
                                 }
 
                                 try {
-                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                            .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                     Image image = transferable.getImage();
-                                    JLabel label = new JLabel(new ImageIcon(image));
-                                    label.setHorizontalAlignment(JLabel.CENTER);
-                                    JPanel targetPanel = (JPanel) support.getComponent();
-                                    targetPanel.add(label);
-                                    targetPanel.revalidate();
-                                    targetPanel.repaint();
+                                    JLabel zombieLabel = new JLabel(new ImageIcon(image));
+                                    zombieLabel.setHorizontalAlignment(JLabel.CENTER);
+                                    // Get the cell's position relative to the main panel
+                                    JPanel targetCell = (JPanel) support.getComponent();
+                                    Point cellLocation = targetCell.getLocation();
+                                    int x = gridPanel.getX() + cellLocation.x;
+                                    int y = gridPanel.getY() + cellLocation.y;
+                                    // Set the zombie's bounds
+                                    zombieLabel.setBounds(x, y, targetCell.getWidth(), targetCell.getHeight());
+                                    // Add the zombie to the main panel
+                                    panel.add(zombieLabel);
+                                    panel.setComponentZOrder(zombieLabel, 0); // Bring to front if necessary
+                                    panel.revalidate();
+                                    panel.repaint();
+                                    // Add the zombie to the movingZombies list
+                                    movingZombies.add(zombieLabel);
                                     return true;
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
@@ -317,7 +343,8 @@ public class GardenMenu extends JFrame {
             inputPanel.add(new JLabel("Column (1-9):"));
             inputPanel.add(colField);
 
-            int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant", JOptionPane.OK_CANCEL_OPTION);
+            int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant",
+                    JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     int row = Integer.parseInt(rowField.getText());
@@ -325,13 +352,16 @@ public class GardenMenu extends JFrame {
 
                     // Validate limits and conditions
                     if (row < 0 || row > 4 || col < 1 || col > 9) {
-                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     } else if (col == 0) {
-                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error",
+                                JOptionPane.ERROR_MESSAGE);
                     } else {
                         JPanel targetPanel = gridCells[row][col];
                         if (targetPanel.getComponentCount() == 0) {
-                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
                         } else {
                             // Remove the plant
                             targetPanel.removeAll();
@@ -340,7 +370,8 @@ public class GardenMenu extends JFrame {
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -350,10 +381,10 @@ public class GardenMenu extends JFrame {
 
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
-            "resources/images/buttons/export-icon.png",     // Export
-            "resources/images/buttons/save-icon.png",       // Save
-            "resources/images/buttons/return-icon.png",     // Return
-            "resources/images/buttons/home-icon.png"        // Back to main menu
+                "resources/images/buttons/export-icon.png", // Export
+                "resources/images/buttons/save-icon.png", // Save
+                "resources/images/buttons/return-icon.png", // Return
+                "resources/images/buttons/home-icon.png" // Back to main menu
         };
 
         int x = 660;
@@ -362,7 +393,8 @@ public class GardenMenu extends JFrame {
 
         for (String imagePath : buttonImagePaths) {
             ImageIcon icon = new ImageIcon(imagePath);
-            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+            JButton button = new JButton(
+                    new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
             button.setBounds(x, y, buttonSize, buttonSize);
             button.setContentAreaFilled(false);
             button.setBorderPainted(false);
@@ -396,7 +428,8 @@ public class GardenMenu extends JFrame {
         }
     }
 
-    // Auxiliary class to handle the Transferable object of image type with type (plant or zombie)
+    // Auxiliary class to handle the Transferable object of image type with type
+    // (plant or zombie)
     private static class ImageTransferable implements Transferable {
         public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
         private Image image;
@@ -417,7 +450,7 @@ public class GardenMenu extends JFrame {
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[]{IMAGE_FLAVOR};
+            return new DataFlavor[] { IMAGE_FLAVOR };
         }
 
         @Override
@@ -439,20 +472,20 @@ public class GardenMenu extends JFrame {
         if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state) && selectedZombies != null) {
             // Paths of the cards corresponding to the zombies
             String[] zombieCards = {
-                "resources/images/cards/Zombies/card_basic_zombie.png",
-                "resources/images/cards/Zombies/card_brainstein.png",
-                "resources/images/cards/Zombies/card_buckethead_zombie.png",
-                "resources/images/cards/Zombies/card_conehead_zombie.png",
-                "resources/images/cards/Zombies/card_ECIZombie.png"
+                    "resources/images/cards/Zombies/card_basic_zombie.png",
+                    "resources/images/cards/Zombies/card_brainstein.png",
+                    "resources/images/cards/Zombies/card_buckethead_zombie.png",
+                    "resources/images/cards/Zombies/card_conehead_zombie.png",
+                    "resources/images/cards/Zombies/card_ECIZombie.png"
             };
 
             // Paths of the GIFs or PNGs of the zombies to drag
             String[] zombieDragImages = {
-                "resources/images/zombies/Basic/BasicDinamic.gif",
-                "resources/images/zombies/Brainstein/brainsteinAnimated.gif",
-                "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
-                "resources/images/zombies/Conehead/ConeheadAnimated.gif",
-                "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
+                    "resources/images/zombies/Basic/BasicDinamic.gif",
+                    "resources/images/zombies/Brainstein/brainsteinAnimated.gif",
+                    "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
+                    "resources/images/zombies/Conehead/ConeheadAnimated.gif",
+                    "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
             };
 
             int x = 85; // Initial X position
@@ -463,7 +496,8 @@ public class GardenMenu extends JFrame {
                     if (zombieIndex != -1) {
                         // Display the card
                         ImageIcon icon = new ImageIcon(zombieCards[zombieIndex]);
-                        JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
+                        JLabel cardLabel = new JLabel(
+                                new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                         cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
                         panel.add(cardLabel);
 
@@ -502,11 +536,16 @@ public class GardenMenu extends JFrame {
 
     private int getZombieIndex(String zombiePath) {
         // Map zombies to their indices
-        if (zombiePath.contains("Basic")) return 0;
-        if (zombiePath.contains("Brainstein")) return 1;
-        if (zombiePath.contains("BucketHead")) return 2;
-        if (zombiePath.contains("Conehead")) return 3;
-        if (zombiePath.contains("ECIZombie")) return 4;
+        if (zombiePath.contains("Basic"))
+            return 0;
+        if (zombiePath.contains("Brainstein"))
+            return 1;
+        if (zombiePath.contains("BucketHead"))
+            return 2;
+        if (zombiePath.contains("Conehead"))
+            return 3;
+        if (zombiePath.contains("ECIZombie"))
+            return 4;
         return -1; // Not found
     }
 
@@ -551,21 +590,46 @@ public class GardenMenu extends JFrame {
         }
     }
 
+    private void startZombieMovement() {
+        Timer timer = new Timer(100, e -> {
+            Iterator<JLabel> iterator = movingZombies.iterator();
+            while (iterator.hasNext()) {
+                JLabel zombie = iterator.next();
+                Point location = zombie.getLocation();
+                if (location.x > 0) {
+                    // Move zombie to the left
+                    zombie.setLocation(location.x - 5, location.y);
+                } else {
+                    // Remove zombie safely
+                    Container parent = zombie.getParent();
+                    if (parent != null) {
+                        parent.remove(zombie);
+                        parent.revalidate();
+                        parent.repaint();
+                    }
+                    iterator.remove();
+                }
+            }
+        });
+        timer.start();
+    }
+    
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             String[] selectedPlants = {
-                "Sunflower",
-                "Peashooter",
-                "WallNut",
-                "PotatoMine",
-                "ECIPlant"
+                    "Sunflower",
+                    "Peashooter",
+                    "WallNut",
+                    "PotatoMine",
+                    "ECIPlant"
             };
             String[] selectedZombies = {
-                "Basic",
-                "Conehead",
-                "BucketHead",
-                "ECIZombie",
-                "Brainstein"
+                    "Basic",
+                    "Conehead",
+                    "BucketHead",
+                    "ECIZombie",
+                    "Brainstein"
             };
             GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");
             frame.setVisible(true);
