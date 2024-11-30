@@ -282,8 +282,8 @@ public class MachineVSMachine extends JFrame {
             button.addActionListener(e -> {
                 // Volver al menú principal
                 dispose(); // Cerrar la ventana actual
-                MainMenu mainMenu = new MainMenu(); // Abrir el menú principal
-                mainMenu.setVisible(true);
+                POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Abrir el menú principal
+                POOBvsZombiesGUI.setVisible(true);
             });
         }
 

@@ -30,7 +30,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.0.0</version>
             <configuration>
-                <mainClass>presentation.MainMenu</mainClass> <!-- Cambia esto al nombre completo de tu clase principal -->
+                <mainClass>presentation.POOBvsZombiesGUI</mainClass> <!-- Cambia esto al nombre completo de tu clase principal -->
             </configuration>
         </plugin>
         </plugins>

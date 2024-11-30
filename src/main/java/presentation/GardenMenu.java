@@ -390,8 +390,8 @@ public class GardenMenu extends JFrame {
                 button.addActionListener(e -> {
                     // Back to main menu
                     dispose(); // Close the current window
-                    MainMenu mainMenu = new MainMenu(); // Open the main menu
-                    mainMenu.setVisible(true);
+                    POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
+                    POOBvsZombiesGUI.setVisible(true);
                 });
             }
 

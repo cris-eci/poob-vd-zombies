@@ -19,11 +19,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-public class MainMenu extends JFrame {
+public class POOBvsZombiesGUI extends JFrame {
 
-    private Clip clip;
+    private static Clip clip;
 
-    public MainMenu() {
+    public POOBvsZombiesGUI() {
         setTitle("POOBvsZombies");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 700);
@@ -58,7 +58,6 @@ public class MainMenu extends JFrame {
             PlayerVsPlayer PlayerVsPlayerMenu = new PlayerVsPlayer();
             PlayerVsPlayerMenu.setVisible(true);
             dispose();
-            stopMusic(); // Stop music when moving to the next menu
         });
 
         playerVsMachineButton.addActionListener(e -> {
@@ -66,7 +65,6 @@ public class MainMenu extends JFrame {
             PlayerVSMachine playerVsMachineMenu = new PlayerVSMachine();
             playerVsMachineMenu.setVisible(true);
             dispose(); // Close the main menu
-            stopMusic(); // Stop music when moving to the next menu
         });
 
         machineVsMachineButton.addActionListener(e -> {
@@ -74,14 +72,13 @@ public class MainMenu extends JFrame {
             MachineVSMachine machineVSMachineMenu = new MachineVSMachine();
             machineVSMachineMenu.setVisible(true);
             dispose();
-            stopMusic(); // Stop music when moving to the next menu
         });
 
         // Add panel to frame
         add(panel);
         addTopRightButtons(panel);
 
-        // Play background music
+        // Play background music if it is not already playing
         playMusic("resources/sound/pvzSound.wav");
     }
 
@@ -142,32 +139,27 @@ public class MainMenu extends JFrame {
 
     // Method to play background music
     private void playMusic(String filePath) {
-        try {
-            File musicFile = new File(filePath);
-            if (musicFile.exists()) {
-                AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
-                clip = AudioSystem.getClip();
-                clip.open(audioStream);
-                clip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music continuously
-            } else {
-                System.out.println("The specified music file does not exist: " + filePath);
+        if (clip == null) {
+            try {
+                File musicFile = new File(filePath);
+                if (musicFile.exists()) {
+                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+                    clip = AudioSystem.getClip();
+                    clip.open(audioStream);
+                    clip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music continuously
+                } else {
+                    System.out.println("The specified music file does not exist: " + filePath);
+                }
+            } catch (UnsupportedAudioFileException | LineUnavailableException | java.io.IOException e) {
+                e.printStackTrace();
             }
-        } catch (UnsupportedAudioFileException | LineUnavailableException | java.io.IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to stop the music
-    private void stopMusic() {
-        if (clip != null && clip.isRunning()) {
-            clip.stop();
         }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            MainMenu mainMenu = new MainMenu();
-            mainMenu.setVisible(true);
+            POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI();
+            POOBvsZombiesGUI.setVisible(true);
         });
     }
 }
