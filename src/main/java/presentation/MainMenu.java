@@ -7,7 +7,12 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 public class MainMenu extends JFrame {
+
+    private Clip clip;
 
     public MainMenu() {
         setTitle("POOBvsZombies");
@@ -50,7 +57,8 @@ public class MainMenu extends JFrame {
             // Open Player vs Player Menu
             PlayerVsPlayer PlayerVsPlayerMenu = new PlayerVsPlayer();
             PlayerVsPlayerMenu.setVisible(true);
-            dispose(); 
+            dispose();
+            stopMusic(); // Stop music when moving to the next menu
         });
 
         playerVsMachineButton.addActionListener(e -> {
@@ -58,18 +66,23 @@ public class MainMenu extends JFrame {
             PlayerVSMachine playerVsMachineMenu = new PlayerVSMachine();
             playerVsMachineMenu.setVisible(true);
             dispose(); // Close the main menu
+            stopMusic(); // Stop music when moving to the next menu
         });
 
         machineVsMachineButton.addActionListener(e -> {
-            //Open Machine vs Machine menu
+            // Open Machine vs Machine menu
             MachineVSMachine machineVSMachineMenu = new MachineVSMachine();
             machineVSMachineMenu.setVisible(true);
             dispose();
+            stopMusic(); // Stop music when moving to the next menu
         });
 
         // Add panel to frame
         add(panel);
         addTopRightButtons(panel);
+
+        // Play background music
+        playMusic("resources/sound/pvzSound.wav");
     }
 
     // Helper method to create buttons with consistent styling
@@ -78,7 +91,7 @@ public class MainMenu extends JFrame {
 
         // Use HTML to create multiline text
         button.setText("<html><center>" + mainText + "<br><font color='#FFFF00' size='4'>" + subText + "</font></center></html>");
-        
+
         button.setBounds(343, yPosition, 250, 90);
         button.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
         button.setBackground(new Color(110, 52, 48)); // Button background
@@ -103,8 +116,8 @@ public class MainMenu extends JFrame {
 
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
-            "resources/images/buttons/import-icon.png",     // Import
-            "resources/images/buttons/open-icon.png"      // Open
+                "resources/images/buttons/import-icon.png", // Import
+                "resources/images/buttons/open-icon.png" // Open
         };
 
         int x = 40;
@@ -113,7 +126,8 @@ public class MainMenu extends JFrame {
 
         for (String imagePath : buttonImagePaths) {
             ImageIcon icon = new ImageIcon(imagePath);
-            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+            JButton button = new JButton(
+                    new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
             button.setBounds(x, y, buttonSize, buttonSize);
             button.setContentAreaFilled(false);
             button.setBorderPainted(false);
@@ -123,6 +137,30 @@ public class MainMenu extends JFrame {
 
             panel.add(button);
             x += 60; // Adjust X position for the next button
+        }
+    }
+
+    // Method to play background music
+    private void playMusic(String filePath) {
+        try {
+            File musicFile = new File(filePath);
+            if (musicFile.exists()) {
+                AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+                clip = AudioSystem.getClip();
+                clip.open(audioStream);
+                clip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music continuously
+            } else {
+                System.out.println("The specified music file does not exist: " + filePath);
+            }
+        } catch (UnsupportedAudioFileException | LineUnavailableException | java.io.IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to stop the music
+    private void stopMusic() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
         }
     }
 
