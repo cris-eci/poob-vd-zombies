@@ -10,6 +10,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import java.util.*;
 
 public class PlayerVsPlayer extends JFrame {
     private List<PlantPanel> plantPanelsList = new ArrayList<>();
@@ -440,7 +441,7 @@ public class PlayerVsPlayer extends JFrame {
                 g.drawImage(zombieImage, 0, 0, getWidth(), getHeight(), this);
             }
             // Draw the translucent rectangle
-            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255, 0, 0, 128));
+            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255,     0, 0, 128));
             g.fillRect(0, 0, getWidth(), getHeight());
         }
     }
