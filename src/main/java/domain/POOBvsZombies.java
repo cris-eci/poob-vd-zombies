@@ -18,7 +18,7 @@ public class POOBvsZombies {
         this.players.add(new ZombiesStrategic(namePlayerOne, sunAmount, plants));
         this.players.add(new PlantsStrategic(namePlayerTwo, brainAmount, zombies));
 
-        this.modality = "PlayervsPlayer";
+        this.modality = "PlayerVsPlayer";
         this.winner = "";
 
         this.entities = new ArrayList<Entity>();

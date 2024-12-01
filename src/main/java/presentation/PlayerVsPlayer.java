@@ -134,9 +134,8 @@ public class PlayerVsPlayer extends JFrame {
 
             // Proceed to the next step (e.g., open GardenMenu)
             // For example:
-            // new GardenMenu(selectedPlants, selectedZombies,
-            // "PlayerVsPlayer").setVisible(true);
-            // dispose();
+            new GardenMenu(poobvsZombies).setVisible(true);
+            dispose();
 
             // Display Success Message
             JOptionPane.showMessageDialog(this,
@@ -257,7 +256,7 @@ public class PlayerVsPlayer extends JFrame {
                 // Back to main menu
                 dispose(); // Close the current window
                 // Open the main menu (uncomment if POOBvsZombiesGUI exists)
-                // new POOBvsZombiesGUI().setVisible(true);
+                new POOBvsZombiesGUI().setVisible(true);
             }
         });
 

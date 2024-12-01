@@ -528,7 +528,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addZombieCards(JPanel panel) {
-        //if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) && selectedZombies != null) {
+        if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) && selectedZombies != null) {
 
             int x = 85; // Initial X position
             int y = 625; // Initial Y position
@@ -582,7 +582,7 @@ public class GardenMenu extends JFrame {
                     //}
                 }
             }
-        //}
+        }
     }
     private int getZombieIndex(String zombiePath) {
         // Map zombies to their indices
