@@ -127,7 +127,7 @@ public class MachineVSMachine extends JFrame {
             }
 
             // Abrir el GardenMenu con las plantas y zombies seleccionados
-            new GardenMenu(selectedPlants.toArray(new String[0]), selectedZombies.toArray(new String[0]), "MachineVsMachine").setVisible(true);
+            //new GardenMenu(selectedPlants.toArray(new String[0]), selectedZombies.toArray(new String[0]), "MachineVsMachine").setVisible(true);
 
             // Cerrar la ventana actual
             dispose();

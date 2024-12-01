@@ -17,8 +17,4 @@ public class PlantsStrategic extends HumanPlayer {
         throw new UnsupportedOperationException("Unimplemented method 'playTurn'");
     }
 
-    @Override
-    public String getTeamName() {
-        return team.getTeamName();
-    }
 }

@@ -30,8 +30,4 @@ public class ZombiesStrategic extends HumanPlayer {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'playTurn'");
     }
-    @Override
-    public String getTeamName() {
-        return team.getTeamName();
-    }    
 }

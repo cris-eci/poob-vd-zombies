@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.swing.Timer;
 
 public class POOBvsZombies {
-    private int modality;
+    private String modality;
     private String winner;
     private Timer roundTimer;
     private ArrayList<Player> players;
@@ -18,7 +18,7 @@ public class POOBvsZombies {
         this.players.add(new ZombiesStrategic(namePlayerOne, sunAmount, plants));
         this.players.add(new PlantsStrategic(namePlayerTwo, brainAmount, zombies));
 
-        this.modality = 0;
+        this.modality = "PlayervsPlayer";
         this.winner = "";
 
         this.entities = new ArrayList<Entity>();
@@ -40,4 +40,15 @@ public class POOBvsZombies {
         return new Timer(milliseconds, null);
     }
     
+    public String getModality() {
+        return modality;
+    }
+
+    public Player getPlayerOne(){
+        return players.get(0);
+    }
+
+    public Player getPlayerTwo(){
+        return players.get(1);
+    }
 }

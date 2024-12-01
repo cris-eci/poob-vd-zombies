@@ -18,9 +18,11 @@ public abstract class Player {
         return score;
     }
 
-    public abstract String getTeamName();
-
     public abstract void setScore();
+
+    public Team getTeam(){
+        return team;
+    }
 
 
 

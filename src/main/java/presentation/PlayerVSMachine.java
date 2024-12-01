@@ -102,11 +102,11 @@ public class PlayerVSMachine extends JFrame {
             }
 
             // Open the garden menu with the selected plants
-            new GardenMenu(selectedPlants.toArray(new String[0]), null, "PlayerVsMachine").setVisible(true);
+            //new GardenMenu(selectedPlants.toArray(new String[0]), null, "PlayerVsMachine").setVisible(true);
 
             // Close the current menu
             dispose();
-        });
+        }); 
 
         // FlowLayout for plants
         JPanel plantSelectionPanel = new JPanel();

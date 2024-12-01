@@ -11,6 +11,11 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+
+import java.util.Arrays;
+
 import domain.Zombies;
 
 public class PlayerVsPlayer extends JFrame {
@@ -24,21 +29,6 @@ public class PlayerVsPlayer extends JFrame {
     private List<PlantPanel> plantPanelsList;
     private List<ZombiePanel> zombiePanelsList;
 
-    public static String[] zombieImages = {
-            "resources/images/zombies/Basic/Basic.jpg",
-            "resources/images/zombies/Conehead/Conehead.jpg",
-            "resources/images/zombies/BucketHead/Buckethead.jpg",
-            "resources/images/zombies/ECIZombie/ECIZombie.png",
-            "resources/images/zombies/Brainstein/brainsteinGarden.jpeg"
-    };
-
-    String[] plantImages = {
-            "resources/images/plants/Sunflower/Sunflower.jpg",
-            "resources/images/plants/Peashooter/Peashooter.jpg",
-            "resources/images/plants/WallNut/Wall-nutGrass.jpg",
-            "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
-            "resources/images/plants/ECIPlant/ECIPlant.png"
-    };
 
     public PlayerVsPlayer() {
         prepareElements();
@@ -225,7 +215,8 @@ public class PlayerVsPlayer extends JFrame {
         plantsPanel.setBounds(65, 440, 100, 160);
         plantsPanel.setOpaque(false);
 
-        for (String imagePath : plantImages) {
+        for (List<String> plant : GardenMenu.PLANTS_VIEW) {
+            String imagePath = plant.get(1);
             PlantPanel plantPanel = new PlantPanel(imagePath);
             plantPanelsList.add(plantPanel);
             plantsPanel.add(plantPanel);
@@ -237,14 +228,15 @@ public class PlayerVsPlayer extends JFrame {
         JPanel zombiesPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         zombiesPanel.setBounds(710, 440, 100, 160);
         zombiesPanel.setOpaque(false);
-
-        for (String imagePath : zombieImages) {
+        for (List<String> zombies : GardenMenu.ZOMBIES_VIEW) {
+            String imagePath = zombies.get(1);        
             ZombiePanel zombiePanel = new ZombiePanel(imagePath);
             zombiePanelsList.add(zombiePanel);
             zombiesPanel.add(zombiePanel);
         }
         panel.add(zombiesPanel);
     }
+    
 
     private void addTopRightButtons(JPanel panel) {
         String buttonImagePath = "resources/images/buttons/return-icon.png";
@@ -322,11 +314,19 @@ public class PlayerVsPlayer extends JFrame {
         for (SelectablePanel panel : panels) {
             if (panel.isSelected()) {
                 String itemPath = panel.getItemPath();
+
                 for (int i = 0; i < 5; i++) {
-                    if (itemPath.equals(plantImages[i])) {
-                        selectedItems.add(Plants.PLANT_TYPES[i]);
-                    } else if (itemPath.equals(zombieImages[i])) {
-                        selectedItems.add(Zombies.ZOMBIE_TYPES[i]);
+                    List<String>plant = GardenMenu.PLANTS_VIEW.get(i);
+                    List<String>zombie = GardenMenu.ZOMBIES_VIEW.get(i);
+                    if (itemPath.equals(plant.get(1))) {
+                        selectedItems.add(plant.get(0));
+                    } else if (itemPath.equals(zombie.get(1))) {
+                        selectedItems.add(zombie.get(0));
+                    // }   
+                    // if (itemPath.equals(GardenMenu.PLANTS_VIEW.get(3))){
+                    //     selectedItems.add(Plants.PLANT_TYPES[i]);
+                    // } else if (itemPath.equals(GardenMenu.ZOMBIES_VIEW.get(3))) {
+                    //     selectedItems.add(Zombies.ZOMBIE_TYPES[i]);
                     }
                 }           
             }

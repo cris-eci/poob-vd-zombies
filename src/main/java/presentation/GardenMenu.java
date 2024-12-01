@@ -13,7 +13,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList; // Add this import
+import java.util.Arrays;
 import java.util.Iterator; // Add this import
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -27,27 +30,101 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.LineBorder;
 
+import domain.POOBvsZombies;
+import domain.Player;
+
 public class GardenMenu extends JFrame {
-    private String[] selectedPlants;
-    private String[] selectedZombies;
-    private String state; // "PlayerVsPlayer" or "PlayerVsMachine"
+    private ArrayList<String> selectedPlants;
+    private ArrayList<String> selectedZombies;
+    private String modality; // "PlayerVsPlayer" or "PlayerVsMachine"
     private JLabel shovelLabel;
     private Point originalShovelPosition;
     private JPanel[][] gridCells = new JPanel[5][10];
     private java.util.List<JLabel> movingZombies = new java.util.ArrayList<>();
+    public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
+        Arrays.asList(
+            "Basic",
+            "resources/images/zombies/Basic/Basic.jpg",
+            "resources/images/cards/Zombies/card_basic_zombie.png",
+            "resources/images/zombies/Basic/BasicDinamic.gif"
+        ),
+        Arrays.asList(
+            "Brainstein",
+            "resources/images/zombies/Brainstein/brainsteinGarden.jpeg",
+            "resources/images/cards/Zombies/card_brainstein.png",
+            "resources/images/zombies/Brainstein/brainsteinAnimated.gif"
+        ),
+        Arrays.asList(
+            "BucketHead",
+            "resources/images/zombies/BucketHead/Buckethead.jpg",
+            "resources/images/cards/Zombies/card_buckethead_zombie.png",
+            "resources/images/zombies/BucketHead/BucketheadAnimated.gif"
+        ),
+        Arrays.asList(
+            "Conehead",
+            "resources/images/zombies/Conehead/Conehead.jpg",
+            "resources/images/cards/Zombies/card_conehead_zombie.png",
+            "resources/images/zombies/Conehead/ConeheadAnimated.gif"
+        ),
+        Arrays.asList(
+            "ECIZombie",
+            "resources/images/zombies/ECIZombie/ECIZombie.png",
+            "resources/images/cards/Zombies/card_ECIZombie.png",
+            "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
+        )
+    );
 
-    public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state) {
-        this.selectedPlants = selectedPlants;
-        this.selectedZombies = selectedZombies;
-        this.state = state;
+    public static final  List<List<String>> PLANTS_VIEW = Arrays.asList(
+        Arrays.asList(
+            "Sunflower",
+            "resources/images/plants/Sunflower/Sunflower.jpg",
+            "resources/images/cards/Plants/card_sunflower.png",
+            "resources/images/plants/Sunflower/sunflowerAnimated.gif"
+        ),
+        Arrays.asList(
+            "Peashooter",
+            "resources/images/plants/Peashooter/Peashooter.jpg",
+            "resources/images/cards/Plants/card_peashooter.png",
+            "resources/images/plants/Peashooter/peashooterAnimated.gif"
+        ),
+        Arrays.asList(
+            "WallNut",
+            "resources/images/plants/WallNut/Wall-nutGrass.jpg",
+            "resources/images/cards/Plants/card_wallnut.png",
+            "resources/images/plants/WallNut/wall-nutAnimated.gif"
+        ),
+        Arrays.asList(
+            "PotatoMine",
+            "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
+            "resources/images/cards/Plants/card_potatomine.png",
+            "resources/images/plants/PotatoMine/before-potato-mineAnimated.gif"
+        ),
+        Arrays.asList(
+            "ECIPlant",
+            "resources/images/plants/ECIPlant/ECIPlant.png",
+            "resources/images/cards/Plants/card_ECIPlant.png",
+            "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
+        )
+    );
+
+
+    public GardenMenu(POOBvsZombies poobvszombies) {        
         setTitle("Garden Menu");
         setSize(900, 700);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        
 
+        this.modality = poobvszombies.getModality();
+        Player playerOne = poobvszombies.getPlayerOne();
+        Player playerTwo = poobvszombies.getPlayerTwo();
+        this.selectedPlants = playerOne.getTeam().getCharacters();
+        this.selectedZombies = playerTwo.getTeam().getCharacters();  
+        
         // Panel with custom background
         JPanel panel = new JPanel() {
             Image backgroundImage = new ImageIcon("resources/images/gardenPvsP.png").getImage();
@@ -61,7 +138,7 @@ public class GardenMenu extends JFrame {
         panel.setLayout(null);
 
         // Display plant cards based on selection and make them draggable
-        addCards(panel);
+        addPlantsCards(panel);
 
         // Add the shovel at the top right corner
         addShovel(panel);
@@ -77,7 +154,7 @@ public class GardenMenu extends JFrame {
 
         // Add zombie components only if in "PlayerVsPlayer" mode
         
-        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
+        if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
@@ -87,39 +164,32 @@ public class GardenMenu extends JFrame {
         startZombieMovement();
     }
 
-    private void addCards(JPanel panel) {
-        // Paths of the cards corresponding to the selected plants
-        String[] plantCards = {
-            "resources/images/cards/Plants/card_sunflower.png",
-            "resources/images/cards/Plants/card_peashooter.png",
-            "resources/images/cards/Plants/card_wallnut.png",
-            "resources/images/cards/Plants/card_potatomine.png",
-            "resources/images/cards/Plants/card_ECIPlant.png"
-        };
-
-        // Paths of the GIFs or PNGs of the plants to drag
-        String[] plantDragImages = {
-            "resources/images/plants/Sunflower/sunflowerAnimated.gif",
-            "resources/images/plants/Peashooter/peashooterAnimated.gif",
-            "resources/images/plants/WallNut/wall-nutAnimated.gif",
-            "resources/images/plants/PotatoMine/before-potato-mineAnimated.gif",
-            "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
-        };
+    private void addPlantsCards(JPanel panel) {
 
         int x = 75; // Initial X position
         int y = -25; // Initial Y position
-        for (int i = 0; i < selectedPlants.length; i++) {
-            if (selectedPlants[i] != null) { // Only if it's a valid plant
-                int plantIndex = getPlantIndex(selectedPlants[i]);
-                if (plantIndex != -1) {
+        for (String plantName : selectedPlants) {
+            if (plantName != null) { // Only if it's a valid plant
+                //int plantIndex = getPlantIndex(selectedPlants[i]);
+                //if (plantIndex != -1) {
                     // Display the card
-                    ImageIcon icon = new ImageIcon(plantCards[plantIndex]);
+                    List<String> plant = PLANTS_VIEW.get(0);
+
+                    // Buscar la planta en la lista de plantas y asignarla a la variable plant para tener todas sus posibles representaciones graficas
+                    for (List<String> plants : PLANTS_VIEW) {
+                        if (plants.get(0).equals(plantName)) {
+                            plant = plants;
+                            break;
+                        }
+                    }
+
+                    ImageIcon icon = new ImageIcon(plant.get(2));  
                     JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                     cardLabel.setBounds(x, y, 100, 150);
                     panel.add(cardLabel);
 
                     // Add drag functionality
-                    String dragImagePath = plantDragImages[plantIndex];
+                    String dragImagePath = plant.get(3);
                     cardLabel.setTransferHandler(new TransferHandler("icon") {
                         @Override
                         protected Transferable createTransferable(JComponent c) {
@@ -145,7 +215,7 @@ public class GardenMenu extends JFrame {
                     });
 
                     x += 70; // Move X position for the next card
-                }
+                //}
             }
         }
     }
@@ -250,7 +320,7 @@ public class GardenMenu extends JFrame {
                         }
                     });
                 } else if (col == 9) {
-                    if ("PlayerVsPlayer".equals(state)) {
+                    if ("PlayerVsPlayer".equals(modality)) {
                         // Allow dragging and dropping zombies only in the last column
                         cellPanel.setTransferHandler(new TransferHandler("icon") {
                             @Override
@@ -390,10 +460,10 @@ public class GardenMenu extends JFrame {
             if (imagePath.contains("return-icon")) {
                 button.addActionListener(e -> {
                     dispose(); // Close the current window
-                    if ("PlayerVsMachine".equals(state)) {
+                    if ("PlayerVsMachine".equals(modality)) {
                         PlayerVSMachine pvmMenu = new PlayerVSMachine();
                         pvmMenu.setVisible(true);
-                    } else if ("PlayerVsPlayer".equals(state)) {
+                    } else if ("PlayerVsPlayer".equals(modality)) {
                         PlayerVsPlayer pvpMenu = new PlayerVsPlayer();
                         pvpMenu.setVisible(true);
                     }
@@ -458,39 +528,32 @@ public class GardenMenu extends JFrame {
     }
 
     private void addZombieCards(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state) && selectedZombies != null) {
-            // Paths of the cards corresponding to the zombies
-            String[] zombieCards = {
-                "resources/images/cards/Zombies/card_basic_zombie.png",
-                "resources/images/cards/Zombies/card_brainstein.png",
-                "resources/images/cards/Zombies/card_buckethead_zombie.png",
-                "resources/images/cards/Zombies/card_conehead_zombie.png",
-                "resources/images/cards/Zombies/card_ECIZombie.png"
-            };
-
-            // Paths of the GIFs or PNGs of the zombies to drag
-            String[] zombieDragImages = {
-                "resources/images/zombies/Basic/BasicDinamic.gif",
-                "resources/images/zombies/Brainstein/brainsteinAnimated.gif",
-                "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
-                "resources/images/zombies/Conehead/ConeheadAnimated.gif",
-                "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
-            };
+        //if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) && selectedZombies != null) {
 
             int x = 85; // Initial X position
             int y = 625; // Initial Y position
-            for (int i = 0; i < selectedZombies.length; i++) {
-                if (selectedZombies[i] != null) {
-                    int zombieIndex = getZombieIndex(selectedZombies[i]);
-                    if (zombieIndex != -1) {
+            for (String zombieName : selectedZombies) {
+                if (zombieName != null) {
+                    //int zombieIndex = getZombieIndex(zombieName);
+                    //if (zombieIndex != -1) {
                         // Display the card
-                        ImageIcon icon = new ImageIcon(zombieCards[zombieIndex]);
+
+
+                    List<String> zombie = ZOMBIES_VIEW.get(0);
+                    for (List<String> zombies : ZOMBIES_VIEW) {
+                        if (zombies.get(0).equals(zombieName)) {
+                            zombie = zombies;
+                            break;
+                        }
+                    }
+
+                        ImageIcon icon = new ImageIcon(zombie.get(2));
                         JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                         cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
                         panel.add(cardLabel);
 
                         // Add drag functionality
-                        String dragImagePath = zombieDragImages[zombieIndex];
+                        String dragImagePath = zombie.get(3);
                         cardLabel.setTransferHandler(new TransferHandler("icon") {
                             @Override
                             protected Transferable createTransferable(JComponent c) {
@@ -516,12 +579,11 @@ public class GardenMenu extends JFrame {
                         });
 
                         x += 70; // Move X position for the next card
-                    }
+                    //}
                 }
             }
-        }
+        //}
     }
-
     private int getZombieIndex(String zombiePath) {
         // Map zombies to their indices
         if (zombiePath.contains("Basic")) return 0;
@@ -533,7 +595,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addZombieTable(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
+        if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
             // Path of the zombie table image
             String zombieTableImagePath = "resources/images/zombie-table.png";
 
@@ -550,7 +612,7 @@ public class GardenMenu extends JFrame {
     }
 
     private void addBrainIcon(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
+        if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
             // Path of the brain image
             String brainImagePath = "resources/images/brain.png";
 
@@ -600,21 +662,31 @@ public class GardenMenu extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            String[] selectedPlants = {
+            ArrayList<String> selectedPlants = new ArrayList<>(Arrays.asList(
                     "Sunflower",
                     "Peashooter",
                     "WallNut",
                     "PotatoMine",
                     "ECIPlant"
-            };
-            String[] selectedZombies = {
+            ));
+            ArrayList<String> selectedZombies = new ArrayList<>(Arrays.asList(
                     "Basic",
                     "Conehead",
                     "BucketHead",
                     "ECIZombie",
                     "Brainstein"
-            };
-            GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");
+            ));
+            
+            //GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");s            
+            int matchTimer = 300;
+            String namePlayerOne = "Player1";
+            //ArrayList<String> plants = new ArrayList<>(Arrays.asList(selectedPlants));
+            int sunAmount = 50;
+            String namePlayerTwo = "Player2";
+            int brainAmount = 100;
+            //ArrayList<String> zombies = new ArrayList<>(Arrays.asList(selectedZombies));
+            POOBvsZombies poobvszombies = new POOBvsZombies(matchTimer, namePlayerOne, selectedPlants, sunAmount, namePlayerTwo, brainAmount, selectedZombies);
+            GardenMenu frame = new GardenMenu(poobvszombies);
             frame.setVisible(true);
         });
     }
