@@ -52,7 +52,7 @@ public class POOBvsZombies {
         return seconds * 60;
     }
 
-    public float getroundTime() {
+    public float getRoundTime() {
         return roundTime;
     }
     

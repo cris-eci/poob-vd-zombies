@@ -3,7 +3,8 @@ package presentation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container; // Add this import
-import java.awt.Dimension;
+import java.awt.Dimension; // Add this import
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -11,6 +12,8 @@ import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList; // Add this import
@@ -34,6 +37,7 @@ import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.LineBorder;
 
 import domain.POOBvsZombies;
+import domain.Plants;
 import domain.Player;
 
 public class GardenMenu extends JFrame {
@@ -45,86 +49,74 @@ public class GardenMenu extends JFrame {
     private JPanel[][] gridCells = new JPanel[5][10];
     private java.util.List<JLabel> movingZombies = new java.util.ArrayList<>();
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
-        Arrays.asList(
-            "Basic",
-            "resources/images/zombies/Basic/Basic.jpg",
-            "resources/images/cards/Zombies/card_basic_zombie.png",
-            "resources/images/zombies/Basic/BasicDinamic.gif"
-        ),
-        Arrays.asList(
-            "Brainstein",
-            "resources/images/zombies/Brainstein/brainsteinGarden.jpeg",
-            "resources/images/cards/Zombies/card_brainstein.png",
-            "resources/images/zombies/Brainstein/brainsteinAnimated.gif"
-        ),
-        Arrays.asList(
-            "BucketHead",
-            "resources/images/zombies/BucketHead/Buckethead.jpg",
-            "resources/images/cards/Zombies/card_buckethead_zombie.png",
-            "resources/images/zombies/BucketHead/BucketheadAnimated.gif"
-        ),
-        Arrays.asList(
-            "Conehead",
-            "resources/images/zombies/Conehead/Conehead.jpg",
-            "resources/images/cards/Zombies/card_conehead_zombie.png",
-            "resources/images/zombies/Conehead/ConeheadAnimated.gif"
-        ),
-        Arrays.asList(
-            "ECIZombie",
-            "resources/images/zombies/ECIZombie/ECIZombie.png",
-            "resources/images/cards/Zombies/card_ECIZombie.png",
-            "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
-        )
-    );
+            Arrays.asList(
+                    "Basic",
+                    "resources/images/zombies/Basic/Basic.jpg",
+                    "resources/images/cards/Zombies/card_basic_zombie.png",
+                    "resources/images/zombies/Basic/BasicDinamic.gif"),
+            Arrays.asList(
+                    "Brainstein",
+                    "resources/images/zombies/Brainstein/brainsteinGarden.jpeg",
+                    "resources/images/cards/Zombies/card_brainstein.png",
+                    "resources/images/zombies/Brainstein/brainsteinAnimated.gif"),
+            Arrays.asList(
+                    "BucketHead",
+                    "resources/images/zombies/BucketHead/Buckethead.jpg",
+                    "resources/images/cards/Zombies/card_buckethead_zombie.png",
+                    "resources/images/zombies/BucketHead/BucketheadAnimated.gif"),
+            Arrays.asList(
+                    "Conehead",
+                    "resources/images/zombies/Conehead/Conehead.jpg",
+                    "resources/images/cards/Zombies/card_conehead_zombie.png",
+                    "resources/images/zombies/Conehead/ConeheadAnimated.gif"),
+            Arrays.asList(
+                    "ECIZombie",
+                    "resources/images/zombies/ECIZombie/ECIZombie.png",
+                    "resources/images/cards/Zombies/card_ECIZombie.png",
+                    "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"));
 
-    public static final  List<List<String>> PLANTS_VIEW = Arrays.asList(
-        Arrays.asList(
-            "Sunflower",
-            "resources/images/plants/Sunflower/Sunflower.jpg",
-            "resources/images/cards/Plants/card_sunflower.png",
-            "resources/images/plants/Sunflower/sunflowerAnimated.gif"
-        ),
-        Arrays.asList(
-            "Peashooter",
-            "resources/images/plants/Peashooter/Peashooter.jpg",
-            "resources/images/cards/Plants/card_peashooter.png",
-            "resources/images/plants/Peashooter/peashooterAnimated.gif"
-        ),
-        Arrays.asList(
-            "WallNut",
-            "resources/images/plants/WallNut/Wall-nutGrass.jpg",
-            "resources/images/cards/Plants/card_wallnut.png",
-            "resources/images/plants/WallNut/wall-nutAnimated.gif"
-        ),
-        Arrays.asList(
-            "PotatoMine",
-            "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
-            "resources/images/cards/Plants/card_potatomine.png",
-            "resources/images/plants/PotatoMine/before-potato-mineAnimated.gif"
-        ),
-        Arrays.asList(
-            "ECIPlant",
-            "resources/images/plants/ECIPlant/ECIPlant.png",
-            "resources/images/cards/Plants/card_ECIPlant.png",
-            "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
-        )
-    );
+    public static final List<List<String>> PLANTS_VIEW = Arrays.asList(
+            Arrays.asList(
+                    "Sunflower",
+                    "resources/images/plants/Sunflower/Sunflower.jpg",
+                    "resources/images/cards/Plants/card_sunflower.png",
+                    "resources/images/plants/Sunflower/sunflowerAnimated.gif"),
+            Arrays.asList(
+                    "Peashooter",
+                    "resources/images/plants/Peashooter/Peashooter.jpg",
+                    "resources/images/cards/Plants/card_peashooter.png",
+                    "resources/images/plants/Peashooter/peashooterAnimated.gif"),
+            Arrays.asList(
+                    "WallNut",
+                    "resources/images/plants/WallNut/Wall-nutGrass.jpg",
+                    "resources/images/cards/Plants/card_wallnut.png",
+                    "resources/images/plants/WallNut/wall-nutAnimated.gif"),
+            Arrays.asList(
+                    "PotatoMine",
+                    "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
+                    "resources/images/cards/Plants/card_potatomine.png",
+                    "resources/images/plants/PotatoMine/before-potato-mineAnimated.gif"),
+            Arrays.asList(
+                    "ECIPlant",
+                    "resources/images/plants/ECIPlant/ECIPlant.png",
+                    "resources/images/cards/Plants/card_ECIPlant.png",
+                    "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"));
+    private List<TimerTask> timerTasks = new ArrayList<>();
 
 
-    public GardenMenu(POOBvsZombies poobvszombies) {        
+    public GardenMenu(POOBvsZombies poobvszombies) {
         setTitle("Garden Menu");
         setSize(900, 700);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        
 
         this.modality = poobvszombies.getModality();
         Player playerOne = poobvszombies.getPlayerOne();
         Player playerTwo = poobvszombies.getPlayerTwo();
         this.selectedPlants = playerOne.getTeam().getCharacters();
-        this.selectedZombies = playerTwo.getTeam().getCharacters();  
-        
+        this.selectedZombies = playerTwo.getTeam().getCharacters();
+
         // Panel with custom background
         JPanel panel = new JPanel() {
             Image backgroundImage = new ImageIcon("resources/images/gardenPvsP.png").getImage();
@@ -153,14 +145,17 @@ public class GardenMenu extends JFrame {
         addTopRightButtons(panel);
 
         // Add zombie components only if in "PlayerVsPlayer" mode
-        
+
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
         }
 
-        addTimerSection(panel, poobvszombies);
+        //addTimerSection(panel, poobvszombies);
+        initializeTimers(poobvszombies);
+    setupTimerLabels(panel);
+    startSequentialTimers(0);
 
         add(panel);
         startZombieMovement();
@@ -172,52 +167,54 @@ public class GardenMenu extends JFrame {
         int y = -25; // Initial Y position
         for (String plantName : selectedPlants) {
             if (plantName != null) { // Only if it's a valid plant
-                //int plantIndex = getPlantIndex(selectedPlants[i]);
-                //if (plantIndex != -1) {
-                    // Display the card
-                    List<String> plant = PLANTS_VIEW.get(0);
+                // int plantIndex = getPlantIndex(selectedPlants[i]);
+                // if (plantIndex != -1) {
+                // Display the card
+                List<String> plant = PLANTS_VIEW.get(0);
 
-                    // Buscar la planta en la lista de plantas y asignarla a la variable plant para tener todas sus posibles representaciones graficas
-                    for (List<String> plants : PLANTS_VIEW) {
-                        if (plants.get(0).equals(plantName)) {
-                            plant = plants;
-                            break;
-                        }
+                // Buscar la planta en la lista de plantas y asignarla a la variable plant para
+                // tener todas sus posibles representaciones graficas
+                for (List<String> plants : PLANTS_VIEW) {
+                    if (plants.get(0).equals(plantName)) {
+                        plant = plants;
+                        break;
+                    }
+                }
+
+                ImageIcon icon = new ImageIcon(plant.get(2));
+                JLabel cardLabel = new JLabel(
+                        new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
+                cardLabel.setBounds(x, y, 100, 150);
+                panel.add(cardLabel);
+
+                // Add drag functionality
+                String dragImagePath = plant.get(3);
+                cardLabel.setTransferHandler(new TransferHandler("icon") {
+                    @Override
+                    protected Transferable createTransferable(JComponent c) {
+                        ImageIcon icon = new ImageIcon(dragImagePath);
+                        return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
                     }
 
-                    ImageIcon icon = new ImageIcon(plant.get(2));  
-                    JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
-                    cardLabel.setBounds(x, y, 100, 150);
-                    panel.add(cardLabel);
+                    @Override
+                    public int getSourceActions(JComponent c) {
+                        return COPY;
+                    }
+                });
 
-                    // Add drag functionality
-                    String dragImagePath = plant.get(3);
-                    cardLabel.setTransferHandler(new TransferHandler("icon") {
-                        @Override
-                        protected Transferable createTransferable(JComponent c) {
-                            ImageIcon icon = new ImageIcon(dragImagePath);
-                            return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
+                cardLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        JComponent comp = (JComponent) e.getSource();
+                        TransferHandler handler = comp.getTransferHandler();
+                        if (handler != null) {
+                            handler.exportAsDrag(comp, e, TransferHandler.COPY);
                         }
+                    }
+                });
 
-                        @Override
-                        public int getSourceActions(JComponent c) {
-                            return COPY;
-                        }
-                    });
-
-                    cardLabel.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            JComponent comp = (JComponent) e.getSource();
-                            TransferHandler handler = comp.getTransferHandler();
-                            if (handler != null) {
-                                handler.exportAsDrag(comp, e, TransferHandler.COPY);
-                            }
-                        }
-                    });
-
-                    x += 70; // Move X position for the next card
-                //}
+                x += 70; // Move X position for the next card
+                // }
             }
         }
     }
@@ -296,7 +293,8 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                        .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                 Image image = transferable.getImage();
                                 JLabel label = new JLabel(new ImageIcon(image));
                                 label.setHorizontalAlignment(JLabel.CENTER);
@@ -331,7 +329,8 @@ public class GardenMenu extends JFrame {
                                 }
 
                                 try {
-                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                            .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                     return "zombie".equals(transferable.getType()); // Only accept zombies
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -397,7 +396,8 @@ public class GardenMenu extends JFrame {
             inputPanel.add(new JLabel("Column (1-9):"));
             inputPanel.add(colField);
 
-            int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant", JOptionPane.OK_CANCEL_OPTION);
+            int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant",
+                    JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     int row = Integer.parseInt(rowField.getText());
@@ -405,13 +405,16 @@ public class GardenMenu extends JFrame {
 
                     // Validate limits and conditions
                     if (row < 0 || row > 4 || col < 1 || col > 9) {
-                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     } else if (col == 0) {
-                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error",
+                                JOptionPane.ERROR_MESSAGE);
                     } else {
                         JPanel targetPanel = gridCells[row][col];
                         if (targetPanel.getComponentCount() == 0) {
-                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
                         } else {
                             // Remove the plant
                             targetPanel.removeAll();
@@ -420,7 +423,8 @@ public class GardenMenu extends JFrame {
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -430,10 +434,10 @@ public class GardenMenu extends JFrame {
 
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
-            "resources/images/buttons/export-icon.png",     // Export
-            "resources/images/buttons/save-icon.png",       // Save
-            "resources/images/buttons/return-icon.png",     // Return
-            "resources/images/buttons/home-icon.png"        // Back to main menu
+                "resources/images/buttons/export-icon.png", // Export
+                "resources/images/buttons/save-icon.png", // Save
+                "resources/images/buttons/return-icon.png", // Return
+                "resources/images/buttons/home-icon.png" // Back to main menu
         };
 
         int x = 660;
@@ -442,7 +446,8 @@ public class GardenMenu extends JFrame {
 
         for (String imagePath : buttonImagePaths) {
             ImageIcon icon = new ImageIcon(imagePath);
-            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+            JButton button = new JButton(
+                    new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
             button.setBounds(x, y, buttonSize, buttonSize);
             button.setContentAreaFilled(false);
             button.setBorderPainted(false);
@@ -458,8 +463,7 @@ public class GardenMenu extends JFrame {
                     } else if ("PlayerVsPlayer".equals(modality)) {
                         PlayerVsPlayer pvpMenu = new PlayerVsPlayer();
                         pvpMenu.setVisible(true);
-                    }
-                    else{
+                    } else {
                         MachineVSMachine mvsmMenu = new MachineVSMachine();
                         mvsmMenu.setVisible(true);
                     }
@@ -480,7 +484,8 @@ public class GardenMenu extends JFrame {
         }
     }
 
-    // Auxiliary class to handle the Transferable object of image type with type (plant or zombie)
+    // Auxiliary class to handle the Transferable object of image type with type
+    // (plant or zombie)
     private static class ImageTransferable implements Transferable {
         public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
         private Image image;
@@ -501,7 +506,7 @@ public class GardenMenu extends JFrame {
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[]{IMAGE_FLAVOR};
+            return new DataFlavor[] { IMAGE_FLAVOR };
         }
 
         @Override
@@ -526,10 +531,9 @@ public class GardenMenu extends JFrame {
             int y = 625; // Initial Y position
             for (String zombieName : selectedZombies) {
                 if (zombieName != null) {
-                    //int zombieIndex = getZombieIndex(zombieName);
-                    //if (zombieIndex != -1) {
-                        // Display the card
-
+                    // int zombieIndex = getZombieIndex(zombieName);
+                    // if (zombieIndex != -1) {
+                    // Display the card
 
                     List<String> zombie = ZOMBIES_VIEW.get(0);
                     for (List<String> zombies : ZOMBIES_VIEW) {
@@ -539,39 +543,40 @@ public class GardenMenu extends JFrame {
                         }
                     }
 
-                        ImageIcon icon = new ImageIcon(zombie.get(2));
-                        JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
-                        cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
-                        panel.add(cardLabel);
+                    ImageIcon icon = new ImageIcon(zombie.get(2));
+                    JLabel cardLabel = new JLabel(
+                            new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
+                    cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
+                    panel.add(cardLabel);
 
-                        // Add drag functionality
-                        String dragImagePath = zombie.get(3);
-                        cardLabel.setTransferHandler(new TransferHandler("icon") {
-                            @Override
-                            protected Transferable createTransferable(JComponent c) {
-                                ImageIcon icon = new ImageIcon(dragImagePath);
-                                return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                    // Add drag functionality
+                    String dragImagePath = zombie.get(3);
+                    cardLabel.setTransferHandler(new TransferHandler("icon") {
+                        @Override
+                        protected Transferable createTransferable(JComponent c) {
+                            ImageIcon icon = new ImageIcon(dragImagePath);
+                            return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                        }
+
+                        @Override
+                        public int getSourceActions(JComponent c) {
+                            return COPY;
+                        }
+                    });
+
+                    cardLabel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            JComponent comp = (JComponent) e.getSource();
+                            TransferHandler handler = comp.getTransferHandler();
+                            if (handler != null) {
+                                handler.exportAsDrag(comp, e, TransferHandler.COPY);
                             }
+                        }
+                    });
 
-                            @Override
-                            public int getSourceActions(JComponent c) {
-                                return COPY;
-                            }
-                        });
-
-                        cardLabel.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mousePressed(MouseEvent e) {
-                                JComponent comp = (JComponent) e.getSource();
-                                TransferHandler handler = comp.getTransferHandler();
-                                if (handler != null) {
-                                    handler.exportAsDrag(comp, e, TransferHandler.COPY);
-                                }
-                            }
-                        });
-
-                        x += 70; // Move X position for the next card
-                    //}
+                    x += 70; // Move X position for the next card
+                    // }
                 }
             }
         }
@@ -617,37 +622,9 @@ public class GardenMenu extends JFrame {
             panel.add(textLabel);
         }
     }
-        private void addTimerSection(JPanel panel, POOBvsZombies poobvsZombies) {
-            // Create a JLabel for the timer message
-            JLabel timerMessageLabel = new JLabel("Round time:");
-            timerMessageLabel.setForeground(Color.BLACK);
-            timerMessageLabel.setFont(timerMessageLabel.getFont().deriveFont(20f));
-            timerMessageLabel.setBounds(500, 585, 150, 30); // Adjust position and size
+        
 
-            // Create a JLabel for the timer value
-            int initialSeconds = (int) poobvsZombies.getroundTime();
-            int[] remainingSeconds = {initialSeconds};
-            JLabel timerValueLabel = new JLabel(String.format("%d:%02d", initialSeconds / 60, initialSeconds % 60)); // Initial timer value
-            timerValueLabel.setForeground(Color.BLACK);
-            timerValueLabel.setFont(timerValueLabel.getFont().deriveFont(20f));
-            timerValueLabel.setBounds(500, 625, 150, 30); // Adjust position and size
-
-            panel.add(timerMessageLabel);
-            panel.add(timerValueLabel);
-
-            // Timer to update the timer value label
-            Timer timer = new Timer(1000, e -> {
-                if (remainingSeconds[0] > 0) {
-                    remainingSeconds[0]--;
-                    int minutes = remainingSeconds[0] / 60;
-                    int seconds = remainingSeconds[0] % 60;
-                    timerValueLabel.setText(String.format("%d:%02d", minutes, seconds));
-                }
-            });
-            timer.start();
-        }
-
-        private void startZombieMovement() {
+    private void startZombieMovement() {
         Timer timer = new Timer(100, e -> {
             Iterator<JLabel> iterator = movingZombies.iterator();
             while (iterator.hasNext()) {
@@ -670,7 +647,91 @@ public class GardenMenu extends JFrame {
         });
         timer.start();
     }
-    
+
+    // Clase interna para representar cada temporizador
+private class TimerTask {
+    private String message;
+    private int durationInSeconds;
+    private JLabel messageLabel;
+    private JLabel timeLabel;
+
+    public TimerTask(String message, int durationInSeconds) {
+        this.message = message;
+        this.durationInSeconds = durationInSeconds;
+    }
+}
+
+// Método para inicializar los temporizadores
+private void initializeTimers(POOBvsZombies poobvsZombies) {
+    timerTasks.add(new TimerTask("Tiempo de siembra 1", Plants.PLANTING_TIME));
+    timerTasks.add(new TimerTask("Tiempo de ronda", (int) poobvsZombies.getRoundTime()));
+    timerTasks.add(new TimerTask("Tiempo de siembra 2", Plants.PLANTING_TIME));
+    timerTasks.add(new TimerTask("Última ronda", (int) poobvsZombies.getRoundTime()));
+}
+
+// Método para configurar las etiquetas en la interfaz
+private void setupTimerLabels(JPanel panel) {
+    int startX = 500;
+    int startY = 400;
+    int yOffset = 60;
+
+    for (int i = 0; i < timerTasks.size(); i++) {
+        TimerTask task = timerTasks.get(i);
+
+        JLabel messageLabel = new JLabel(task.message);
+        messageLabel.setForeground(Color.BLACK);
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        messageLabel.setBounds(startX, startY + i * yOffset, 200, 30);
+
+        JLabel timeLabel = new JLabel(formatTime(task.durationInSeconds));
+        timeLabel.setForeground(Color.BLACK);
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timeLabel.setBounds(startX, startY + i * yOffset + 25, 200, 30);
+
+        task.messageLabel = messageLabel;
+        task.timeLabel = timeLabel;
+
+        panel.add(messageLabel);
+        panel.add(timeLabel);
+    }
+}
+
+// Método para iniciar los temporizadores secuencialmente
+private void startSequentialTimers(int index) {
+    if (index >= timerTasks.size()) {
+        return;
+    }
+
+    TimerTask currentTask = timerTasks.get(index);
+    int duration = currentTask.durationInSeconds;
+
+    Timer timer = new Timer(1000, null);
+    timer.addActionListener(new ActionListener() {
+        int remainingTime = duration;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (remainingTime > 0) {
+                remainingTime--;
+                currentTask.timeLabel.setText(formatTime(remainingTime));
+            } else {
+                timer.stop();
+                // Iniciar el siguiente temporizador
+                startSequentialTimers(index + 1);
+            }
+        }
+    });
+
+    timer.setInitialDelay(0);
+    timer.start();
+}
+
+// Método para formatear el tiempo
+private String formatTime(int seconds) {
+    int minutes = seconds / 60;
+    int remainingSeconds = seconds % 60;
+    return String.format("%d:%02d", minutes, remainingSeconds);
+}
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -679,25 +740,25 @@ public class GardenMenu extends JFrame {
                     "Peashooter",
                     "WallNut",
                     "PotatoMine",
-                    "ECIPlant"
-            ));
+                    "ECIPlant"));
             ArrayList<String> selectedZombies = new ArrayList<>(Arrays.asList(
                     "Basic",
                     "Conehead",
                     "BucketHead",
                     "ECIZombie",
-                    "Brainstein"
-            ));
-            
-            //GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");s            
-            int matchTimer = 3;
+                    "Brainstein"));
+
+            // GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies,
+            // "PlayerVsPlayer");s
+            int matchTimer = 1;
             String namePlayerOne = "Player1";
-            //ArrayList<String> plants = new ArrayList<>(Arrays.asList(selectedPlants));
+            // ArrayList<String> plants = new ArrayList<>(Arrays.asList(selectedPlants));
             int sunAmount = 50;
             String namePlayerTwo = "Player2";
             int brainAmount = 100;
-            //ArrayList<String> zombies = new ArrayList<>(Arrays.asList(selectedZombies));
-            POOBvsZombies poobvszombies = new POOBvsZombies(matchTimer, namePlayerOne, selectedPlants, sunAmount, namePlayerTwo, brainAmount, selectedZombies);
+            // ArrayList<String> zombies = new ArrayList<>(Arrays.asList(selectedZombies));
+            POOBvsZombies poobvszombies = new POOBvsZombies(matchTimer, namePlayerOne, selectedPlants, sunAmount,
+                    namePlayerTwo, brainAmount, selectedZombies);
             GardenMenu frame = new GardenMenu(poobvszombies);
             frame.setVisible(true);
         });
