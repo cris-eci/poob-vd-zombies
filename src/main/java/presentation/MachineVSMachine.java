@@ -31,6 +31,7 @@ public class MachineVSMachine extends JFrame {
     private List<ZombiePanel> zombiePanelsList = new ArrayList<>();
     private JTextField time, quantity, setSunsField, setBrainsField;
     private JButton startButton;
+    private int hordeDuration;
 
     public MachineVSMachine() {
         // Configuración básica de la ventana
@@ -164,7 +165,8 @@ public class MachineVSMachine extends JFrame {
             players.add(zombiesAI);
 
             // Crear el objeto POOBvsZombies con los jugadores y el tiempo de la partida
-            POOBvsZombies game = new POOBvsZombies(players, matchTimeValue);
+            POOBvsZombies game = new POOBvsZombies(players, numberOfHordes, hordeDuration, "MachineVsMachine");
+
 
             // Abrir el GardenMenu con las plantas y zombies seleccionados
             GardenMenu gardenMenu = new GardenMenu(

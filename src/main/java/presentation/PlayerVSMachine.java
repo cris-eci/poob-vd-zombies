@@ -14,6 +14,7 @@ public class PlayerVSMachine extends JFrame {
     private String playerName;
     private int matchTime;
     private int numberOfHordes;
+    private int hordeDuration;
 
     public PlayerVSMachine() {
         // Configuración del JFrame
@@ -208,7 +209,8 @@ public class PlayerVSMachine extends JFrame {
         players.add(machinePlayer);
 
         // Crear el juego
-        POOBvsZombies game = new POOBvsZombies(players, matchTime);
+        POOBvsZombies game = new POOBvsZombies(players, numberOfHordes, hordeDuration, "PlayerVsMachine");
+
 
         // Abrir el GardenMenu
         GardenMenu gardenMenu = new GardenMenu(

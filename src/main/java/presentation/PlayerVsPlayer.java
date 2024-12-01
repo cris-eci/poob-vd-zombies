@@ -188,7 +188,8 @@ public class PlayerVsPlayer extends JFrame {
 
 
         // Crear el objeto POOBvsZombies con los jugadores y el tiempo de la partida
-        POOBvsZombies game = new POOBvsZombies(playersList, matchTimeValue);
+        POOBvsZombies game = new POOBvsZombies(playersList, matchTimeValue, "PlayerVsPlayer");
+
 
         // Obtener las plantas y zombies seleccionados
         List<String> selectedPlantsList = new ArrayList<>();

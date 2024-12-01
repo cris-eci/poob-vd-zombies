@@ -2,6 +2,8 @@ package presentation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -27,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.LineBorder;
+import javax.swing.Timer;
 
 import domain.POOBvsZombies;
 import domain.Player;
@@ -35,8 +38,10 @@ import domain.Zombies;
 import domain.Team;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
+
+
 
 
 /**
@@ -68,6 +73,10 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
     // Sistema de puntaje
     private double playerOneScore = 0;
     private double playerTwoScore = 0;
+
+    // Declarar a nivel de clase
+    private boolean shovelSelected = false;
+
     
     public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state, POOBvsZombies game, List<Player> players) {
         // Validación de la lista de jugadores
@@ -121,21 +130,24 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
         // Agregar etiquetas para mostrar los puntajes
         addScoreLabels(panel);
 
-        if ("PlayerVsMachine".equals(state) || "MachineVsMachine".equals(state)) {
+        if ("PlayerVsPlayer".equals(state)) {
+            addPlayerInfo(panel);
+            addScoreLabels(panel);
+            addBrainIcon(panel);
+            addZombieCards(panel);
+            addZombieTable(panel);
+        } else if ("PlayerVsMachine".equals(state)) {
+            addPlayerInfo(panel); // Solo mostrar información del jugador
             addHordeLabel(panel);
-        }
-        
-
-        // Add zombie components only if in "PlayerVsPlayer" mode
-        
-        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
+        } else if ("MachineVsMachine".equals(state)) {
+            addHordeLabel(panel);
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
         }
 
         add(panel);
-        //startZombieMovement();
+        startZombieMovement();
         if (game != null) {
             game.setGameListener(this);
         }
@@ -238,15 +250,15 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
         shovelLabel.setBounds(520, 28, 50, 50); // Colocar en la esquina superior derecha
         originalShovelPosition = shovelLabel.getLocation();
 
-        // Agregar funcionalidad de clic para seleccionar la pala
         shovelLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Implementar lógica para usar la pala si es necesario
-                // Por ejemplo, cambiar el cursor o indicar que la pala está seleccionada
-                JOptionPane.showMessageDialog(null, "Pala seleccionada. Haz clic en una planta para removerla.");
+                shovelSelected = true;
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cambiar el cursor
+                // JOptionPane.showMessageDialog(null, "Pala seleccionada. Haz clic en una planta para removerla.");
             }
         });
+        
 
         panel.add(shovelLabel);
     }
@@ -327,6 +339,26 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
                             return false;
                         }
                     });
+
+                    
+                    // Añadir MouseListener a la celda
+                        cellPanel.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                if (shovelSelected) {
+                                    if (cellPanel.getComponentCount() > 0) {
+                                        // Remover la planta
+                                        cellPanel.removeAll();
+                                        cellPanel.revalidate();
+                                        cellPanel.repaint();
+                                        shovelSelected = false;
+                                        setCursor(Cursor.getDefaultCursor()); // Restablecer el cursor
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "No hay planta en esta celda.");
+                                    }
+                                }
+                            }
+                        });
                 } else if (col == 9) {
                     if ("PlayerVsPlayer".equals(state)) {
                         // Allow dragging and dropping zombies only in the last column
@@ -452,10 +484,10 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
      * Método para agregar las etiquetas que muestran el tiempo restante.
      */
     private void addTimerLabel(JPanel panel) {
-        timerLabel = new JLabel("Tiempo Restante: ");
+        timerLabel = new JLabel("");
         timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        timerLabel.setForeground(Color.WHITE);
-        timerLabel.setBounds(500, 10, 200, 30); // Ajustar posición y tamaño
+        timerLabel.setForeground(Color.BLACK);
+        timerLabel.setBounds(670, 600, 200, 30); // Ajustar posición y tamaño
         panel.add(timerLabel);
     }
 
@@ -467,38 +499,39 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             Player playerOne = players.get(0);
     
             // Etiqueta para el nombre del Jugador 1
-            playerOneNameLabel = new JLabel("Jugador 1: " + playerOne.getName());
+            playerOneNameLabel = new JLabel("" + playerOne.getName());
             playerOneNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
             playerOneNameLabel.setForeground(Color.YELLOW);
-            playerOneNameLabel.setBounds(50, 20, 300, 30); // Ajustar posición y tamaño
+            playerOneNameLabel.setBounds(480, 595, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneNameLabel);
     
             // Etiqueta para los soles iniciales del Jugador 1
-            playerOneSunsLabel = new JLabel("Soles: " + playerOne.getTeam().getResourceCounterAmount());
+            playerOneSunsLabel = new JLabel(""+playerOne.getTeam().getResourceCounterAmount());
             playerOneSunsLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            playerOneSunsLabel.setForeground(Color.GREEN);
-            playerOneSunsLabel.setBounds(50, 60, 300, 30); // Ajustar posición y tamaño
+            playerOneSunsLabel.setForeground(Color.ORANGE);
+            playerOneSunsLabel.setBounds(30, 60, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneSunsLabel);
     
             if ("PlayerVsPlayer".equals(state) && players.size() >= 2) {
                 Player playerTwo = players.get(1);
     
                 // Etiqueta para el nombre del Jugador 2
-                playerTwoNameLabel = new JLabel("Jugador 2: " + playerTwo.getName());
+                playerTwoNameLabel = new JLabel("" + playerTwo.getName());
                 playerTwoNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
                 playerTwoNameLabel.setForeground(Color.RED);
-                playerTwoNameLabel.setBounds(50, 100, 300, 30); // Ajustar posición y tamaño
+                playerTwoNameLabel.setBounds(480, 625, 300, 30); // Ajustar posición y tamaño
                 panel.add(playerTwoNameLabel);
     
                 // Etiqueta para los cerebros iniciales del Jugador 2
-                playerTwoBrainsLabel = new JLabel("Cerebros: " + playerTwo.getTeam().getResourceCounterAmount());
+                playerTwoBrainsLabel = new JLabel("" + playerTwo.getTeam().getResourceCounterAmount());
                 playerTwoBrainsLabel.setFont(new Font("Arial", Font.BOLD, 16));
                 playerTwoBrainsLabel.setForeground(Color.MAGENTA);
-                playerTwoBrainsLabel.setBounds(50, 140, 300, 30); // Ajustar posición y tamaño
+                playerTwoBrainsLabel.setBounds(50, 620, 300, 30); // Ajustar posición y tamaño
                 panel.add(playerTwoBrainsLabel);
             }
         }
     }
+    
     
 
     /**
@@ -506,18 +539,22 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
      */
     private void addScoreLabels(JPanel panel) {
         // Etiqueta para el puntaje del Jugador 1
-        playerOneScoreLabel = new JLabel("Puntaje Jugador 1: 0");
-        playerOneScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        playerOneScoreLabel.setForeground(Color.YELLOW);
-        playerOneScoreLabel.setBounds(50, 180, 300, 30); // Ajustar posición y tamaño
-        panel.add(playerOneScoreLabel);
+        if ("PlayerVsPlayer".equals(state) || "PlayerVsMachine".equals(state)){
+            playerOneScoreLabel = new JLabel("Score: 0");
+            playerOneScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerOneScoreLabel.setForeground(Color.YELLOW);
+            playerOneScoreLabel.setBounds(560, 595, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerOneScoreLabel);
+        }
 
-        // Etiqueta para el puntaje del Jugador 2
-        playerTwoScoreLabel = new JLabel("Puntaje Jugador 2: 0");
-        playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        playerTwoScoreLabel.setForeground(Color.RED);
-        playerTwoScoreLabel.setBounds(50, 220, 300, 30); // Ajustar posición y tamaño
-        panel.add(playerTwoScoreLabel);
+        if("PlayerVsPlayer".equals(state)){
+            // Etiqueta para el puntaje del Jugador 2
+            playerTwoScoreLabel = new JLabel("Score: 0");
+            playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerTwoScoreLabel.setForeground(Color.RED);
+            playerTwoScoreLabel.setBounds(560, 625, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerTwoScoreLabel);
+        }
     }
 
     /**
@@ -713,29 +750,29 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             panel.repaint();
     }
 
-    // private void startZombieMovement() {
-    //     Timer timer = new Timer(100, e -> {
-    //         Iterator<JLabel> iterator = movingZombies.iterator();
-    //         while (iterator.hasNext()) {
-    //             JLabel zombie = iterator.next();
-    //             Point location = zombie.getLocation();
-    //             if (location.x > 0) {
-    //                 // Move zombie to the left
-    //                 zombie.setLocation(location.x - 5, location.y);
-    //             } else {
-    //                 // Remove zombie safely
-    //                 Container parent = zombie.getParent();
-    //                 if (parent != null) {
-    //                     parent.remove(zombie);
-    //                     parent.revalidate();
-    //                     parent.repaint();
-    //                 }
-    //                 iterator.remove();
-    //             }
-    //         }
-    //     });
-    //     timer.start();
-    // }
+    private void startZombieMovement() {
+        Timer timer = new Timer(100, e -> {
+            Iterator<JLabel> iterator = movingZombies.iterator();
+            while (iterator.hasNext()) {
+                JLabel zombie = iterator.next();
+                Point location = zombie.getLocation();
+                if (location.x > 0) {
+                    // Move zombie to the left
+                    zombie.setLocation(location.x - 5, location.y);
+                } else {
+                    // Remove zombie safely
+                    Container parent = zombie.getParent();
+                    if (parent != null) {
+                        parent.remove(zombie);
+                        parent.revalidate();
+                        parent.repaint();
+                    }
+                    iterator.remove();
+                }
+            }
+        });
+        timer.start();
+    }
     
     /**
      * Método para actualizar la cantidad de soles en la interfaz.
@@ -747,7 +784,7 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
         int currentSuns = playerOne.getTeam().getResourceCounterAmount();
         currentSuns += delta;
         playerOne.getTeam().setResourceCounter(currentSuns);
-        playerOneSunsLabel.setText("Soles: " + currentSuns);
+        playerOneSunsLabel.setText(""+ currentSuns);
     }
 
     /**
@@ -761,7 +798,7 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             int currentBrains = playerTwo.getTeam().getResourceCounterAmount();
             currentBrains += delta;
             playerTwo.getTeam().setResourceCounter(currentBrains);
-            playerTwoBrainsLabel.setText("Cerebros: " + currentBrains);
+            playerTwoBrainsLabel.setText("" + currentBrains);
         }
     }
 
@@ -776,7 +813,7 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             int remainingSuns = playerOne.getTeam().getResourceCounterAmount();
             double plantsValue = getPlantsValue();
             playerOneScore = remainingSuns + (plantsValue * 1.5);
-            playerOneScoreLabel.setText("Puntaje Jugador 1: " + playerOneScore);
+            playerOneScoreLabel.setText("Score Player 1: " + playerOneScore);
     
             if ("PlayerVsPlayer".equals(state) && players.size() >= 2) {
                 Player playerTwo = players.get(1);
@@ -785,13 +822,14 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
                 int remainingBrains = playerTwo.getTeam().getResourceCounterAmount();
                 double zombiesValue = getZombiesValue();
                 playerTwoScore = remainingBrains + zombiesValue;
-                playerTwoScoreLabel.setText("Puntaje Jugador 2: " + playerTwoScore);
+                playerTwoScoreLabel.setText("Score Player 2: " + playerTwoScore);
             }
         }
     }
     
+    
 
-    /**
+        /**
      * Método para obtener el valor total de las plantas en el tablero.
      * @return Suma de los costos de las plantas en soles.
      */
@@ -828,6 +866,7 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
         return total;
     }
 
+
     /**
      * Método para obtener el costo de una planta basado en su nombre.
      * @param plantName Nombre de la planta.
@@ -857,40 +896,57 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
     }
 
     private void addHordeLabel(JPanel panel) {
-        
-        hordeLabel = new JLabel("Horda 1");
+        hordeLabel = new JLabel(""); // Etiqueta inicialmente vacía
         hordeLabel.setFont(new Font("Arial", Font.BOLD, 16));
         hordeLabel.setForeground(Color.WHITE);
         hordeLabel.setBounds(400, 10, 200, 30); // Ajusta la posición según sea necesario
         panel.add(hordeLabel);
     }
     
-    /**
-     * Método para implementar la interfaz GameListener de POOBvsZombies.
-     */
+    
+    
     @Override
-    public void onTimeUpdate(int timeRemaining) {
-        SwingUtilities.invokeLater(() -> {
-            timerLabel.setText("Tiempo Restante: " + timeRemaining + "s");
-        });
-    }
+public void onTimeUpdate(int timeRemaining) {
+    SwingUtilities.invokeLater(() -> {
+        int minutes = timeRemaining / 60;
+        int seconds = timeRemaining % 60;
+        timerLabel.setText("Remaining time: " + minutes + "m " + seconds + "s");
+    });
+}
 
-    @Override
-    public void onHalfTime() {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, "Inicia la segunda ronda.");
-            // Puedes implementar lógica adicional para reiniciar el temporizador o ajustar la interfaz
-        });
-    }
+@Override
+public void onInitialSetupTimeUpdate(int timeRemaining) {
+    SwingUtilities.invokeLater(() -> {
+        int minutes = timeRemaining / 60;
+        int seconds = timeRemaining % 60;
+        timerLabel.setText("Round Time: " + minutes + "m " + seconds + "s");
+    });
+}
 
-    @Override
-    public void onGameEnd(String result) {
-        SwingUtilities.invokeLater(() -> {
-            timerLabel.setText("Tiempo Restante: 0s");
-            calculateScores(); // Calcular los puntajes al final del juego
-            JOptionPane.showMessageDialog(this, "Resultado del Juego: " + result);
+@Override
+public void onRoundStart(int roundNumber) {
+    SwingUtilities.invokeLater(() -> {
+        JOptionPane.showMessageDialog(this, "Starts the round " + roundNumber + ".");
+    });
+}
 
-            // Determinar y mostrar el ganador basado en los puntajes
+@Override
+public void onHordeChange(int hordeNumber) {
+    SwingUtilities.invokeLater(() -> {
+        hordeLabel.setText("Horda " + hordeNumber);
+    });
+}
+
+
+@Override
+public void onGameEnd(String result) {
+    SwingUtilities.invokeLater(() -> {
+        timerLabel.setText("Tiempo Restante: 0m 0s");
+        calculateScores(); // Calcular los puntajes al final del juego
+        JOptionPane.showMessageDialog(this, "Resultado del Juego: " + result);
+
+        // Determinar y mostrar el ganador basado en los puntajes
+        if ("PlayerVsPlayer".equals(state)) {
             if (playerOneScore > playerTwoScore) {
                 JOptionPane.showMessageDialog(this, "¡" + players.get(0).getName() + " ha ganado!", "Ganador", JOptionPane.INFORMATION_MESSAGE);
             } else if (playerTwoScore > playerOneScore) {
@@ -898,20 +954,27 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             } else {
                 JOptionPane.showMessageDialog(this, "¡La partida ha terminado en empate!", "Empate", JOptionPane.INFORMATION_MESSAGE);
             }
+        } else if ("PlayerVsMachine".equals(state)) {
+            // Mostrar mensaje de victoria o derrota
+            JOptionPane.showMessageDialog(this, result, "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // Para MachineVsMachine, mostrar resultados basados en puntajes
+            if (playerOneScore > playerTwoScore) {
+                JOptionPane.showMessageDialog(this, "¡Las plantas han ganado!", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            } else if (playerTwoScore > playerOneScore) {
+                JOptionPane.showMessageDialog(this, "¡Los zombies han ganado!", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "¡La partida ha terminado en empate!", "Empate", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
 
-            // Cerrar la ventana de GardenMenu y posiblemente retornar al menú principal
-            dispose();
-            POOBvsZombiesGUI mainMenu = new POOBvsZombiesGUI();
-            mainMenu.setVisible(true);
-        });
-    }
+        // Cerrar la ventana y regresar al menú principal
+        dispose();
+        POOBvsZombiesGUI mainMenu = new POOBvsZombiesGUI();
+        mainMenu.setVisible(true);
+    });
+}
 
-    @Override
-    public void onHordeChange(int hordeNumber) {
-        SwingUtilities.invokeLater(() -> {
-            hordeLabel.setText("Horda " + hordeNumber);
-        });
-    }
 
     private static class ImageTransferable implements Transferable {
         public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");

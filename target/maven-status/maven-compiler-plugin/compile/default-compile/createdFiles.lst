@@ -22,6 +22,7 @@ domain\Conehead.class
 domain\WallNut.class
 domain\ECIZombie.class
 presentation\PlayerVsPlayer$5.class
+domain\POOBvsZombies$6.class
 domain\Entity.class
 domain\Character.class
 domain\ECIPlant.class
@@ -49,8 +50,10 @@ presentation\PlayerVSMachine$1.class
 domain\PlantsStrategic.class
 presentation\GardenMenu$7.class
 presentation\PlayerVsPlayer$4.class
+domain\POOBvsZombies$3.class
 domain\Shooter.class
 domain\ZombiesStrategy.class
+domain\POOBvsZombies$4.class
 presentation\PlayerVSMachine$PlantPanel.class
 domain\Brainstein.class
 domain\Zombie.class
@@ -65,8 +68,11 @@ domain\Resource.class
 domain\Zombies.class
 domain\Lawnmower.class
 presentation\GardenMenu$3.class
+presentation\GardenMenu$9.class
 domain\MachinePlayer.class
+domain\POOBvsZombies$2.class
 domain\ZombieOriginal.class
 presentation\MachineVSMachine$1.class
 presentation\PlayerVsPlayer$ZombiePanel$1.class
+domain\POOBvsZombies$5.class
 presentation\MachineVSMachine$PlantPanel.class

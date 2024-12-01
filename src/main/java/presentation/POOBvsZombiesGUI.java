@@ -135,14 +135,14 @@ public class POOBvsZombiesGUI extends JFrame {
             if (imagePath.contains("import-icon")) {
                 button.addActionListener(e -> {
                     // Implementar funcionalidad para exportar el estado del juego
-                    JOptionPane.showMessageDialog(this, "Funcionalidad de exportar aún no implementada.", "Exportar", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de importar aún no implementada.", "Importar", JOptionPane.INFORMATION_MESSAGE);
                 });
             }
 
             if (imagePath.contains("open-icon")) {
                 button.addActionListener(e -> {
                     // Implementar funcionalidad para guardar el estado del juego
-                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de abrir aún no implementada.", "Abrir", JOptionPane.INFORMATION_MESSAGE);
                 });
             }
             
