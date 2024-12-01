@@ -160,6 +160,8 @@ public class GardenMenu extends JFrame {
             addZombieTable(panel);
         }
 
+        addTimerSection(panel, poobvszombies);
+
         add(panel);
         startZombieMovement();
     }
@@ -218,16 +220,6 @@ public class GardenMenu extends JFrame {
                 //}
             }
         }
-    }
-
-    private int getPlantIndex(String plantPath) {
-        // Map plants to their indices
-        if (plantPath.contains("Sunflower")) return 0;
-        if (plantPath.contains("Peashooter")) return 1;
-        if (plantPath.contains("WallNut")) return 2;
-        if (plantPath.contains("PotatoMine")) return 3;
-        if (plantPath.contains("ECIPlant")) return 4;
-        return -1; // Not found
     }
 
     private void addShovel(JPanel panel) {
@@ -584,15 +576,6 @@ public class GardenMenu extends JFrame {
             }
         }
     }
-    private int getZombieIndex(String zombiePath) {
-        // Map zombies to their indices
-        if (zombiePath.contains("Basic")) return 0;
-        if (zombiePath.contains("Brainstein")) return 1;
-        if (zombiePath.contains("BucketHead")) return 2;
-        if (zombiePath.contains("Conehead")) return 3;
-        if (zombiePath.contains("ECIZombie")) return 4;
-        return -1; // Not found
-    }
 
     private void addZombieTable(JPanel panel) {
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
@@ -634,8 +617,37 @@ public class GardenMenu extends JFrame {
             panel.add(textLabel);
         }
     }
+        private void addTimerSection(JPanel panel, POOBvsZombies poobvsZombies) {
+            // Create a JLabel for the timer message
+            JLabel timerMessageLabel = new JLabel("Round time:");
+            timerMessageLabel.setForeground(Color.BLACK);
+            timerMessageLabel.setFont(timerMessageLabel.getFont().deriveFont(20f));
+            timerMessageLabel.setBounds(500, 585, 150, 30); // Adjust position and size
 
-    private void startZombieMovement() {
+            // Create a JLabel for the timer value
+            int initialSeconds = (int) poobvsZombies.getroundTime();
+            int[] remainingSeconds = {initialSeconds};
+            JLabel timerValueLabel = new JLabel(String.format("%d:%02d", initialSeconds / 60, initialSeconds % 60)); // Initial timer value
+            timerValueLabel.setForeground(Color.BLACK);
+            timerValueLabel.setFont(timerValueLabel.getFont().deriveFont(20f));
+            timerValueLabel.setBounds(500, 625, 150, 30); // Adjust position and size
+
+            panel.add(timerMessageLabel);
+            panel.add(timerValueLabel);
+
+            // Timer to update the timer value label
+            Timer timer = new Timer(1000, e -> {
+                if (remainingSeconds[0] > 0) {
+                    remainingSeconds[0]--;
+                    int minutes = remainingSeconds[0] / 60;
+                    int seconds = remainingSeconds[0] % 60;
+                    timerValueLabel.setText(String.format("%d:%02d", minutes, seconds));
+                }
+            });
+            timer.start();
+        }
+
+        private void startZombieMovement() {
         Timer timer = new Timer(100, e -> {
             Iterator<JLabel> iterator = movingZombies.iterator();
             while (iterator.hasNext()) {
@@ -678,7 +690,7 @@ public class GardenMenu extends JFrame {
             ));
             
             //GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");s            
-            int matchTimer = 300;
+            int matchTimer = 3;
             String namePlayerOne = "Player1";
             //ArrayList<String> plants = new ArrayList<>(Arrays.asList(selectedPlants));
             int sunAmount = 50;
