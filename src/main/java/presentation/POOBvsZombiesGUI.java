@@ -16,6 +16,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -45,7 +46,7 @@ public class POOBvsZombiesGUI extends JFrame {
         // Create buttons with text on them
         JButton PlayerVsPlayerButton = createMenuButton("Player vs Player", "SURVIVAL", 242);
         JButton playerVsMachineButton = createMenuButton("Player vs Machine", "ORIGINAL", 362);
-        JButton machineVsMachineButton = createMenuButton("Machine vs Machine", "SURVIVAL", 472);
+        JButton machineVsMachineButton = createMenuButton("Machine vs Machine", "ORIGINAL", 472);
 
         // Add buttons to panel
         panel.add(PlayerVsPlayerButton);
@@ -130,7 +131,21 @@ public class POOBvsZombiesGUI extends JFrame {
             button.setBorderPainted(false);
             button.setFocusPainted(false);
 
-            // Add action events to buttons
+            // Agregar eventos de acción a los botones
+            if (imagePath.contains("import-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para exportar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de exportar aún no implementada.", "Exportar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+
+            if (imagePath.contains("open-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para guardar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+            
 
             panel.add(button);
             x += 60; // Adjust X position for the next button

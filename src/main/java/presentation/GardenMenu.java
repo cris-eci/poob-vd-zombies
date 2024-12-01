@@ -3,6 +3,7 @@ package presentation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -24,22 +25,62 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.LineBorder;
 
-public class GardenMenu extends JFrame {
+import domain.POOBvsZombies;
+import domain.Player;
+import domain.Plants;
+import domain.Zombies;
+import domain.Team;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+
+
+/**
+ * Clase GardenMenu que representa la interfaz de juego donde se colocan las plantas y zombies en el tablero.
+ * Integra la lógica de dominio a través de la instancia de POOBvsZombies y la lista de jugadores.
+ */
+public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
     private String[] selectedPlants;
     private String[] selectedZombies;
-    private String state; // "PlayerVsPlayer" or "PlayerVsMachine"
+    private String state; // "PlayerVsPlayer" o "PlayerVsMachine" o "MachineVsMachine"
     private JLabel shovelLabel;
     private Point originalShovelPosition;
     private JPanel[][] gridCells = new JPanel[5][10];
+    private List<JLabel> movingZombies = new ArrayList<>();
 
-    public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state) {
+    // Referencia al objeto de juego y a los jugadores
+    private POOBvsZombies game;
+    private List<Player> players;
+    
+
+    // Componentes de la interfaz para mostrar recursos y puntajes
+    private JLabel timerLabel;
+    private JLabel playerOneNameLabel, playerTwoNameLabel;
+    private JLabel playerOneSunsLabel, playerTwoBrainsLabel;
+    private JLabel playerOneScoreLabel, playerTwoScoreLabel;
+    private JLabel hordeLabel;
+
+
+    // Sistema de puntaje
+    private double playerOneScore = 0;
+    private double playerTwoScore = 0;
+    
+    public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state, POOBvsZombies game, List<Player> players) {
+        // Validación de la lista de jugadores
+    
+        
         this.selectedPlants = selectedPlants;
         this.selectedZombies = selectedZombies;
         this.state = state;
+        this.game = game;
+        this.players = players;
+
         setTitle("Garden Menu");
-        setSize(900, 700);
+        setSize(900, 700); // Aumentado el tamaño para mejor visibilidad
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -57,7 +98,7 @@ public class GardenMenu extends JFrame {
         panel.setLayout(null);
 
         // Display plant cards based on selection and make them draggable
-        addCards(panel);
+        addPlantCards(panel);
 
         // Add the shovel at the top right corner
         addShovel(panel);
@@ -71,7 +112,22 @@ public class GardenMenu extends JFrame {
         // Add icons for returning to menus, saving, and exporting
         addTopRightButtons(panel);
 
+        // Agregar etiquetas para mostrar el tiempo restante
+        addTimerLabel(panel);
+
+        // Agregar etiquetas para mostrar los nombres de los jugadores y sus recursos iniciales
+        addPlayerInfo(panel);
+
+        // Agregar etiquetas para mostrar los puntajes
+        addScoreLabels(panel);
+
+        if ("PlayerVsMachine".equals(state) || "MachineVsMachine".equals(state)) {
+            addHordeLabel(panel);
+        }
+        
+
         // Add zombie components only if in "PlayerVsPlayer" mode
+        
         if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
             addBrainIcon(panel);
             addZombieCards(panel);
@@ -79,10 +135,18 @@ public class GardenMenu extends JFrame {
         }
 
         add(panel);
+        //startZombieMovement();
+        if (game != null) {
+            game.setGameListener(this);
+        }
     }
 
-    private void addCards(JPanel panel) {
-        // Paths of the cards corresponding to the selected plants
+
+    /**
+     * Método para agregar las tarjetas de plantas seleccionadas.
+     */
+    private void addPlantCards(JPanel panel) {
+        // Rutas de las tarjetas correspondientes a las plantas seleccionadas
         String[] plantCards = {
             "resources/images/cards/Plants/card_sunflower.png",
             "resources/images/cards/Plants/card_peashooter.png",
@@ -91,7 +155,7 @@ public class GardenMenu extends JFrame {
             "resources/images/cards/Plants/card_ECIPlant.png"
         };
 
-        // Paths of the GIFs or PNGs of the plants to drag
+        // Rutas de los GIFs o PNGs de las plantas para arrastrar
         String[] plantDragImages = {
             "resources/images/plants/Sunflower/sunflowerAnimated.gif",
             "resources/images/plants/Peashooter/peashooterAnimated.gif",
@@ -100,25 +164,26 @@ public class GardenMenu extends JFrame {
             "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"
         };
 
-        int x = 75; // Initial X position
-        int y = -25; // Initial Y position
+        int x = 75; // Posición X inicial
+        int y = -25; // Posición Y inicial
         for (int i = 0; i < selectedPlants.length; i++) {
-            if (selectedPlants[i] != null) { // Only if it's a valid plant
+            if (selectedPlants[i] != null && !selectedPlants[i].isEmpty()) { // Solo si es una planta válida
                 int plantIndex = getPlantIndex(selectedPlants[i]);
                 if (plantIndex != -1) {
-                    // Display the card
+                    // Mostrar la tarjeta de la planta
                     ImageIcon icon = new ImageIcon(plantCards[plantIndex]);
                     JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                     cardLabel.setBounds(x, y, 100, 150);
                     panel.add(cardLabel);
 
-                    // Add drag functionality
+                    // Hacer la tarjeta arrastrable
                     String dragImagePath = plantDragImages[plantIndex];
+                    String plantName = selectedPlants[i];
                     cardLabel.setTransferHandler(new TransferHandler("icon") {
                         @Override
                         protected Transferable createTransferable(JComponent c) {
                             ImageIcon icon = new ImageIcon(dragImagePath);
-                            return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
+                            return new ImageTransferable(icon.getImage(), "plant",plantName); // especificar tipo y nombre
                         }
 
                         @Override
@@ -138,45 +203,64 @@ public class GardenMenu extends JFrame {
                         }
                     });
 
-                    x += 70; // Move X position for the next card
+                    x += 70; // Mover posición X para la siguiente tarjeta
                 }
             }
         }
     }
 
-    private int getPlantIndex(String plantPath) {
-        // Map plants to their indices
-        if (plantPath.contains("Sunflower")) return 0;
-        if (plantPath.contains("Peashooter")) return 1;
-        if (plantPath.contains("WallNut")) return 2;
-        if (plantPath.contains("PotatoMine")) return 3;
-        if (plantPath.contains("ECIPlant")) return 4;
-        return -1; // Not found
+    /**
+     * Método para mapear la ruta de la planta a su índice correspondiente.
+     */
+    private int getPlantIndex(String plantName) {
+        // Mapea las plantas a sus índices
+        if (plantName.contains("Sunflower")) return 0;
+        if (plantName.contains("Peashooter")) return 1;
+        if (plantName.contains("WallNut")) return 2;
+        if (plantName.contains("PotatoMine")) return 3;
+        if (plantName.contains("ECIPlant")) return 4;
+        return -1; // No encontrado
     }
 
+    /**
+     * Método para agregar la pala en la interfaz.
+     */
     private void addShovel(JPanel panel) {
-        // Path of the shovel
+        // Ruta de la imagen de la pala
         String shovelImagePath = "resources/images/shovel.png";
 
-        // Load and scale the shovel
+        // Cargar y escalar la imagen de la pala
         ImageIcon shovelIcon = new ImageIcon(shovelImagePath);
         Image scaledShovelImage = shovelIcon.getImage().getScaledInstance(65, 65, Image.SCALE_SMOOTH);
 
-        // Create a JLabel to display the shovel
+        // Crear un JLabel para mostrar la pala
         shovelLabel = new JLabel(new ImageIcon(scaledShovelImage));
-        shovelLabel.setBounds(520, 28, 50, 50); // Place at the top right corner
+        shovelLabel.setBounds(520, 28, 50, 50); // Colocar en la esquina superior derecha
         originalShovelPosition = shovelLabel.getLocation();
+
+        // Agregar funcionalidad de clic para seleccionar la pala
+        shovelLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Implementar lógica para usar la pala si es necesario
+                // Por ejemplo, cambiar el cursor o indicar que la pala está seleccionada
+                JOptionPane.showMessageDialog(null, "Pala seleccionada. Haz clic en una planta para removerla.");
+            }
+        });
 
         panel.add(shovelLabel);
     }
 
+    /**
+     * Método para agregar el tablero de 5x10 con celdas.
+     */
     private void addGridLayout(JPanel panel) {
-        // Create a panel with a 5x10 GridLayout
-        JPanel gridPanel = new JPanel(new GridLayout(5, 10, 5, 5)); // 5 rows, 10 columns, 5px spacing
-        gridPanel.setBounds(40, 80, 800, 500); // Adjust position and size
-        gridPanel.setOpaque(false); // Transparent to make the background visible
+        // Crear un panel con un GridLayout de 5 filas x 10 columnas
+        JPanel gridPanel = new JPanel(new GridLayout(5, 10, 5, 5)); // 5 filas, 10 columnas, 5px de espacio
+        gridPanel.setBounds(40, 80, 800, 500); // Ajustar posición y tamaño
+        gridPanel.setOpaque(false); // Transparente para ver el fondo
 
-        // Path of the lawn mower
+        // Ruta de la imagen de la podadora
         String lawnMowerImagePath = "resources/images/Lawnmower.jpg";
 
         // Add cells to the grid with specific restrictions for plants and zombies
@@ -212,7 +296,8 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
+                                ImageTransferable transferable = (ImageTransferable) support.getTransferable()
+                                        .getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                 return "plant".equals(transferable.getType()); // Only accept plants
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -279,23 +364,30 @@ public class GardenMenu extends JFrame {
                                 try {
                                     ImageTransferable transferable = (ImageTransferable) support.getTransferable().getTransferData(ImageTransferable.IMAGE_FLAVOR);
                                     Image image = transferable.getImage();
+                                    String plantName = transferable.getName(); // Obtener el nombre de la planta
                                     JLabel label = new JLabel(new ImageIcon(image));
                                     label.setHorizontalAlignment(JLabel.CENTER);
+                                    label.putClientProperty("name", plantName); // Establecer la propiedad "name"
                                     JPanel targetPanel = (JPanel) support.getComponent();
                                     targetPanel.add(label);
                                     targetPanel.revalidate();
                                     targetPanel.repaint();
+
+                                    // Actualizar los recursos (soles) al colocar una planta
+                                    updateSuns(-getPlantCost(plantName));
+
                                     return true;
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
                                 return false;
                             }
+
                         });
                     }
                 }
 
-                gridCells[row][col] = cellPanel; // Save the cell reference
+                gridCells[row][col] = cellPanel; // Guardar la referencia de la celda
                 gridPanel.add(cellPanel);
             }
         }
@@ -303,18 +395,26 @@ public class GardenMenu extends JFrame {
         panel.add(gridPanel);
     }
 
+    /**
+     * Método para agregar el botón "Use Shovel".
+     */
     private void addUseShovelButton(JPanel panel) {
         JButton useShovelButton = new JButton("Use Shovel");
-        useShovelButton.setBounds(580, 55, 100, 30);
+        useShovelButton.setBounds(580, 55, 100, 30); // Ajustar posición y tamaño
+        // useShovelButton.setBackground(new Color(240, 162, 198));
+        // useShovelButton.setForeground(Color.WHITE);
+        // useShovelButton.setFocusPainted(false);
+        // useShovelButton.setBorder(new LineBorder(Color.BLACK));
+
         useShovelButton.addActionListener(e -> {
-            // Show JOptionPane to enter row and column
+            // Mostrar un diálogo para ingresar la fila y columna de la planta a remover
             JTextField rowField = new JTextField(2);
             JTextField colField = new JTextField(2);
             JPanel inputPanel = new JPanel();
             inputPanel.add(new JLabel("Row (0-4):"));
             inputPanel.add(rowField);
-            inputPanel.add(Box.createHorizontalStrut(15)); // Space between fields
-            inputPanel.add(new JLabel("Column (1-9):"));
+            inputPanel.add(Box.createHorizontalStrut(15)); // Espacio entre campos
+            inputPanel.add(new JLabel("Column (1-8):"));
             inputPanel.add(colField);
 
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant", JOptionPane.OK_CANCEL_OPTION);
@@ -323,20 +423,20 @@ public class GardenMenu extends JFrame {
                     int row = Integer.parseInt(rowField.getText());
                     int col = Integer.parseInt(colField.getText());
 
-                    // Validate limits and conditions
-                    if (row < 0 || row > 4 || col < 1 || col > 9) {
+                    // Validar límites y condiciones
+                    if (row < 0 || row > 4 || col < 1 || col > 8) {
                         JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
-                    } else if (col == 0) {
-                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         JPanel targetPanel = gridCells[row][col];
                         if (targetPanel.getComponentCount() == 0) {
                             JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error", JOptionPane.ERROR_MESSAGE);
                         } else {
-                            // Remove the plant
+                            // Remover la planta
                             targetPanel.removeAll();
                             targetPanel.revalidate();
                             targetPanel.repaint();
+
+                            // No se recuperan los soles invertidos al remover una planta
                         }
                     }
                 } catch (NumberFormatException ex) {
@@ -348,136 +448,121 @@ public class GardenMenu extends JFrame {
         panel.add(useShovelButton);
     }
 
-    private void addTopRightButtons(JPanel panel) {
-        String[] buttonImagePaths = {
-            "resources/images/buttons/export-icon.png",     // Export
-            "resources/images/buttons/save-icon.png",       // Save
-            "resources/images/buttons/return-icon.png",     // Return
-            "resources/images/buttons/home-icon.png"        // Back to main menu
-        };
-
-        int x = 660;
-        int y = 5;
-        int buttonSize = 40;
-
-        for (String imagePath : buttonImagePaths) {
-            ImageIcon icon = new ImageIcon(imagePath);
-            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
-            button.setBounds(x, y, buttonSize, buttonSize);
-            button.setContentAreaFilled(false);
-            button.setBorderPainted(false);
-            button.setFocusPainted(false);
-
-            // Add action events to buttons
-            if (imagePath.contains("return-icon")) {
-                button.addActionListener(e -> {
-                    dispose(); // Close the current window
-                    if ("PlayerVsMachine".equals(state)) {
-                        PlayerVSMachine pvmMenu = new PlayerVSMachine();
-                        pvmMenu.setVisible(true);
-                    } else if ("PlayerVsPlayer".equals(state)) {
-                        PlayerVsPlayer pvpMenu = new PlayerVsPlayer();
-                        pvpMenu.setVisible(true);
-                    }
-                    else{
-                        MachineVSMachine mvsmMenu = new MachineVSMachine();
-                        mvsmMenu.setVisible(true);
-                    }
-                });
-            }
-
-            if (imagePath.contains("home-icon")) {
-                button.addActionListener(e -> {
-                    // Back to main menu
-                    dispose(); // Close the current window
-                    POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
-                    POOBvsZombiesGUI.setVisible(true);
-                });
-            }
-
-            panel.add(button);
-            x += 60; // Adjust X position for the next button
-        }
+    /**
+     * Método para agregar las etiquetas que muestran el tiempo restante.
+     */
+    private void addTimerLabel(JPanel panel) {
+        timerLabel = new JLabel("Tiempo Restante: ");
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timerLabel.setForeground(Color.WHITE);
+        timerLabel.setBounds(500, 10, 200, 30); // Ajustar posición y tamaño
+        panel.add(timerLabel);
     }
 
-    // Auxiliary class to handle the Transferable object of image type with type (plant or zombie)
-    private static class ImageTransferable implements Transferable {
-        public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
-        private Image image;
-        private String type; // "plant" or "zombie"
-
-        public ImageTransferable(Image image, String type) {
-            this.image = image;
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public Image getImage() {
-            return image;
-        }
-
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[]{IMAGE_FLAVOR};
-        }
-
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return flavor.equals(IMAGE_FLAVOR);
-        }
-
-        @Override
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            if (flavor.equals(IMAGE_FLAVOR)) {
-                return this;
-            } else {
-                throw new UnsupportedFlavorException(flavor);
+    /**
+     * Método para agregar las etiquetas que muestran información de los jugadores.
+     */
+    private void addPlayerInfo(JPanel panel) {
+        if (("PlayerVsPlayer".equals(state) || "PlayerVsMachine".equals(state)) && players != null && !players.isEmpty()) {
+            Player playerOne = players.get(0);
+    
+            // Etiqueta para el nombre del Jugador 1
+            playerOneNameLabel = new JLabel("Jugador 1: " + playerOne.getName());
+            playerOneNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerOneNameLabel.setForeground(Color.YELLOW);
+            playerOneNameLabel.setBounds(50, 20, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerOneNameLabel);
+    
+            // Etiqueta para los soles iniciales del Jugador 1
+            playerOneSunsLabel = new JLabel("Soles: " + playerOne.getTeam().getResourceCounterAmount());
+            playerOneSunsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerOneSunsLabel.setForeground(Color.GREEN);
+            playerOneSunsLabel.setBounds(50, 60, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerOneSunsLabel);
+    
+            if ("PlayerVsPlayer".equals(state) && players.size() >= 2) {
+                Player playerTwo = players.get(1);
+    
+                // Etiqueta para el nombre del Jugador 2
+                playerTwoNameLabel = new JLabel("Jugador 2: " + playerTwo.getName());
+                playerTwoNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoNameLabel.setForeground(Color.RED);
+                playerTwoNameLabel.setBounds(50, 100, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoNameLabel);
+    
+                // Etiqueta para los cerebros iniciales del Jugador 2
+                playerTwoBrainsLabel = new JLabel("Cerebros: " + playerTwo.getTeam().getResourceCounterAmount());
+                playerTwoBrainsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoBrainsLabel.setForeground(Color.MAGENTA);
+                playerTwoBrainsLabel.setBounds(50, 140, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoBrainsLabel);
             }
         }
     }
+    
 
+    /**
+     * Método para agregar las etiquetas que muestran los puntajes de los jugadores.
+     */
+    private void addScoreLabels(JPanel panel) {
+        // Etiqueta para el puntaje del Jugador 1
+        playerOneScoreLabel = new JLabel("Puntaje Jugador 1: 0");
+        playerOneScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        playerOneScoreLabel.setForeground(Color.YELLOW);
+        playerOneScoreLabel.setBounds(50, 180, 300, 30); // Ajustar posición y tamaño
+        panel.add(playerOneScoreLabel);
+
+        // Etiqueta para el puntaje del Jugador 2
+        playerTwoScoreLabel = new JLabel("Puntaje Jugador 2: 0");
+        playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        playerTwoScoreLabel.setForeground(Color.RED);
+        playerTwoScoreLabel.setBounds(50, 220, 300, 30); // Ajustar posición y tamaño
+        panel.add(playerTwoScoreLabel);
+    }
+
+    /**
+     * Método para agregar las tarjetas de zombies seleccionados.
+     */
     private void addZombieCards(JPanel panel) {
         if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state) && selectedZombies != null) {
-            // Paths of the cards corresponding to the zombies
+            // Rutas de las tarjetas correspondientes a los zombies seleccionados
             String[] zombieCards = {
                 "resources/images/cards/Zombies/card_basic_zombie.png",
-                "resources/images/cards/Zombies/card_brainstein.png",
-                "resources/images/cards/Zombies/card_buckethead_zombie.png",
                 "resources/images/cards/Zombies/card_conehead_zombie.png",
+                "resources/images/cards/Zombies/card_buckethead_zombie.png",
+                "resources/images/cards/Zombies/card_brainstein.png",
                 "resources/images/cards/Zombies/card_ECIZombie.png"
             };
 
-            // Paths of the GIFs or PNGs of the zombies to drag
+            // Rutas de los GIFs o PNGs de los zombies para arrastrar
             String[] zombieDragImages = {
                 "resources/images/zombies/Basic/BasicDinamic.gif",
-                "resources/images/zombies/Brainstein/brainsteinAnimated.gif",
-                "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
                 "resources/images/zombies/Conehead/ConeheadAnimated.gif",
+                "resources/images/zombies/BucketHead/BucketheadAnimated.gif",
+                "resources/images/zombies/Brainstein/brainsteinAnimated.gif",
                 "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"
             };
 
-            int x = 85; // Initial X position
-            int y = 625; // Initial Y position
+            int x = 85; // Posición X inicial
+            int y = 625; // Posición Y inicial
             for (int i = 0; i < selectedZombies.length; i++) {
-                if (selectedZombies[i] != null) {
+                if (selectedZombies[i] != null && !selectedZombies[i].isEmpty()) {
                     int zombieIndex = getZombieIndex(selectedZombies[i]);
                     if (zombieIndex != -1) {
-                        // Display the card
+                        // Mostrar la tarjeta del zombie
                         ImageIcon icon = new ImageIcon(zombieCards[zombieIndex]);
                         JLabel cardLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
-                        cardLabel.setBounds(x, y - 85, 100, 150); // Adjust y position to paint over the table
+                        cardLabel.setBounds(x, y - 85, 100, 150); // Ajustar posición y tamaño
                         panel.add(cardLabel);
 
-                        // Add drag functionality
+                        // Hacer la tarjeta arrastrable
                         String dragImagePath = zombieDragImages[zombieIndex];
+                        String zombieName = selectedZombies[i];
                         cardLabel.setTransferHandler(new TransferHandler("icon") {
                             @Override
                             protected Transferable createTransferable(JComponent c) {
                                 ImageIcon icon = new ImageIcon(dragImagePath);
-                                return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                                return new ImageTransferable(icon.getImage(), "zombie",zombieName); 
                             }
 
                             @Override
@@ -497,82 +582,381 @@ public class GardenMenu extends JFrame {
                             }
                         });
 
-                        x += 70; // Move X position for the next card
+                        x += 70; // Mover posición X para la siguiente tarjeta
                     }
+                
                 }
             }
         }
     }
-
-    private int getZombieIndex(String zombiePath) {
-        // Map zombies to their indices
-        if (zombiePath.contains("Basic")) return 0;
-        if (zombiePath.contains("Brainstein")) return 1;
-        if (zombiePath.contains("BucketHead")) return 2;
-        if (zombiePath.contains("Conehead")) return 3;
-        if (zombiePath.contains("ECIZombie")) return 4;
-        return -1; // Not found
+    /**
+     * Método para mapear la ruta del zombie a su índice correspondiente.
+     */
+    private int getZombieIndex(String zombieName) {
+        // Mapea los zombies a sus índices
+        if (zombieName.contains("Basic")) return 0;
+        if (zombieName.contains("Conehead")) return 1;
+        if (zombieName.contains("BucketHead")) return 2;
+        if (zombieName.contains("Brainstein")) return 3;
+        if (zombieName.contains("ECIZombie")) return 4;
+        return -1; // No encontrado
     }
 
+    /**
+     * Método para agregar la tabla de zombies.
+     */
     private void addZombieTable(JPanel panel) {
-        if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
-            // Path of the zombie table image
-            String zombieTableImagePath = "resources/images/zombie-table.png";
+            if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
+                // Ruta de la imagen de la tabla de zombies
+                String zombieTableImagePath = "resources/images/zombie-table.png";
 
-            // Load and scale the image
-            ImageIcon zombieTableIcon = new ImageIcon(zombieTableImagePath);
-            Image scaledZombieTableImage = zombieTableIcon.getImage().getScaledInstance(460, 80, Image.SCALE_SMOOTH);
+                // Cargar y escalar la imagen
+                ImageIcon zombieTableIcon = new ImageIcon(zombieTableImagePath);
+                Image scaledZombieTableImage = zombieTableIcon.getImage().getScaledInstance(460, 80, Image.SCALE_SMOOTH);
 
-            // Create a JLabel to display the zombie table
-            JLabel zombieTableLabel = new JLabel(new ImageIcon(scaledZombieTableImage));
-            zombieTableLabel.setBounds(10, 575, 460, 80); // Adjust position and size
+                // Crear un JLabel para mostrar la tabla de zombies
+                JLabel zombieTableLabel = new JLabel(new ImageIcon(scaledZombieTableImage));
+                zombieTableLabel.setBounds(10, 575, 460, 80); // Ajustar posición y tamaño
 
-            panel.add(zombieTableLabel);
-        }
+                panel.add(zombieTableLabel);
+            }
     }
 
+    /**
+     * Método para agregar el icono de cerebro y su contador.
+     */
     private void addBrainIcon(JPanel panel) {
         if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) {
-            // Path of the brain image
+            // Ruta de la imagen del cerebro
             String brainImagePath = "resources/images/brain.png";
 
-            // Load and scale the image
+            // Cargar y escalar la imagen
             ImageIcon brainIcon = new ImageIcon(brainImagePath);
             Image scaledBrainImage = brainIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
 
-            // Create a JLabel to display the brain
+            // Crear un JLabel para mostrar el cerebro
             JLabel brainLabel = new JLabel(new ImageIcon(scaledBrainImage));
-            brainLabel.setBounds(50, 585, 40, 40); // Adjust position and size
-
-            // Create a JLabel to display the text "100"
-            JLabel textLabel = new JLabel("100");
-            textLabel.setForeground(Color.WHITE);
-            textLabel.setFont(textLabel.getFont().deriveFont(20f));
-            textLabel.setBounds(50, 625, 80, 30); // Adjust position and size
-
+            brainLabel.setBounds(50, 585, 40, 40); // Ajustar posición y tamaño
             panel.add(brainLabel);
-            panel.add(textLabel);
         }
     }
 
-    public static void main(String[] args) {
+    /**
+     * Método para agregar los botones de la esquina superior derecha.
+     */
+    private void addTopRightButtons(JPanel panel) {
+        String[] buttonImagePaths = {
+            "resources/images/buttons/export-icon.png",     // Exportar
+            "resources/images/buttons/save-icon.png",       // Guardar
+            "resources/images/buttons/return-icon.png",     // Retornar
+            "resources/images/buttons/home-icon.png"        // Volver al menú principal
+        };
+
+        int x = 660;
+        int y = 5;
+        int buttonSize = 40;
+
+        for (String imagePath : buttonImagePaths) {
+            ImageIcon icon = new ImageIcon(imagePath);
+            JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+            button.setBounds(x, y, buttonSize, buttonSize);
+            button.setContentAreaFilled(false);
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+
+            // Agregar eventos de acción a los botones
+            if (imagePath.contains("export-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para exportar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de exportar aún no implementada.", "Exportar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+
+            if (imagePath.contains("save-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para guardar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+
+            if (imagePath.contains("return-icon")) {
+                button.addActionListener(e -> {
+                    // Retornar al menú anterior según el estado del juego
+                    dispose(); // Cerrar la ventana actual
+                    if ("PlayerVsMachine".equals(state)) {
+                        PlayerVSMachine pvmMenu = new PlayerVSMachine();
+                        pvmMenu.setVisible(true);
+                    } else if ("PlayerVsPlayer".equals(state)) {
+                        PlayerVsPlayer pvpMenu = new PlayerVsPlayer();
+                        pvpMenu.setVisible(true);
+                    } else {
+                        MachineVSMachine mvsmMenu = new MachineVSMachine();
+                        mvsmMenu.setVisible(true);
+                    }
+                });
+            }
+
+            if (imagePath.contains("home-icon")) {
+                button.addActionListener(e -> {
+                    // Volver al menú principal
+                    dispose(); // Cerrar la ventana actual
+                    POOBvsZombiesGUI mainMenu = new POOBvsZombiesGUI();
+                    mainMenu.setVisible(true);
+                });
+            }
+
+            panel.add(button);
+            x += 60; // Ajustar posición X para el siguiente botón
+        }
+            // Forzar la actualización del panel
+            panel.revalidate();
+            panel.repaint();
+    }
+
+    // private void startZombieMovement() {
+    //     Timer timer = new Timer(100, e -> {
+    //         Iterator<JLabel> iterator = movingZombies.iterator();
+    //         while (iterator.hasNext()) {
+    //             JLabel zombie = iterator.next();
+    //             Point location = zombie.getLocation();
+    //             if (location.x > 0) {
+    //                 // Move zombie to the left
+    //                 zombie.setLocation(location.x - 5, location.y);
+    //             } else {
+    //                 // Remove zombie safely
+    //                 Container parent = zombie.getParent();
+    //                 if (parent != null) {
+    //                     parent.remove(zombie);
+    //                     parent.revalidate();
+    //                     parent.repaint();
+    //                 }
+    //                 iterator.remove();
+    //             }
+    //         }
+    //     });
+    //     timer.start();
+    // }
+    
+    /**
+     * Método para actualizar la cantidad de soles en la interfaz.
+     * @param delta Valor a sumar o restar a los soles.
+     */
+    private void updateSuns(int delta) {
+        // Asumimos que el Jugador 1 es el de las plantas
+        Player playerOne = players.get(0);
+        int currentSuns = playerOne.getTeam().getResourceCounterAmount();
+        currentSuns += delta;
+        playerOne.getTeam().setResourceCounter(currentSuns);
+        playerOneSunsLabel.setText("Soles: " + currentSuns);
+    }
+
+    /**
+     * Método para actualizar la cantidad de cerebros en la interfaz.
+     * @param delta Valor a sumar o restar a los cerebros.
+     */
+    private void updateBrains(int delta) {
+        // Asumimos que el Jugador 2 es el de los zombies
+        if (players.size() >= 2) {
+            Player playerTwo = players.get(1);
+            int currentBrains = playerTwo.getTeam().getResourceCounterAmount();
+            currentBrains += delta;
+            playerTwo.getTeam().setResourceCounter(currentBrains);
+            playerTwoBrainsLabel.setText("Cerebros: " + currentBrains);
+        }
+    }
+
+    /**
+     * Método para calcular el puntaje de los jugadores al finalizar el juego.
+     */
+    private void calculateScores() {
+        if (players != null && !players.isEmpty()) {
+            Player playerOne = players.get(0);
+    
+            // Calcular puntaje para las plantas (Jugador 1)
+            int remainingSuns = playerOne.getTeam().getResourceCounterAmount();
+            double plantsValue = getPlantsValue();
+            playerOneScore = remainingSuns + (plantsValue * 1.5);
+            playerOneScoreLabel.setText("Puntaje Jugador 1: " + playerOneScore);
+    
+            if ("PlayerVsPlayer".equals(state) && players.size() >= 2) {
+                Player playerTwo = players.get(1);
+    
+                // Calcular puntaje para los zombies (Jugador 2)
+                int remainingBrains = playerTwo.getTeam().getResourceCounterAmount();
+                double zombiesValue = getZombiesValue();
+                playerTwoScore = remainingBrains + zombiesValue;
+                playerTwoScoreLabel.setText("Puntaje Jugador 2: " + playerTwoScore);
+            }
+        }
+    }
+    
+
+    /**
+     * Método para obtener el valor total de las plantas en el tablero.
+     * @return Suma de los costos de las plantas en soles.
+     */
+    private double getPlantsValue() {
+        double total = 0;
+        for (int row = 0; row < 5; row++) {
+            for (int col = 1; col <= 8; col++) {
+                JPanel cell = gridCells[row][col];
+                if (cell.getComponentCount() > 0) {
+                    JLabel plantLabel = (JLabel) cell.getComponent(0);
+                    String plantName = (String) plantLabel.getClientProperty("name");
+                    total += getPlantCost(plantName);
+                }
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Método para obtener el valor total de los zombies en el tablero.
+     * @return Suma de los costos de los zombies en cerebros.
+     */
+    private double getZombiesValue() {
+        double total = 0;
+        for (int row = 0; row < 5; row++) {
+            int col = 9; // Solo la última columna para zombies
+            JPanel cell = gridCells[row][col];
+            if (cell.getComponentCount() > 0) {
+                JLabel zombieLabel = (JLabel) cell.getComponent(0);
+                String zombieName = (String) zombieLabel.getClientProperty("name");
+                total += getZombieCost(zombieName);
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Método para obtener el costo de una planta basado en su nombre.
+     * @param plantName Nombre de la planta.
+     * @return Costo en soles de la planta.
+     */
+    private int getPlantCost(String plantName) {
+        if (plantName.contains("Sunflower")) return 50;
+        if (plantName.contains("Peashooter")) return 100;
+        if (plantName.contains("WallNut")) return 50;
+        if (plantName.contains("PotatoMine")) return 25;
+        if (plantName.contains("ECIPlant")) return 75;
+        return 0; // Por defecto
+    }
+
+    /**
+     * Método para obtener el costo de un zombie basado en su nombre.
+     * @param zombieName Nombre del zombie.
+     * @return Costo en cerebros del zombie.
+     */
+    private int getZombieCost(String zombieName) {
+        if (zombieName.contains("Basic")) return 100;
+        if (zombieName.contains("Conehead")) return 150;
+        if (zombieName.contains("BucketHead")) return 200;
+        if (zombieName.contains("Brainstein")) return 50;
+        if (zombieName.contains("ECIZombie")) return 250;
+        return 0; // Por defecto
+    }
+
+    private void addHordeLabel(JPanel panel) {
+        
+        hordeLabel = new JLabel("Horda 1");
+        hordeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        hordeLabel.setForeground(Color.WHITE);
+        hordeLabel.setBounds(400, 10, 200, 30); // Ajusta la posición según sea necesario
+        panel.add(hordeLabel);
+    }
+    
+    /**
+     * Método para implementar la interfaz GameListener de POOBvsZombies.
+     */
+    @Override
+    public void onTimeUpdate(int timeRemaining) {
         SwingUtilities.invokeLater(() -> {
-            String[] selectedPlants = {
-                "Sunflower",
-                "Peashooter",
-                "WallNut",
-                "PotatoMine",
-                "ECIPlant"
-            };
-            String[] selectedZombies = {
-                "Basic",
-                "Conehead",
-                "BucketHead",
-                "ECIZombie",
-                "Brainstein"
-            };
-            GardenMenu frame = new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer");
-            frame.setVisible(true);
+            timerLabel.setText("Tiempo Restante: " + timeRemaining + "s");
         });
     }
+
+    @Override
+    public void onHalfTime() {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, "Inicia la segunda ronda.");
+            // Puedes implementar lógica adicional para reiniciar el temporizador o ajustar la interfaz
+        });
+    }
+
+    @Override
+    public void onGameEnd(String result) {
+        SwingUtilities.invokeLater(() -> {
+            timerLabel.setText("Tiempo Restante: 0s");
+            calculateScores(); // Calcular los puntajes al final del juego
+            JOptionPane.showMessageDialog(this, "Resultado del Juego: " + result);
+
+            // Determinar y mostrar el ganador basado en los puntajes
+            if (playerOneScore > playerTwoScore) {
+                JOptionPane.showMessageDialog(this, "¡" + players.get(0).getName() + " ha ganado!", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            } else if (playerTwoScore > playerOneScore) {
+                JOptionPane.showMessageDialog(this, "¡" + players.get(1).getName() + " ha ganado!", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "¡La partida ha terminado en empate!", "Empate", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            // Cerrar la ventana de GardenMenu y posiblemente retornar al menú principal
+            dispose();
+            POOBvsZombiesGUI mainMenu = new POOBvsZombiesGUI();
+            mainMenu.setVisible(true);
+        });
+    }
+
+    @Override
+    public void onHordeChange(int hordeNumber) {
+        SwingUtilities.invokeLater(() -> {
+            hordeLabel.setText("Horda " + hordeNumber);
+        });
+    }
+
+    private static class ImageTransferable implements Transferable {
+        public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
+        private Image image;
+        private String type; // "plant" or "zombie"
+        private String name; // Nombre de la planta o zombie
+    
+        public ImageTransferable(Image image, String type, String name) {
+            this.image = image;
+            this.type = type;
+            this.name = name;
+        }
+    
+        public String getType() {
+            return type;
+        }
+    
+        public String getName() {
+            return name;
+        }
+    
+        public Image getImage() {
+            return image;
+        }
+    
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{IMAGE_FLAVOR};
+        }
+    
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return flavor.equals(IMAGE_FLAVOR);
+        }
+    
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+            if (flavor.equals(IMAGE_FLAVOR)) {
+                return this;
+            } else {
+                throw new UnsupportedFlavorException(flavor);
+            }
+        }
+    }
+    
+
+    
 }

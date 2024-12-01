@@ -1,13 +1,20 @@
 package domain;
 
-public class Brainstein extends Zombie implements ResourceGenerator{
+public class Brainstein extends Zombie implements ResourceGenerator {
 
-    private Resource resource;
+    public Brainstein(int line, int xPos) {
+        super(line, xPos, 300, 200, 0, 0); // No se mueve ni ataca
+    }
 
     @Override
-    public void generateResource(int lane) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateResource'");
+    public void act() {
+        generateResource();
     }
-    
+
+    @Override
+    public void generateResource() {
+        // Generar un cerebro y añadirlo al jardín
+        Resource brain = new Resource(line, xPos, "brain");
+        // Añadir el recurso al juego
+    }
 }

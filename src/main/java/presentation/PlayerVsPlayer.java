@@ -15,10 +15,20 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import java.util.*;
+
+import domain.HumanPlayer;
+import domain.POOBvsZombies;
+import domain.Plants;
+import domain.PlantsStrategic;
+import domain.Player;
+import domain.Team;
+import domain.Zombies;
+import domain.ZombiesStrategic;
 
 public class PlayerVsPlayer extends JFrame {
     private List<PlantPanel> plantPanelsList = new ArrayList<>();
@@ -132,32 +142,96 @@ public class PlayerVsPlayer extends JFrame {
         startButton.setEnabled(false); // Initially disabled
         panel.add(startButton);
 
-        // Add action listener to the start button
         startButton.addActionListener(e -> {
-            // Gather selected plants and zombies
-            List<String> selectedPlants = new ArrayList<>();
-            List<String> selectedZombies = new ArrayList<>();
+        // Validar y obtener los nombres de los jugadores
+        String namePlayerOne = playerOneName.getText().trim();
+        String namePlayerTwo = playerTwoName.getText().trim();
 
-            // Iterate over plant panels
-            for (PlantPanel plantPanel : plantPanelsList) {
-                if (plantPanel.isSelected()) {
-                    selectedPlants.add(plantPanel.getPlantPath());
-                }
+        // Validar y obtener el tiempo de la partida
+        int matchTimeValue = 0;
+        try {
+            matchTimeValue = Integer.parseInt(matchTime.getText().trim());
+            if (matchTimeValue <= 0) {
+                throw new NumberFormatException("El tiempo debe ser un número positivo.");
             }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingresa un tiempo de partida válido en segundos.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            // Iterate over zombie panels
-            for (ZombiePanel zombiePanel : zombiePanelsList) {
-                if (zombiePanel.isSelected()) {
-                    selectedZombies.add(zombiePanel.getZombiePath());
-                }
+        // Validar y obtener los recursos iniciales
+        int initialSuns = 0;
+        int initialBrains = 0;
+        try {
+            initialSuns = Integer.parseInt(setSunsField.getText().trim());
+            initialBrains = Integer.parseInt(setBrainsField.getText().trim());
+            if (initialSuns < 0 || initialBrains < 0) {
+                throw new NumberFormatException("Los recursos iniciales deben ser números no negativos.");
             }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingresa cantidades válidas para soles y cerebros.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            // Now, open the GardenMenu with the selected plants and zombies
-            new GardenMenu(selectedPlants.toArray(new String[0]), selectedZombies.toArray(new String[0]), "PlayerVsPlayer").setVisible(true);
+        // Crear los equipos para cada jugador
+        Plants plantsTeam = new Plants(initialSuns);
+        Zombies zombiesTeam = new Zombies(initialBrains);
 
-            // Close the current window
-            dispose();
-        });
+        // Crear los jugadores
+        PlantsStrategic playerOne = new PlantsStrategic(plantsTeam, namePlayerOne);
+        ZombiesStrategic playerTwo = new ZombiesStrategic(zombiesTeam, namePlayerTwo);
+
+        // Crear la lista de jugadores
+        List<Player> playersList = new ArrayList<>();
+        playersList.add(playerOne); // Agregar playerOne directamente
+        playersList.add(playerTwo); // Agregar playerTwo directamente
+
+
+        // Crear el objeto POOBvsZombies con los jugadores y el tiempo de la partida
+        POOBvsZombies game = new POOBvsZombies(playersList, matchTimeValue);
+
+        // Obtener las plantas y zombies seleccionados
+        List<String> selectedPlantsList = new ArrayList<>();
+        List<String> selectedZombiesList = new ArrayList<>();
+
+        for (PlantPanel plantPanel : plantPanelsList) {
+            if (plantPanel.isSelected()) {
+                selectedPlantsList.add(plantPanel.getPlantPath());
+            }
+        }
+
+        for (ZombiePanel zombiePanel : zombiePanelsList) {
+            if (zombiePanel.isSelected()) {
+                selectedZombiesList.add(zombiePanel.getZombiePath());
+            }
+        }
+
+        // Validar que al menos una planta y un zombie estén seleccionados
+        if (selectedPlantsList.isEmpty() || selectedZombiesList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar al menos una planta y un zombie.", "Error de Selección", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Crear la instancia de GardenMenu pasando los parámetros necesarios
+        GardenMenu gardenMenu = new GardenMenu(
+            selectedPlantsList.toArray(new String[0]),
+            selectedZombiesList.toArray(new String[0]),
+            "PlayerVsPlayer",
+            game, // Pasar el objeto de juego para manejar tiempo y puntajes
+            playersList // Pasar la lista de jugadores para obtener nombres y equipos
+        );
+        gardenMenu.setVisible(true);
+
+        // Cerrar la ventana actual
+        dispose();
+
+        // Iniciar el juego
+        game.startGame();
+    });
+
+
+            
+           
 
         // Label "Select your plants" for Player One
         JLabel selectPlantsLabel = new JLabel("Select your plants");
@@ -309,7 +383,6 @@ public class PlayerVsPlayer extends JFrame {
         startButton.setEnabled(atLeastOnePlantSelected && atLeastOneZombieSelected && playerOneNameFilled && playerTwoNameFilled && matchTimeFilled && sunsFilled && brainsFilled);
     }
 
-
     private void addTopRightButtons(JPanel panel) {
         String buttonImagePath = "resources/images/buttons/return-icon.png";     // Return;
 
@@ -327,12 +400,12 @@ public class PlayerVsPlayer extends JFrame {
 
         if (buttonImagePath.contains("return-icon")) {
             button.addActionListener(e -> {
-            // Back to main menu
-            dispose(); // Close the current window
-            POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
-            POOBvsZombiesGUI.setVisible(true);
-        });
-    }
+                // Back to main menu
+                dispose(); // Close the current window
+                POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
+                POOBvsZombiesGUI.setVisible(true);
+            });
+        }
 
         panel.add(button);
     }

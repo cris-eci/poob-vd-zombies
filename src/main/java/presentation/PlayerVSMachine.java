@@ -1,34 +1,29 @@
 package presentation;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.List;
+import java.awt.event.*;
+import javax.swing.*;
 import java.util.*;
+import domain.*;
 
 public class PlayerVSMachine extends JFrame {
     private JButton playerNameButton, timeButton, numberButton;
     private JButton startButton;
-    private JPanel[] plantPanels; // Array to store plant panels
+    private PlantPanel[] plantPanels; // Array para almacenar los paneles de plantas
+    private String playerName;
+    private int matchTime;
+    private int numberOfHordes;
 
     public PlayerVSMachine() {
-        // JFrame configuration
+        // Configuración del JFrame
         setTitle("Player vs Machine");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Panel with custom background
+        // Panel con fondo personalizado
         JPanel panel = new JPanel() {
             Image backgroundImage = new ImageIcon("resources/images/menu/PlayervsMachineMenu.png").getImage();
 
@@ -40,7 +35,15 @@ public class PlayerVSMachine extends JFrame {
         };
         panel.setLayout(null);
 
-        // Create a JLabel for multi-line text
+        // Crear y agregar componentes
+        addComponents(panel);
+        addTopRightButtons(panel);
+
+        add(panel); // Añadir el panel al JFrame
+    }
+
+    private void addComponents(JPanel panel) {
+        // Etiqueta de información
         JLabel infoLabel = new JLabel("<html>"
                 + "Machine will adopt its original<br>"
                 + "behavior from PvsZ original game.<br>"
@@ -52,7 +55,7 @@ public class PlayerVSMachine extends JFrame {
         infoLabel.setForeground(Color.WHITE);
         infoLabel.setFont(new Font("Arial", Font.PLAIN, 10));
 
-        // Create text "SELECT PLANTS"
+        // Texto "SELECT PLANTS"
         JLabel selectPlant = new JLabel("<html>SELECT PLANTS</html>");
         selectPlant.setBounds(385, 525, 500, 100);
         selectPlant.setForeground(Color.WHITE);
@@ -79,7 +82,7 @@ public class PlayerVSMachine extends JFrame {
         numberLabel.setFont(new Font("Arial", Font.BOLD, 10));
         numberButton = createTimeNumberButton(305, 370);
 
-        // START button
+        // Botón START
         startButton = new JButton("¡START!");
         startButton.setBounds(485, 355, 160, 27);
         startButton.setBackground(Color.ORANGE);
@@ -87,32 +90,15 @@ public class PlayerVSMachine extends JFrame {
         startButton.setBorderPainted(false);
         startButton.setFocusPainted(false);
         startButton.setEnabled(false);
-        startButton.addActionListener(e -> {
-            // Create a list for the selected plants
-            List<String> selectedPlants = new ArrayList<>();
+        startButton.addActionListener(e -> startGame());
 
-            // Iterate over the plant selection panels to identify the selected ones
-            for (int i = 0; i < plantPanels.length; i++) {
-                PlantPanel plantPanel = (PlantPanel) plantPanels[i];
-                if (plantPanel.isSelected()) {
-                    selectedPlants.add(plantPanel.getPlantPath());
-                }
-            }
-
-            // Open the garden menu with the selected plants
-            new GardenMenu(selectedPlants.toArray(new String[0]), null, "PlayerVsMachine").setVisible(true);
-
-            // Close the current menu
-            dispose();
-        });
-
-        // FlowLayout for plants
+        // Panel para la selección de plantas
         JPanel plantSelectionPanel = new JPanel();
         plantSelectionPanel.setBounds(115, 590, 600, 150);
         plantSelectionPanel.setLayout(new FlowLayout());
         plantSelectionPanel.setOpaque(false);
 
-        // Specific path for each plant button
+        // Imágenes de plantas
         String[] plantImages = {
                 "resources/images/plants/Sunflower/Sunflower.jpg",
                 "resources/images/plants/Peashooter/Peashooter.jpg",
@@ -121,18 +107,17 @@ public class PlayerVSMachine extends JFrame {
                 "resources/images/plants/ECIPlant/ECIPlant.png"
         };
 
-        // Initialize the array of plant panels
+        // Inicializar array de paneles de plantas
         plantPanels = new PlantPanel[5];
 
-        // Assign specific images to each button
+        // Crear paneles de plantas
         for (int i = 0; i < plantImages.length; i++) {
-            // Create custom plant panel
             PlantPanel plantPanel = new PlantPanel(plantImages[i]);
-            plantPanels[i] = plantPanel; // Save in the array for later use
-            plantSelectionPanel.add(plantPanel); // Add to the main container
+            plantPanels[i] = plantPanel;
+            plantSelectionPanel.add(plantPanel);
         }
 
-        // Add components to the main panel
+        // Añadir componentes al panel
         panel.add(infoLabel);
         panel.add(selectPlant);
         panel.add(playerNameLabel);
@@ -143,13 +128,8 @@ public class PlayerVSMachine extends JFrame {
         panel.add(numberButton);
         panel.add(startButton);
         panel.add(plantSelectionPanel);
-        
-
-        add(panel); // Add the panel to the JFrame
-        addTopRightButtons(panel);
     }
 
-    // Method to create an input button
     private JButton createPlayerNameButton(int x, int y) {
         JButton button = new JButton();
         button.setBounds(x, y, 150, 30);
@@ -157,12 +137,11 @@ public class PlayerVSMachine extends JFrame {
         button.setBorderPainted(false);
         button.setBackground(new Color(229, 206, 172));
         button.setForeground(Color.BLACK);
-        button.setEnabled(true); // Initially enabled
+        button.setEnabled(true);
         button.addActionListener(e -> handleInput(button));
         return button;
     }
 
-    // Method to create an input button
     private JButton createTimeNumberButton(int x, int y) {
         JButton button = new JButton();
         button.setBounds(x, y, 60, 14);
@@ -170,12 +149,11 @@ public class PlayerVSMachine extends JFrame {
         button.setBorderPainted(false);
         button.setBackground(new Color(239, 162, 198));
         button.setForeground(Color.BLACK);
-        button.setEnabled(true); // Initially enabled
+        button.setEnabled(true);
         button.addActionListener(e -> handleInput(button));
         return button;
     }
 
-    // Handle input in buttons
     private void handleInput(JButton button) {
         String label = button == playerNameButton ? "Player Name" :
                 button == timeButton ? "Time" : "Number";
@@ -183,20 +161,23 @@ public class PlayerVSMachine extends JFrame {
         String input = JOptionPane.showInputDialog(this, "Enter " + label + ":");
         if (input != null && !input.trim().isEmpty()) {
             button.setText(input);
-            button.setEnabled(false); // Disable the button after input
-            checkFields(); // Validate if actions can be enabled
+            button.setEnabled(false);
+            if (button == playerNameButton) {
+                playerName = input.trim();
+            } else if (button == timeButton) {
+                matchTime = Integer.parseInt(input.trim());
+            } else if (button == numberButton) {
+                numberOfHordes = Integer.parseInt(input.trim());
+            }
+            checkFields();
         }
     }
 
-    // Method to enable the START button if all fields have values and at least one plant is selected
     private void checkFields() {
-        boolean allFieldsFilled = !playerNameButton.getText().isEmpty() &&
-                !timeButton.getText().isEmpty() &&
-                !numberButton.getText().isEmpty();
+        boolean allFieldsFilled = playerName != null && matchTime > 0 && numberOfHordes > 0;
 
         boolean atLeastOnePlantSelected = false;
-        for (int i = 0; i < plantPanels.length; i++) {
-            PlantPanel plantPanel = (PlantPanel) plantPanels[i];
+        for (PlantPanel plantPanel : plantPanels) {
             if (plantPanel.isSelected()) {
                 atLeastOnePlantSelected = true;
                 break;
@@ -206,9 +187,48 @@ public class PlayerVSMachine extends JFrame {
         startButton.setEnabled(allFieldsFilled && atLeastOnePlantSelected);
     }
 
+    private void startGame() {
+        // Obtener las plantas seleccionadas
+        ArrayList<String> selectedPlants = new ArrayList<>();
+        for (PlantPanel plantPanel : plantPanels) {
+            if (plantPanel.isSelected()) {
+                selectedPlants.add(plantPanel.getPlantPath());
+            }
+        }
+
+        // Crear los equipos y jugadores
+        Plants plantsTeam = new Plants(100); // Soles iniciales
+        PlantsStrategic humanPlayer = new PlantsStrategic(plantsTeam,playerName);
+
+        Zombies zombiesTeam = new Zombies(100); // Cerebros iniciales
+        ZombieOriginal machinePlayer = new ZombieOriginal(zombiesTeam, "Machine", numberOfHordes, matchTime);
+
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(humanPlayer);
+        players.add(machinePlayer);
+
+        // Crear el juego
+        POOBvsZombies game = new POOBvsZombies(players, matchTime);
+
+        // Abrir el GardenMenu
+        GardenMenu gardenMenu = new GardenMenu(
+                selectedPlants.toArray(new String[0]),
+                null,
+                "PlayerVsMachine",
+                game,
+                players
+        );
+        gardenMenu.setVisible(true);
+
+        // Iniciar el juego
+        game.startGame();
+
+        // Cerrar la ventana actual
+        dispose();
+    }
 
     private void addTopRightButtons(JPanel panel) {
-        String buttonImagePath = "resources/images/buttons/return-icon.png";     // Return;
+        String buttonImagePath = "resources/images/buttons/return-icon.png";
 
         int x = 830;
         int y = 5;
@@ -221,21 +241,16 @@ public class PlayerVSMachine extends JFrame {
         button.setBorderPainted(false);
         button.setFocusPainted(false);
 
-
-        if (buttonImagePath.contains("return-icon")) {
-            button.addActionListener(e -> {
-            // Back to main menu
-            dispose(); // Close the current window
-            POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
-            POOBvsZombiesGUI.setVisible(true);
+        button.addActionListener(e -> {
+            dispose();
+            POOBvsZombiesGUI mainMenu = new POOBvsZombiesGUI();
+            mainMenu.setVisible(true);
         });
-    }
 
         panel.add(button);
     }
 
-
-    // PlantPanel class that represents each plant panel and handles its selection
+    // Clase interna PlantPanel
     class PlantPanel extends JPanel {
         private boolean selected = false;
         private Image plantImage;
@@ -247,11 +262,10 @@ public class PlayerVSMachine extends JFrame {
             setPreferredSize(new Dimension(50, 50));
             setOpaque(false);
 
-            // Change selection state on click
-            addMouseListener(new java.awt.event.MouseAdapter() {
+            addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    selected = !selected; // Toggle state
+                public void mouseClicked(MouseEvent e) {
+                    selected = !selected;
                     repaint();
                     checkFields();
                 }
@@ -273,12 +287,5 @@ public class PlayerVSMachine extends JFrame {
             g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255, 0, 0, 128));
             g.fillRect(0, 0, getWidth(), getHeight());
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            PlayerVSMachine frame = new PlayerVSMachine();
-            frame.setVisible(true);
-        });
     }
 }

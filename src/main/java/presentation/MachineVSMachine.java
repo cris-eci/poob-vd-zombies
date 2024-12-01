@@ -12,9 +12,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import domain.POOBvsZombies;
+import domain.Plants;
+import domain.PlantsIntelligent;
+import domain.Player;
+import domain.ZombieOriginal;
+import domain.Zombies;
+
 import java.util.*;
 
 public class MachineVSMachine extends JFrame {
@@ -104,7 +113,6 @@ public class MachineVSMachine extends JFrame {
         startButton.setEnabled(false); // Inicialmente deshabilitado
         panel.add(startButton);
 
-        // Añadir ActionListener al botón start
         startButton.addActionListener(e -> {
             // Recopilar las plantas seleccionadas
             List<String> selectedPlants = new ArrayList<>();
@@ -124,12 +132,57 @@ public class MachineVSMachine extends JFrame {
                 }
             }
 
+            // Obtener y validar los valores ingresados
+            int matchTimeValue = 0;
+            int numberOfHordes = 0;
+            int initialSuns = 0;
+            int initialBrains = 0;
+            try {
+                matchTimeValue = Integer.parseInt(time.getText().trim());
+                numberOfHordes = Integer.parseInt(quantity.getText().trim());
+                initialSuns = Integer.parseInt(setSunsField.getText().trim());
+                initialBrains = Integer.parseInt(setBrainsField.getText().trim());
+                if (matchTimeValue <= 0 || numberOfHordes <= 0 || initialSuns < 0 || initialBrains < 0) {
+                    throw new NumberFormatException("Los valores deben ser positivos.");
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Por favor, ingresa valores válidos.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Crear los equipos y jugadores
+            Plants plantsTeam = new Plants(initialSuns);
+            Zombies zombiesTeam = new Zombies(initialBrains);
+
+            // Crear jugadores inteligentes (AI)
+            PlantsIntelligent plantsAI = new PlantsIntelligent(plantsTeam, "Plants AI");
+            ZombieOriginal zombiesAI = new ZombieOriginal(zombiesTeam, "Zombies AI",numberOfHordes,matchTimeValue);
+
+            // Crear lista de jugadores
+            List<Player> players = new ArrayList<>();
+            players.add(plantsAI);
+            players.add(zombiesAI);
+
+            // Crear el objeto POOBvsZombies con los jugadores y el tiempo de la partida
+            POOBvsZombies game = new POOBvsZombies(players, matchTimeValue);
+
             // Abrir el GardenMenu con las plantas y zombies seleccionados
-            new GardenMenu(selectedPlants.toArray(new String[0]), selectedZombies.toArray(new String[0]), "MachineVsMachine").setVisible(true);
+            GardenMenu gardenMenu = new GardenMenu(
+                selectedPlants.toArray(new String[0]),
+                selectedZombies.toArray(new String[0]),
+                "MachineVsMachine",
+                game,
+                players
+            );
+            gardenMenu.setVisible(true);
+
+            // Iniciar el juego
+            game.startGame();
 
             // Cerrar la ventana actual
             dispose();
         });
+
 
         // Etiqueta "Select your plants"
         JLabel selectPlantsLabel = new JLabel("Plants");

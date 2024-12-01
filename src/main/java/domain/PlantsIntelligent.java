@@ -1,28 +1,13 @@
 package domain;
 
-public class PlantsIntelligent extends MachinePlayer implements Strategy{
-    
+
+
+/**
+ * Jugador máquina que controla las plantas utilizando una estrategia inteligente.
+ */
+public class PlantsIntelligent extends MachinePlayer {
+
     public PlantsIntelligent(Team team, String name) {
-        super(team, name);
+        super(team, name, new PlantsStrategy(team));
     }
-
-    @Override
-    public void executeStrategicTurn(int state) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'executeStrategicTurn'");
-    }
-
-    @Override
-    public int getStrategy(int currentGameState) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getStrategy'");
-    }
-
-    @Override
-    public void setStrategy(int strategicGameState) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setStrategy'");
-    }
-
-
 }

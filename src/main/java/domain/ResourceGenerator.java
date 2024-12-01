@@ -1,9 +1,8 @@
 package domain;
 
+/**
+ * Interfaz que define el comportamiento de generar recursos.
+ */
 public interface ResourceGenerator {
-
-    public abstract void generateResource(int lane);
-} 
-    
-    
-
+    void generateResource();
+}

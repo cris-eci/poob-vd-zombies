@@ -1,11 +1,8 @@
 package domain;
 
+/**
+ * Interfaz para las estrategias de los jugadores máquina.
+ */
 public interface Strategy {
-
-    public abstract void executeStrategicTurn(int state);
-
-    public abstract int getStrategy(int currentGameState);
-
-    public abstract void setStrategy(int strategicGameState);
-
-} 
+    void executeStrategy();
+}

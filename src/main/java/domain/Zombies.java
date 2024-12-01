@@ -1,18 +1,27 @@
 package domain;
 
+
 public class Zombies extends Team {
 
-    public static final int RESOURCE_TIME_GENERATOR = 0;
-    public static final String NAME = "";
+    public static final String NAME = "Zombies";
+
+    public Zombies(int initialBrains) {
+        super(initialBrains);
+    }
 
     @Override
-    public void increaseResourceAmount(){
-        
-    };
+    public void increaseResourceAmount() {
+        resourceCounter += RESOURCE_AMOUNT_INCREASE;
+    }
 
     @Override
-    public void selectCharacters(){
-        
-    };
-    
+    public void selectCharacters() {
+        // Implementar selección de zombies
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
 }

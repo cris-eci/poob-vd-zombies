@@ -1,22 +1,21 @@
 package domain;
 
+import domain.Strategy;
+
+/**
+ * Clase abstracta que representa a un jugador controlado por la máquina.
+ * Implementa una estrategia para controlar su equipo.
+ */
 public abstract class MachinePlayer extends Player {
-    protected String[][] strategy;
-    
-    public MachinePlayer(Team team, String name) {
+    protected Strategy strategy;
+
+    public MachinePlayer(Team team, String name, Strategy strategy) {
         super(team, name);
+        this.strategy = strategy;
     }
 
     @Override
-    public void setScore() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setScore'");
+    public void playTurn() {
+        strategy.executeStrategy();
     }
-
-    @Override
-    public void addCharacter() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addCharacter'");
-    }
-
 }
