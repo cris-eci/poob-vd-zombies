@@ -17,7 +17,7 @@ public class PlayerVsPlayer extends JFrame {
 
     // GUI Components
     private JTextField playerOneName, playerTwoName, matchTime, setSunsField, setBrainsField;
-    private JButton startButton, buttonRestart;
+    private JButton startButton;
     private List<PlantPanel> plantPanelsList;
     private List<ZombiePanel> zombiePanelsList;
 
@@ -56,11 +56,6 @@ public class PlayerVsPlayer extends JFrame {
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
 
-        buttonRestart = new JButton("Restart");
-        buttonRestart.setBounds(462, 490, 160, 30);
-        buttonRestart.setBackground(Color.GRAY);
-        buttonRestart.setForeground(Color.WHITE);
-
         // Add Components to Panel
         backgroundPanel.add(playerOneName);
         backgroundPanel.add(playerTwoName);
@@ -68,7 +63,7 @@ public class PlayerVsPlayer extends JFrame {
         backgroundPanel.add(setSunsField);
         backgroundPanel.add(setBrainsField);
         backgroundPanel.add(startButton);
-        backgroundPanel.add(buttonRestart);
+        
 
         // Labels
         addLabels(backgroundPanel);
@@ -97,12 +92,6 @@ public class PlayerVsPlayer extends JFrame {
             }
         });
 
-        // Restart Button Action
-        buttonRestart.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                actionRestart();
-            }
-        });
 
         // Text Fields Document Listeners
         addTextFieldListeners(playerOneName);
@@ -143,7 +132,8 @@ public class PlayerVsPlayer extends JFrame {
             // dispose();
 
             // Display Success Message
-            JOptionPane.showMessageDialog(this, "Game initialized successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Game initialized successfully!"  + " " + namePlayerOne + " " + namePlayerTwo + " " + matchTimer + " " + sunAmount + " " + brainAmount + " " + selectedPlants + " " + selectedZombies, "Success", JOptionPane.INFORMATION_MESSAGE);
+            
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error", JOptionPane.WARNING_MESSAGE);
@@ -152,25 +142,6 @@ public class PlayerVsPlayer extends JFrame {
         }
     }
 
-    private void actionRestart() {
-        // Clear all fields and selections
-        playerOneName.setText("Name player one");
-        playerTwoName.setText("Name player two");
-        matchTime.setText("Time");
-        setSunsField.setText("Amount of suns");
-        setBrainsField.setText("Amount of brains");
-
-        for (PlantPanel plantPanel : plantPanelsList) {
-            plantPanel.setSelected(false);
-        }
-
-        for (ZombiePanel zombiePanel : zombiePanelsList) {
-            zombiePanel.setSelected(false);
-        }
-
-        startButton.setEnabled(false);
-        repaint();
-    }
 
     // Helper Methods
     private JTextField createTextField(String placeholder, int x, int y, int width, int height) {

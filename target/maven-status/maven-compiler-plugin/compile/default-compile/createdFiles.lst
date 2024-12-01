@@ -1,4 +1,3 @@
-presentation\PlayerVsPlayer$PlantPanel$1.class
 domain\ZombiesStrategic.class
 presentation\GardenMenu$ImageTransferable.class
 presentation\MachineVSMachine.class
@@ -19,7 +18,6 @@ presentation\MachineVSMachine$ZombiePanel.class
 domain\Conehead.class
 domain\WallNut.class
 domain\ECIZombie.class
-presentation\PlayerVsPlayer$5.class
 domain\Entity.class
 domain\Character.class
 domain\ECIPlant.class
@@ -32,6 +30,7 @@ presentation\GardenMenu$4.class
 presentation\PlayerVSMachine.class
 domain\Team.class
 domain\Plants.class
+presentation\PlayerVsPlayer$SelectablePanel.class
 presentation\PlayerVsPlayer$ZombiePanel.class
 presentation\PlayerVsPlayer$1.class
 domain\PlantsIntelligent.class
@@ -47,6 +46,7 @@ domain\ProjectTile.class
 presentation\GardenMenu$7.class
 presentation\PlayerVsPlayer$4.class
 domain\Shooter.class
+presentation\PlayerVsPlayer$SelectablePanel$1.class
 presentation\PlayerVSMachine$PlantPanel.class
 domain\Brainstein.class
 domain\Zombie.class
@@ -63,5 +63,4 @@ domain\Zombies.class
 presentation\GardenMenu$3.class
 domain\MachinePlayer.class
 presentation\MachineVSMachine$1.class
-presentation\PlayerVsPlayer$ZombiePanel$1.class
 presentation\MachineVSMachine$PlantPanel.class
