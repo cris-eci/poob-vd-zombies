@@ -1,4 +1,5 @@
 domain\ZombiesStrategic.class
+presentation\GardenMenu$TimerTask.class
 presentation\GardenMenu$ImageTransferable.class
 presentation\MachineVSMachine.class
 domain\PotatoMine.class
@@ -24,6 +25,7 @@ domain\ECIPlant.class
 domain\Strategy.class
 domain\HumanPlayer.class
 presentation\MachineVSMachine$3.class
+presentation\GardenMenu$8.class
 presentation\POOBvsZombiesGUI$1.class
 domain\POOBvsZombiesException.class
 presentation\GardenMenu$4.class

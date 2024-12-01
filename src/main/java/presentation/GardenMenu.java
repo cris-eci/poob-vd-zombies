@@ -103,6 +103,9 @@ public class GardenMenu extends JFrame {
                     "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"));
     private List<TimerTask> timerTasks = new ArrayList<>();
 
+    // Etiquetas para mostrar el mensaje y el tiempo
+    private JLabel messageLabel;
+    private JLabel timeLabel;
 
     public GardenMenu(POOBvsZombies poobvszombies) {
         setTitle("Garden Menu");
@@ -152,10 +155,10 @@ public class GardenMenu extends JFrame {
             addZombieTable(panel);
         }
 
-        //addTimerSection(panel, poobvszombies);
+        // addTimerSection(panel, poobvszombies);
         initializeTimers(poobvszombies);
-    setupTimerLabels(panel);
-    startSequentialTimers(0);
+        setupTimerLabels(panel);
+        startSequentialTimers(0);
 
         add(panel);
         startZombieMovement();
@@ -622,7 +625,6 @@ public class GardenMenu extends JFrame {
             panel.add(textLabel);
         }
     }
-        
 
     private void startZombieMovement() {
         Timer timer = new Timer(100, e -> {
@@ -649,89 +651,99 @@ public class GardenMenu extends JFrame {
     }
 
     // Clase interna para representar cada temporizador
-private class TimerTask {
-    private String message;
-    private int durationInSeconds;
-    private JLabel messageLabel;
-    private JLabel timeLabel;
+    private class TimerTask {
+        private String message;
+        private int durationInSeconds;
 
-    public TimerTask(String message, int durationInSeconds) {
-        this.message = message;
-        this.durationInSeconds = durationInSeconds;
+        public TimerTask(String message, int durationInSeconds) {
+            this.message = message;
+            this.durationInSeconds = durationInSeconds;
+        }
     }
-}
 
-// Método para inicializar los temporizadores
-private void initializeTimers(POOBvsZombies poobvsZombies) {
-    timerTasks.add(new TimerTask("Tiempo de siembra 1", Plants.PLANTING_TIME));
-    timerTasks.add(new TimerTask("Tiempo de ronda", (int) poobvsZombies.getRoundTime()));
-    timerTasks.add(new TimerTask("Tiempo de siembra 2", Plants.PLANTING_TIME));
-    timerTasks.add(new TimerTask("Última ronda", (int) poobvsZombies.getRoundTime()));
-}
+    // Método para inicializar los temporizadores
+    private void initializeTimers(POOBvsZombies poobvsZombies) {
+        timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
+        timerTasks.add(new TimerTask("Round time", (int) poobvsZombies.getRoundTime()));
+        timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
+        timerTasks.add(new TimerTask("Last ronda", (int) poobvsZombies.getRoundTime()));
+    }
 
-// Método para configurar las etiquetas en la interfaz
-private void setupTimerLabels(JPanel panel) {
-    int startX = 500;
-    int startY = 400;
-    int yOffset = 60;
+    // Método para configurar las etiquetas en la interfaz
+    private void setupTimerLabels(JPanel panel) {
+        int startX = 560;
+        int startY = 600;
 
-    for (int i = 0; i < timerTasks.size(); i++) {
-        TimerTask task = timerTasks.get(i);
-
-        JLabel messageLabel = new JLabel(task.message);
+        // Crear la etiqueta para el mensaje
+        messageLabel = new JLabel();
         messageLabel.setForeground(Color.BLACK);
         messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        messageLabel.setBounds(startX, startY + i * yOffset, 200, 30);
+        messageLabel.setBounds(startX, startY, 200, 30);
 
-        JLabel timeLabel = new JLabel(formatTime(task.durationInSeconds));
+        // Crear la etiqueta para el tiempo
+        timeLabel = new JLabel();
         timeLabel.setForeground(Color.BLACK);
         timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        timeLabel.setBounds(startX, startY + i * yOffset + 25, 200, 30);
+        timeLabel.setBounds(startX, startY + 25, 200, 30);
 
-        task.messageLabel = messageLabel;
-        task.timeLabel = timeLabel;
-
+        // Agregar las etiquetas al panel
         panel.add(messageLabel);
         panel.add(timeLabel);
-    }
-}
 
-// Método para iniciar los temporizadores secuencialmente
-private void startSequentialTimers(int index) {
-    if (index >= timerTasks.size()) {
-        return;
+        // Ocultar las etiquetas inicialmente
+        messageLabel.setVisible(false);
+        timeLabel.setVisible(false);
     }
 
-    TimerTask currentTask = timerTasks.get(index);
-    int duration = currentTask.durationInSeconds;
-
-    Timer timer = new Timer(1000, null);
-    timer.addActionListener(new ActionListener() {
-        int remainingTime = duration;
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (remainingTime > 0) {
-                remainingTime--;
-                currentTask.timeLabel.setText(formatTime(remainingTime));
-            } else {
-                timer.stop();
-                // Iniciar el siguiente temporizador
-                startSequentialTimers(index + 1);
-            }
+    // Método para iniciar los temporizadores secuencialmente
+    private void startSequentialTimers(int index) {
+        if (index >= timerTasks.size()) {
+            // Todos los temporizadores han finalizado
+            // Ocultar las etiquetas
+            messageLabel.setVisible(false);
+            timeLabel.setVisible(false);
+            return;
         }
-    });
 
-    timer.setInitialDelay(0);
-    timer.start();
-}
+        TimerTask currentTask = timerTasks.get(index);
+        int duration = currentTask.durationInSeconds;
 
-// Método para formatear el tiempo
-private String formatTime(int seconds) {
-    int minutes = seconds / 60;
-    int remainingSeconds = seconds % 60;
-    return String.format("%d:%02d", minutes, remainingSeconds);
-}
+        // Actualizar las etiquetas y hacerlas visibles
+        messageLabel.setText(currentTask.message);
+        timeLabel.setText(formatTime(duration));
+        messageLabel.setVisible(true);
+        timeLabel.setVisible(true);
+
+        Timer timer = new Timer(1000, null);
+        timer.addActionListener(new ActionListener() {
+            int remainingTime = duration;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (remainingTime > 0) {
+                    remainingTime--;
+                    timeLabel.setText(formatTime(remainingTime));
+                } else {
+                    timer.stop();
+                    // Ocultar las etiquetas
+                    messageLabel.setVisible(false);
+                    timeLabel.setVisible(false);
+                    // Iniciar el siguiente temporizador
+                    startSequentialTimers(index + 1);
+                }
+            }
+        });
+
+        timer.setInitialDelay(0);
+        timer.start();
+    }
+
+    // Método para formatear el tiempo
+    private String formatTime(int seconds) {
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        return String.format("%d:%02d", minutes, remainingSeconds);
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
