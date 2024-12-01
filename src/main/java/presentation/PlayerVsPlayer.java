@@ -330,8 +330,8 @@ public class PlayerVsPlayer extends JFrame {
             button.addActionListener(e -> {
             // Back to main menu
             dispose(); // Close the current window
-            MainMenu mainMenu = new MainMenu(); // Open the main menu
-            mainMenu.setVisible(true);
+            POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
+            POOBvsZombiesGUI.setVisible(true);
         });
     }
 
@@ -441,7 +441,7 @@ public class PlayerVsPlayer extends JFrame {
                 g.drawImage(zombieImage, 0, 0, getWidth(), getHeight(), this);
             }
             // Draw the translucent rectangle
-            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255,     0, 0, 128));
+            g.setColor(selected ? new Color(0, 255, 0, 128) : new Color(255, 0, 0, 128));
             g.fillRect(0, 0, getWidth(), getHeight());
         }
     }

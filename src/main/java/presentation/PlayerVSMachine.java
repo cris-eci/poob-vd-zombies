@@ -6,6 +6,9 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import java.util.*;
 
 public class PlayerVSMachine extends JFrame {
     private JButton playerNameButton, timeButton, numberButton;
@@ -226,8 +228,8 @@ public class PlayerVSMachine extends JFrame {
             button.addActionListener(e -> {
             // Back to main menu
             dispose(); // Close the current window
-            MainMenu mainMenu = new MainMenu(); // Open the main menu
-            mainMenu.setVisible(true);
+            POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Open the main menu
+            POOBvsZombiesGUI.setVisible(true);
         });
     }
 

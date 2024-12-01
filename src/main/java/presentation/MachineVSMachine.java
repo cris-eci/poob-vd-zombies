@@ -8,6 +8,9 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import java.util.*;
 
 public class MachineVSMachine extends JFrame {
     private List<PlantPanel> plantPanelsList = new ArrayList<>();
@@ -282,8 +284,8 @@ public class MachineVSMachine extends JFrame {
             button.addActionListener(e -> {
                 // Volver al menú principal
                 dispose(); // Cerrar la ventana actual
-                MainMenu mainMenu = new MainMenu(); // Abrir el menú principal
-                mainMenu.setVisible(true);
+                POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI(); // Abrir el menú principal
+                POOBvsZombiesGUI.setVisible(true);
             });
         }
 
