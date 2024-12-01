@@ -5,6 +5,13 @@ import java.util.ArrayList;
 public class Zombies extends Team {
     public static final String NAME = "Zombies";
     protected static final int BRAIN_AMOUNT_INCREASE = 50; // Adjusted resource increase for Zombies
+    public static final String[] ZOMBIE_TYPES = {            
+            "Basic",
+            "Conehead",
+            "Buckethead",
+            "ECIZombie",
+            "Brainstain"
+        };
 
     public Zombies(int resourceCounter, ArrayList<String> characters){
         super(resourceCounter, characters);

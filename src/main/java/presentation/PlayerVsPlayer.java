@@ -24,6 +24,22 @@ public class PlayerVsPlayer extends JFrame {
     private List<PlantPanel> plantPanelsList;
     private List<ZombiePanel> zombiePanelsList;
 
+    public static String[] zombieImages = {
+            "resources/images/zombies/Basic/Basic.jpg",
+            "resources/images/zombies/Conehead/Conehead.jpg",
+            "resources/images/zombies/BucketHead/Buckethead.jpg",
+            "resources/images/zombies/ECIZombie/ECIZombie.png",
+            "resources/images/zombies/Brainstein/brainsteinGarden.jpeg"
+    };
+
+    String[] plantImages = {
+            "resources/images/plants/Sunflower/Sunflower.jpg",
+            "resources/images/plants/Peashooter/Peashooter.jpg",
+            "resources/images/plants/WallNut/Wall-nutGrass.jpg",
+            "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
+            "resources/images/plants/ECIPlant/ECIPlant.png"
+    };
+
     public PlayerVsPlayer() {
         prepareElements();
         prepareActions();
@@ -209,14 +225,6 @@ public class PlayerVsPlayer extends JFrame {
         plantsPanel.setBounds(65, 440, 100, 160);
         plantsPanel.setOpaque(false);
 
-        String[] plantImages = {
-                "resources/images/plants/Sunflower/Sunflower.jpg",
-                "resources/images/plants/Peashooter/Peashooter.jpg",
-                "resources/images/plants/WallNut/Wall-nutGrass.jpg",
-                "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
-                "resources/images/plants/ECIPlant/ECIPlant.png"
-        };
-
         for (String imagePath : plantImages) {
             PlantPanel plantPanel = new PlantPanel(imagePath);
             plantPanelsList.add(plantPanel);
@@ -229,14 +237,6 @@ public class PlayerVsPlayer extends JFrame {
         JPanel zombiesPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         zombiesPanel.setBounds(710, 440, 100, 160);
         zombiesPanel.setOpaque(false);
-
-        String[] zombieImages = {
-                "resources/images/zombies/Basic/Basic.jpg",
-                "resources/images/zombies/Conehead/Conehead.jpg",
-                "resources/images/zombies/BucketHead/Buckethead.jpg",
-                "resources/images/zombies/ECIZombie/ECIZombie.png",
-                "resources/images/zombies/Brainstein/brainsteinGarden.jpeg"
-        };
 
         for (String imagePath : zombieImages) {
             ZombiePanel zombiePanel = new ZombiePanel(imagePath);
@@ -302,20 +302,37 @@ public class PlayerVsPlayer extends JFrame {
                 && playerTwoNameFilled && matchTimeFilled && sunsFilled && brainsFilled);
     }
 
+    /**
+     * Retrieves the selected items from a list of selectable panels.
+     *
+     * @param panels the list of selectable panels to check for selected items
+     * @return an ArrayList of selected item types based on the selected panels
+     */
+    /**
+     * Retrieves the selected items from a list of SelectablePanel objects.
+     * It checks each panel to see if it is selected, and if so, it compares the item path
+     * with predefined static lists of plant and zombie images. If a match is found,
+     * the corresponding plant or zombie type is added to the list of selected items.
+     *
+     * @param panels the list of SelectablePanel objects to check for selected items
+     * @return an ArrayList of selected item types (plants or zombies)
+     */
     private ArrayList<String> getSelectedItems(List<? extends SelectablePanel> panels) {
         ArrayList<String> selectedItems = new ArrayList<>();
         for (SelectablePanel panel : panels) {
             if (panel.isSelected()) {
                 String itemPath = panel.getItemPath();
-                String itemName = itemPath.substring(itemPath.lastIndexOf('/') + 1, itemPath.lastIndexOf('.'));
-                if (Plants.PLANT_TYPES.contains(itemName)) {
-                    selectedItems.add(itemName);
-                } else if (Zombies.ZOMBIE_TYPES.contains(itemName)) {
-                    selectedItems.add(itemName);
-                }
-            }   
+                for (int i = 0; i < 5; i++) {
+                    if (itemPath.equals(plantImages[i])) {
+                        selectedItems.add(Plants.PLANT_TYPES[i]);
+                    } else if (itemPath.equals(zombieImages[i])) {
+                        selectedItems.add(Zombies.ZOMBIE_TYPES[i]);
+                    }
+                }           
+            }
         }
         return selectedItems;
+
     }
 
     // Custom Classes
