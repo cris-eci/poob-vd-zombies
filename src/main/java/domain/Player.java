@@ -5,12 +5,9 @@ public abstract class Player {
     protected String name;
     protected int score;
     protected Team team;
-    protected Resource resource;
 
-    public Player(Team team,String name){
-        this.team = team;
+    public Player(String name){
         this.name = name;
-
     }
 
     public String getName(){
@@ -21,14 +18,10 @@ public abstract class Player {
         return score;
     }
 
-
-    public String getTeamName(){
-        return "";
-    }
+    public abstract String getTeamName();
 
     public abstract void setScore();
 
-    public abstract void addCharacter();
 
 
 }

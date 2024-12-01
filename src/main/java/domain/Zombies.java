@@ -1,18 +1,23 @@
 package domain;
 
-public class Zombies extends Team {
+import java.util.ArrayList;
 
-    public static final int RESOURCE_TIME_GENERATOR = 0;
-    public static final String NAME = "";
+public class Zombies extends Team {
+    public static final String NAME = "Zombies";
+    protected static final int BRAIN_AMOUNT_INCREASE = 50; // Adjusted resource increase for Zombies
+
+    public Zombies(int resourceCounter, ArrayList<String> characters){
+        super(resourceCounter, characters);
+    }
 
     @Override
     public void increaseResourceAmount(){
-        
-    };
+        // Implement the logic to increase resource amount for Zombies
+        resourceCounter += BRAIN_AMOUNT_INCREASE;
+    }
 
     @Override
-    public void selectCharacters(){
-        
-    };
-    
+    public String getTeamName(){
+        return NAME;
+    }           
 }

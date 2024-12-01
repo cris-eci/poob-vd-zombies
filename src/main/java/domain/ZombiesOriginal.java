@@ -5,17 +5,18 @@ public class ZombiesOriginal extends MachinePlayer implements Strategy{
     public static final int ORIGINAL_SPAWN_TIME = 0;
     private int hordersNumber;
     private int hordersTime;
+    private int currentStrategy;
 
     public ZombiesOriginal(Team team, String name) {
         super(team, name);
     }
 
     public void setOriginalStrategy(){
-
+        this.currentStrategy = ORIGINAL_SPAWN_TIME;
     }
 
     public void spawnZombie(Zombie zombie, int line, int xPos){
-
+        // Implementation for spawning a zombie
     }
 
     public void setHordersNumbers(int number){
@@ -28,20 +29,23 @@ public class ZombiesOriginal extends MachinePlayer implements Strategy{
 
     @Override
     public void executeStrategicTurn(int state) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'executeStrategicTurn'");
+        // Implementation for executing a strategic turn
+        if (state == currentStrategy) {
+            // Execute specific strategy
+        }
     }
 
     @Override
     public int getStrategy(int currentGameState) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getStrategy'");
+        // Return the current strategy based on the game state
+        return this.currentStrategy;
     }
 
     @Override
     public void setStrategy(int strategicGameState) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setStrategy'");
+        // Set the strategy based on the strategic game state
+        this.currentStrategy = strategicGameState;
     }
+    
 
 }

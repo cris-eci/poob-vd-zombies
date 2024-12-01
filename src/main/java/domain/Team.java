@@ -2,23 +2,27 @@ package domain;
 
 import java.util.ArrayList;
 
+import javax.swing.Timer;
+
 public abstract class Team {
     
     protected int resourceCounter;
-    protected static final int RESOURCE_AMOUNT_INCREASE = 0;
-    protected ArrayList<Entity> characters;
+    protected ArrayList<String> characters;
+    public static final Timer RESOURCE_TIME_GENERATOR = new Timer(10000, null); // 10 seconds or 10000 milliseconds
 
+    public Team(int resourceCounter, ArrayList<String> characters){
+        this.resourceCounter = resourceCounter;
+        this.characters = characters;
+    }
     public abstract void increaseResourceAmount();
 
     public int getResourceCounterAmount(){
-        return 0;
+        return resourceCounter;
     }
 
-    public abstract void selectCharacters();
-
-    public void setResourceCounter(int amount){
-    
+    public ArrayList<String> getCharacters(){
+        return characters;
     }
 
-
+    public abstract String getTeamName();
 }
