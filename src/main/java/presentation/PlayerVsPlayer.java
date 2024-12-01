@@ -1,14 +1,17 @@
 package presentation;
 
-import domain.POOBvsZombies;
+import domain.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import domain.Zombies;
 
 public class PlayerVsPlayer extends JFrame {
 
@@ -63,7 +66,6 @@ public class PlayerVsPlayer extends JFrame {
         backgroundPanel.add(setSunsField);
         backgroundPanel.add(setBrainsField);
         backgroundPanel.add(startButton);
-        
 
         // Labels
         addLabels(backgroundPanel);
@@ -91,7 +93,6 @@ public class PlayerVsPlayer extends JFrame {
                 actionStart();
             }
         });
-
 
         // Text Fields Document Listeners
         addTextFieldListeners(playerOneName);
@@ -123,25 +124,28 @@ public class PlayerVsPlayer extends JFrame {
                     sunAmount,
                     namePlayerTwo,
                     brainAmount,
-                    selectedZombies
-            );
+                    selectedZombies);
 
             // Proceed to the next step (e.g., open GardenMenu)
             // For example:
-            // new GardenMenu(selectedPlants, selectedZombies, "PlayerVsPlayer").setVisible(true);
+            // new GardenMenu(selectedPlants, selectedZombies,
+            // "PlayerVsPlayer").setVisible(true);
             // dispose();
 
             // Display Success Message
-            JOptionPane.showMessageDialog(this, "Game initialized successfully!"  + " " + namePlayerOne + " " + namePlayerTwo + " " + matchTimer + " " + sunAmount + " " + brainAmount + " " + selectedPlants + " " + selectedZombies, "Success", JOptionPane.INFORMATION_MESSAGE);
-            
+            JOptionPane.showMessageDialog(this,
+                    "Game initialized successfully!" + " " + namePlayerOne + " " + namePlayerTwo + " " + matchTimer
+                            + " " + sunAmount + " " + brainAmount + " " + selectedPlants + " " + selectedZombies,
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error",
+                    JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
-
 
     // Helper Methods
     private JTextField createTextField(String placeholder, int x, int y, int width, int height) {
@@ -249,7 +253,8 @@ public class PlayerVsPlayer extends JFrame {
         int buttonSize = 40;
 
         ImageIcon icon = new ImageIcon(buttonImagePath);
-        JButton button = new JButton(new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
+        JButton button = new JButton(
+                new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
         button.setBounds(x, y, buttonSize, buttonSize);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
@@ -284,21 +289,31 @@ public class PlayerVsPlayer extends JFrame {
             }
         }
 
-        boolean playerOneNameFilled = !playerOneName.getText().isEmpty() && !playerOneName.getText().equals("Name player one");
-        boolean playerTwoNameFilled = !playerTwoName.getText().isEmpty() && !playerTwoName.getText().equals("Name player two");
+        boolean playerOneNameFilled = !playerOneName.getText().isEmpty()
+                && !playerOneName.getText().equals("Name player one");
+        boolean playerTwoNameFilled = !playerTwoName.getText().isEmpty()
+                && !playerTwoName.getText().equals("Name player two");
         boolean matchTimeFilled = !matchTime.getText().isEmpty() && !matchTime.getText().equals("Time");
         boolean sunsFilled = !setSunsField.getText().isEmpty() && !setSunsField.getText().equals("Amount of suns");
-        boolean brainsFilled = !setBrainsField.getText().isEmpty() && !setBrainsField.getText().equals("Amount of brains");
+        boolean brainsFilled = !setBrainsField.getText().isEmpty()
+                && !setBrainsField.getText().equals("Amount of brains");
 
-        startButton.setEnabled(atLeastOnePlantSelected && atLeastOneZombieSelected && playerOneNameFilled && playerTwoNameFilled && matchTimeFilled && sunsFilled && brainsFilled);
+        startButton.setEnabled(atLeastOnePlantSelected && atLeastOneZombieSelected && playerOneNameFilled
+                && playerTwoNameFilled && matchTimeFilled && sunsFilled && brainsFilled);
     }
 
     private ArrayList<String> getSelectedItems(List<? extends SelectablePanel> panels) {
         ArrayList<String> selectedItems = new ArrayList<>();
         for (SelectablePanel panel : panels) {
             if (panel.isSelected()) {
-                selectedItems.add(panel.getItemPath());
-            }
+                String itemPath = panel.getItemPath();
+                String itemName = itemPath.substring(itemPath.lastIndexOf('/') + 1, itemPath.lastIndexOf('.'));
+                if (Plants.PLANT_TYPES.contains(itemName)) {
+                    selectedItems.add(itemName);
+                } else if (Zombies.ZOMBIE_TYPES.contains(itemName)) {
+                    selectedItems.add(itemName);
+                }
+            }   
         }
         return selectedItems;
     }
