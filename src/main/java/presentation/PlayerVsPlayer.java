@@ -21,11 +21,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import domain.POOBvsZombies;
+
 public class PlayerVsPlayer extends JFrame {
     private List<PlantPanel> plantPanelsList = new ArrayList<>();
     private List<ZombiePanel> zombiePanelsList = new ArrayList<>();
     private JTextField playerOneName, playerTwoName, matchTime, setSunsField, setBrainsField;
     private JButton startButton;
+
+    private POOBvsZombies poobvszombies;
 
     public PlayerVsPlayer() {
         // Basic window configuration
