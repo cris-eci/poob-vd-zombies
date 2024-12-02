@@ -495,7 +495,7 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
      * Método para agregar las etiquetas que muestran información de los jugadores.
      */
     private void addPlayerInfo(JPanel panel) {
-        if (("PlayerVsPlayer".equals(state) || "PlayerVsMachine".equals(state)) && players != null && !players.isEmpty()) {
+        if (("PlayerVsPlayer".equals(state) || "PlayerVsMachine".equals(state)) || "MachineVsMachine".equals(state) && players != null && !players.isEmpty() ) {
             Player playerOne = players.get(0);
     
             // Etiqueta para el nombre del Jugador 1
@@ -512,7 +512,7 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             playerOneSunsLabel.setBounds(30, 60, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneSunsLabel);
     
-            if ("PlayerVsPlayer".equals(state) && players.size() >= 2) {
+            if ("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state) && players.size() >= 2) {
                 Player playerTwo = players.get(1);
     
                 // Etiqueta para el nombre del Jugador 2
@@ -545,15 +545,16 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
             playerOneScoreLabel.setForeground(Color.YELLOW);
             playerOneScoreLabel.setBounds(560, 595, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneScoreLabel);
-        }
+        
 
-        if("PlayerVsPlayer".equals(state)){
-            // Etiqueta para el puntaje del Jugador 2
-            playerTwoScoreLabel = new JLabel("Score: 0");
-            playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            playerTwoScoreLabel.setForeground(Color.RED);
-            playerTwoScoreLabel.setBounds(560, 625, 300, 30); // Ajustar posición y tamaño
-            panel.add(playerTwoScoreLabel);
+            if("PlayerVsPlayer".equals(state)){
+                // Etiqueta para el puntaje del Jugador 2
+                playerTwoScoreLabel = new JLabel("Score: 0");
+                playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoScoreLabel.setForeground(Color.RED);
+                playerTwoScoreLabel.setBounds(560, 625, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoScoreLabel);
+            }
         }
     }
 
@@ -898,8 +899,8 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
     private void addHordeLabel(JPanel panel) {
         hordeLabel = new JLabel(""); // Etiqueta inicialmente vacía
         hordeLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        hordeLabel.setForeground(Color.WHITE);
-        hordeLabel.setBounds(400, 10, 200, 30); // Ajusta la posición según sea necesario
+        hordeLabel.setForeground(Color.BLACK);
+        hordeLabel.setBounds(570, 630, 200, 30); // Ajusta la posición según sea necesario
         panel.add(hordeLabel);
     }
     
@@ -919,7 +920,7 @@ public void onInitialSetupTimeUpdate(int timeRemaining) {
     SwingUtilities.invokeLater(() -> {
         int minutes = timeRemaining / 60;
         int seconds = timeRemaining % 60;
-        timerLabel.setText("Round Time: " + minutes + "m " + seconds + "s");
+        timerLabel.setText("Planting Time: " + minutes + "m " + seconds + "s");
     });
 }
 

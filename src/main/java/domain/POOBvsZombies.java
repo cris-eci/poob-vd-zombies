@@ -133,75 +133,75 @@ public class POOBvsZombies {
     
     // Dentro de la clase POOBvsZombies
 
-private void startGameWithHordes() {
-    // Fase de preparación inicial
-    timeRemaining = initialSetupTime;
-    notifyInitialSetupTimeUpdate();
-
-    timer = new Timer();
-    timer.scheduleAtFixedRate(new TimerTask() {
-        @Override
-        public void run() {
-            timeRemaining--;
-            notifyInitialSetupTimeUpdate();
-
-            if (timeRemaining <= 0) {
-                timer.cancel();
-                currentHorde = 1;
-                startNextHorde();
-            }
-        }
-    }, 1000, 1000);
-}
-
-private void startNextHorde() {
-    notifyHordeChange(currentHorde); // Notificar el inicio de la horda actual
-
-    timeRemaining = hordeDuration * 60; // Convertir minutos a segundos
-    notifyTimeUpdate();
-
-    timer = new Timer();
-    timer.scheduleAtFixedRate(new TimerTask() {
-        @Override
-        public void run() {
-            timeRemaining--;
-            notifyTimeUpdate();
-
-            if (timeRemaining <= 0) {
-                timer.cancel();
-                if (currentHorde < numberOfHordes) {
-                    // Iniciar fase de preparación intermedia
-                    currentHorde++;
-                    startIntermediateSetup();
-                } else {
-                    // No hay más hordas, finalizar el juego
-                    endGame();
+    private void startGameWithHordes() {
+        // Fase de preparación inicial (2 minutos)
+        timeRemaining = initialSetupTime;
+        notifyInitialSetupTimeUpdate();
+    
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                timeRemaining--;
+                notifyInitialSetupTimeUpdate();
+    
+                if (timeRemaining <= 0) {
+                    timer.cancel();
+                    currentHorde = 1;
+                    startNextHorde();
                 }
             }
-        }
-    }, 1000, 1000);
-}
+        }, 1000, 1000);
+    }
+    
 
-private void startIntermediateSetup() {
-    // Fase de preparación intermedia (2 minutos)
-    timeRemaining = initialSetupTime;
-    notifyInitialSetupTimeUpdate();
-
-    timer = new Timer();
-    timer.scheduleAtFixedRate(new TimerTask() {
-        @Override
-        public void run() {
-            timeRemaining--;
-            notifyInitialSetupTimeUpdate();
-
-            if (timeRemaining <= 0) {
-                timer.cancel();
-                // Iniciar la siguiente horda
-                startNextHorde();
+    private void startNextHorde() {
+        notifyHordeChange(currentHorde); // Notificar el inicio de la horda actual
+    
+        timeRemaining = hordeDuration * 60; // Convertir minutos a segundos
+        notifyTimeUpdate();
+    
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                timeRemaining--;
+                notifyTimeUpdate();
+    
+                if (timeRemaining <= 0) {
+                    timer.cancel();
+                    if (currentHorde < numberOfHordes) {
+                        currentHorde++;
+                        startIntermediateSetup();
+                    } else {
+                        endGame();
+                    }
+                }
             }
-        }
-    }, 1000, 1000);
-}
+        }, 1000, 1000);
+    }
+    
+
+    private void startIntermediateSetup() {
+        // Fase de preparación intermedia (2 minutos)
+        timeRemaining = initialSetupTime;
+        notifyInitialSetupTimeUpdate();
+    
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                timeRemaining--;
+                notifyInitialSetupTimeUpdate();
+    
+                if (timeRemaining <= 0) {
+                    timer.cancel();
+                    startNextHorde();
+                }
+            }
+        }, 1000, 1000);
+    }
+    
 
 
     private void notifyTimeUpdate() {

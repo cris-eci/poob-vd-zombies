@@ -134,16 +134,16 @@ public class MachineVSMachine extends JFrame {
             }
 
             // Obtener y validar los valores ingresados
-            int matchTimeValue = 0;
+            int hordeDuration = 0;
             int numberOfHordes = 0;
             int initialSuns = 0;
             int initialBrains = 0;
             try {
-                matchTimeValue = Integer.parseInt(time.getText().trim());
+                hordeDuration = Integer.parseInt(time.getText().trim());
                 numberOfHordes = Integer.parseInt(quantity.getText().trim());
                 initialSuns = Integer.parseInt(setSunsField.getText().trim());
                 initialBrains = Integer.parseInt(setBrainsField.getText().trim());
-                if (matchTimeValue <= 0 || numberOfHordes <= 0 || initialSuns < 0 || initialBrains < 0) {
+                if (hordeDuration <= 0 || numberOfHordes <= 0 || initialSuns < 0 || initialBrains < 0) {
                     throw new NumberFormatException("Los valores deben ser positivos.");
                 }
             } catch (NumberFormatException ex) {
@@ -157,7 +157,7 @@ public class MachineVSMachine extends JFrame {
 
             // Crear jugadores inteligentes (AI)
             PlantsIntelligent plantsAI = new PlantsIntelligent(plantsTeam, "Plants AI");
-            ZombieOriginal zombiesAI = new ZombieOriginal(zombiesTeam, "Zombies AI",numberOfHordes,matchTimeValue);
+            ZombieOriginal zombiesAI = new ZombieOriginal(zombiesTeam, "Zombies AI",numberOfHordes,hordeDuration);
 
             // Crear lista de jugadores
             List<Player> players = new ArrayList<>();

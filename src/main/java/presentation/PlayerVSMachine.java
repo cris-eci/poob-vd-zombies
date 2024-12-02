@@ -208,6 +208,7 @@ public class PlayerVSMachine extends JFrame {
         players.add(humanPlayer);
         players.add(machinePlayer);
 
+        hordeDuration = matchTime;
         // Crear el juego
         POOBvsZombies game = new POOBvsZombies(players, numberOfHordes, hordeDuration, "PlayerVsMachine");
 
