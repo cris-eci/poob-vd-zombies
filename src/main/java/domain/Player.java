@@ -39,6 +39,16 @@ public abstract class Player {
     }
 
     /**
+     * Método para que el jugador recoja un recurso.
+     */
+    public void collectResource(Resource resource) {
+        int currentAmount = team.getResourceCounterAmount();
+        currentAmount += resource.getValue();
+        team.setResourceCounter(currentAmount);
+    }
+
+    
+    /**
      * Método abstracto para que el jugador realice su turno.
      */
     public abstract void playTurn();

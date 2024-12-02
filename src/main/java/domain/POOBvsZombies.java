@@ -22,6 +22,9 @@ public class POOBvsZombies {
     private int numberOfHordes;
     private int hordeDuration; // en minutos
     private int currentHorde;
+
+    private GameListener gameListener;
+    private Timer resourceGenerationTimer;
     
     // Constructor para PlayerVsPlayer
     public POOBvsZombies(List<Player> players, int matchTime, String gameMode) {
@@ -59,7 +62,7 @@ public class POOBvsZombies {
         }
     }
     
-
+    
     private void startPlayerVsPlayerGame() {
         // Fase de preparación inicial
         timeRemaining = initialSetupTime;

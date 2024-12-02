@@ -57,11 +57,13 @@ domain\POOBvsZombies$4.class
 presentation\PlayerVSMachine$PlantPanel.class
 domain\Brainstein.class
 domain\Zombie.class
+presentation\GardenMenu$10.class
 presentation\GardenMenu$6.class
 domain\ResourceGenerator.class
 domain\Peashooter.class
 domain\Plant.class
 presentation\POOBvsZombiesGUI.class
+domain\Resource$1.class
 presentation\PlayerVsPlayer$3.class
 domain\PlantsStrategy.class
 domain\Resource.class

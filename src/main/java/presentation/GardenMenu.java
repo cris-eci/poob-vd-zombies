@@ -13,6 +13,8 @@ import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -31,15 +33,20 @@ import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.LineBorder;
 import javax.swing.Timer;
 
+import domain.Entity;
 import domain.POOBvsZombies;
 import domain.Player;
+import domain.Resource;
 import domain.Plants;
 import domain.Zombies;
 import domain.Team;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 
 
@@ -76,6 +83,11 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
 
     // Declarar a nivel de clase
     private boolean shovelSelected = false;
+
+    //Resource
+    private Timer sunGenerationTimer;
+    private Timer brainGenerationTimer;
+
 
     
     public GardenMenu(String[] selectedPlants, String[] selectedZombies, String state, POOBvsZombies game, List<Player> players) {
@@ -148,9 +160,11 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
 
         add(panel);
         startZombieMovement();
+        
         if (game != null) {
             game.setGameListener(this);
         }
+
     }
 
 
@@ -776,6 +790,100 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
     }
     
     /**
+     * Inicia los timers para generar soles y cerebros cada 10 segundos.
+     */
+    private void startResourceGenerationTimerSun() {
+        // Timer para generar soles cada 10 segundos
+        if (("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) || "PlayerVsMachine".equals(state)){
+            sunGenerationTimer = new Timer(10000, e -> generateSunResource());
+            sunGenerationTimer.start();
+        }
+        
+    }
+
+
+    /**
+     * Inicia los timers para generar soles y cerebros cada 10 segundos.
+     */
+    private void startResourceGenerationTimersBrain() {
+        
+        // Si el modo de juego incluye zombies, iniciar el timer para cerebros
+        if (("PlayerVsPlayer".equals(state) || "MachineVsMachine".equals(state)) && players.size() >= 2) {
+            brainGenerationTimer = new Timer(10000, e -> generateBrainResource());
+            brainGenerationTimer.start();
+        }
+    }
+
+    /**
+     * Genera un sol en una posición aleatoria del tablero y lo añade al contador de soles.
+     */
+    private void generateSunResource() {
+        // Incrementar el contador de soles en 25
+        updateSuns(25);
+
+        // Mostrar la imagen del sol en una posición aleatoria
+        showResourceOnGrid("sun");
+    }
+
+    /**
+     * Genera un cerebro en una posición aleatoria del tablero y lo añade al contador de cerebros.
+     */
+    private void generateBrainResource() {
+        // Incrementar el contador de cerebros en 50
+        updateBrains(50);
+
+        // Mostrar la imagen del cerebro en una posición aleatoria
+        showResourceOnGrid("brain");
+    }
+
+
+    /**
+     * Muestra un recurso (sol o cerebro) en una posición aleatoria del tablero durante 2 segundos.
+     * @param resourceType El tipo de recurso ("sun" o "brain").
+     */
+    private void showResourceOnGrid(String resourceType) {
+        SwingUtilities.invokeLater(() -> {
+            // Obtener una posición aleatoria en el grid
+            Random random = new Random();
+            int row = random.nextInt(5); // Filas 0 a 4
+            int col;
+
+            if ("sun".equals(resourceType)) {
+                col = random.nextInt(8) + 1; // Columnas 1 a 8 para las plantas
+            } else if ("brain".equals(resourceType)) {
+                col = 9; // Última columna para los zombies
+            } else {
+                return;
+            }
+
+            JPanel cell = gridCells[row][col];
+
+            // Crear un JLabel con la imagen del recurso
+            String imagePath = resourceType.equals("sun") ? "resources/images/sun.png" : "resources/images/brain.png";
+            ImageIcon icon = new ImageIcon(imagePath);
+            Image scaledImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+            JLabel resourceLabel = new JLabel(new ImageIcon(scaledImage));
+
+            // Añadir el JLabel al panel de la celda
+            cell.add(resourceLabel);
+            cell.revalidate();
+            cell.repaint();
+
+            // Remover el recurso después de 2 segundos
+            Timer removalTimer = new Timer(3000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cell.remove(resourceLabel);
+                    cell.revalidate();
+                    cell.repaint();
+                }
+            });
+            removalTimer.setRepeats(false);
+            removalTimer.start();
+        });
+    }
+
+    /**
      * Método para actualizar la cantidad de soles en la interfaz.
      * @param delta Valor a sumar o restar a los soles.
      */
@@ -906,8 +1014,9 @@ public class GardenMenu extends JFrame implements POOBvsZombies.GameListener {
     
     
     
-    @Override
+@Override
 public void onTimeUpdate(int timeRemaining) {
+    startResourceGenerationTimersBrain();
     SwingUtilities.invokeLater(() -> {
         int minutes = timeRemaining / 60;
         int seconds = timeRemaining % 60;
@@ -917,6 +1026,7 @@ public void onTimeUpdate(int timeRemaining) {
 
 @Override
 public void onInitialSetupTimeUpdate(int timeRemaining) {
+    startResourceGenerationTimerSun();
     SwingUtilities.invokeLater(() -> {
         int minutes = timeRemaining / 60;
         int seconds = timeRemaining % 60;
@@ -926,6 +1036,7 @@ public void onInitialSetupTimeUpdate(int timeRemaining) {
 
 @Override
 public void onRoundStart(int roundNumber) {
+    startResourceGenerationTimersBrain();
     SwingUtilities.invokeLater(() -> {
         JOptionPane.showMessageDialog(this, "Starts the round " + roundNumber + ".");
     });
@@ -933,6 +1044,7 @@ public void onRoundStart(int roundNumber) {
 
 @Override
 public void onHordeChange(int hordeNumber) {
+    startResourceGenerationTimersBrain();
     SwingUtilities.invokeLater(() -> {
         hordeLabel.setText("Horda " + hordeNumber);
     });
@@ -967,6 +1079,14 @@ public void onGameEnd(String result) {
             } else {
                 JOptionPane.showMessageDialog(this, "¡La partida ha terminado en empate!", "Empate", JOptionPane.INFORMATION_MESSAGE);
             }
+        }
+
+        // Detener los timers de generación de recursos
+        if (sunGenerationTimer != null) {
+            sunGenerationTimer.stop();
+        }
+        if (brainGenerationTimer != null) {
+            brainGenerationTimer.stop();
         }
 
         // Cerrar la ventana y regresar al menú principal
