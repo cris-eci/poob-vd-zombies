@@ -138,10 +138,10 @@ public class PlayerVsPlayer extends JFrame {
             dispose();
 
             // Display Success Message
-            JOptionPane.showMessageDialog(this,
-                    "Game initialized successfully!" + " " + namePlayerOne + " " + namePlayerTwo + " " + matchTimer
-                            + " " + sunAmount + " " + brainAmount + " " + selectedPlants + " " + selectedZombies,
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            // JOptionPane.showMessageDialog(this,
+            //         "Game initialized successfully!" + " " + namePlayerOne + " " + namePlayerTwo + " " + matchTimer
+            //                 + " " + sunAmount + " " + brainAmount + " " + selectedPlants + " " + selectedZombies,
+            //         "Success", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error",

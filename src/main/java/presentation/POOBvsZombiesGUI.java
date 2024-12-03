@@ -17,6 +17,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -131,7 +132,21 @@ public class POOBvsZombiesGUI extends JFrame {
             button.setBorderPainted(false);
             button.setFocusPainted(false);
 
-            // Add action events to buttons
+            // Agregar eventos de acción a los botones
+            if (imagePath.contains("import-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para exportar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de importar aún no implementada.", "Importar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+
+            if (imagePath.contains("open-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para guardar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de abrir aún no implementada.", "Abrir", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+            
 
             panel.add(button);
             x += 60; // Adjust X position for the next button

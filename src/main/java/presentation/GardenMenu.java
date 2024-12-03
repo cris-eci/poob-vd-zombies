@@ -51,6 +51,11 @@ public class GardenMenu extends JFrame {
     private JPanel[][] gridCells = new JPanel[5][10];
     private boolean shovelSelected = false;
     private java.util.List<JLabel> movingZombies = new java.util.ArrayList<>();
+    private POOBvsZombies poobvszombies;
+    private JLabel playerOneNameLabel, playerTwoNameLabel;
+    private JLabel playerOneSunsLabel, playerTwoBrainsLabel;
+    private JLabel playerOneScoreLabel, playerTwoScoreLabel;
+
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
             Arrays.asList(
                     "Basic",
@@ -117,6 +122,7 @@ public class GardenMenu extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        this.poobvszombies = poobvszombies;
         this.modality = poobvszombies.getModality();
         Player playerOne = poobvszombies.getPlayerOne();
         Player playerTwo = poobvszombies.getPlayerTwo();
@@ -153,13 +159,13 @@ public class GardenMenu extends JFrame {
         // Add zombie components only if in "PlayerVsPlayer" mode
 
         if ("PlayerVsPlayer".equals(modality)) {
-            //addPlayerInfo(panel);
-            //addScoreLabels(panel);
+            addPlayerInfo(panel);
+            addScoreLabels(panel);
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
         } else if ("PlayerVsMachine".equals(modality)) {
-            //addPlayerInfo(panel); // Solo mostrar información del jugador
+            addPlayerInfo(panel); // Solo mostrar información del jugador
             //addHordeLabel(panel);
         } else if ("MachineVsMachine".equals(modality)) {
             //addHordeLabel(panel);
@@ -499,6 +505,21 @@ public class GardenMenu extends JFrame {
             button.setBorderPainted(false);
             button.setFocusPainted(false);
 
+            // Agregar eventos de acción a los botones
+            if (imagePath.contains("export-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para exportar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de exportar aún no implementada.", "Exportar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+
+            if (imagePath.contains("save-icon")) {
+                button.addActionListener(e -> {
+                    // Implementar funcionalidad para guardar el estado del juego
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+
             // Add action events to buttons
             if (imagePath.contains("return-icon")) {
                 button.addActionListener(e -> {
@@ -530,6 +551,67 @@ public class GardenMenu extends JFrame {
         }
     }
 
+    private void addPlayerInfo(JPanel panel) {
+        if (("PlayerVsPlayer".equals(modality) || "PlayerVsMachine".equals(modality)) || "MachineVsMachine".equals(modality) ) {
+            Player playerOne = poobvszombies.getPlayerOne(); 
+    
+            // Etiqueta para el nombre del Jugador 1
+            playerOneNameLabel = new JLabel("" + playerOne.getName());
+            playerOneNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerOneNameLabel.setForeground(Color.YELLOW);
+            playerOneNameLabel.setBounds(480, 595, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerOneNameLabel);
+    
+            // Etiqueta para los soles iniciales del Jugador 1
+            playerOneSunsLabel = new JLabel(""+playerOne.getTeam().getResourceCounterAmount());
+            playerOneSunsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerOneSunsLabel.setForeground(Color.ORANGE);
+            playerOneSunsLabel.setBounds(30, 60, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerOneSunsLabel);
+    
+            if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
+                Player playerTwo = poobvszombies.getPlayerTwo();
+    
+                // Etiqueta para el nombre del Jugador 2
+                playerTwoNameLabel = new JLabel("" + playerTwo.getName());
+                playerTwoNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoNameLabel.setForeground(Color.RED);
+                playerTwoNameLabel.setBounds(480, 625, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoNameLabel);
+    
+                // Etiqueta para los cerebros iniciales del Jugador 2
+                playerTwoBrainsLabel = new JLabel("" + playerTwo.getTeam().getResourceCounterAmount());
+                playerTwoBrainsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoBrainsLabel.setForeground(Color.MAGENTA);
+                playerTwoBrainsLabel.setBounds(50, 620, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoBrainsLabel);
+            }
+        }
+    }
+
+    /**
+     * Método para agregar las etiquetas que muestran los puntajes de los jugadores.
+     */
+    private void addScoreLabels(JPanel panel) {
+        // Etiqueta para el puntaje del Jugador 1
+        if ("PlayerVsPlayer".equals(modality) || "PlayerVsMachine".equals(modality)){
+            playerOneScoreLabel = new JLabel("Score: 0");
+            playerOneScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            playerOneScoreLabel.setForeground(Color.YELLOW);
+            playerOneScoreLabel.setBounds(560, 595, 300, 30); // Ajustar posición y tamaño
+            panel.add(playerOneScoreLabel);
+        
+
+            if("PlayerVsPlayer".equals(modality)){
+                // Etiqueta para el puntaje del Jugador 2
+                playerTwoScoreLabel = new JLabel("Score: 0");
+                playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoScoreLabel.setForeground(Color.RED);
+                playerTwoScoreLabel.setBounds(560, 625, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoScoreLabel);
+            }
+        }
+    }
     // Auxiliary class to handle the Transferable object of image type with type
     // (plant or zombie)
     private static class ImageTransferable implements Transferable {
@@ -659,7 +741,7 @@ public class GardenMenu extends JFrame {
             brainLabel.setBounds(50, 585, 40, 40); // Adjust position and size
 
             // Create a JLabel to display the text "100"
-            JLabel textLabel = new JLabel("100");
+            JLabel textLabel = new JLabel("");
             textLabel.setForeground(Color.WHITE);
             textLabel.setFont(textLabel.getFont().deriveFont(20f));
             textLabel.setBounds(50, 625, 80, 30); // Adjust position and size
@@ -714,7 +796,7 @@ public class GardenMenu extends JFrame {
 
     // Método para configurar las etiquetas en la interfaz
     private void setupTimerLabels(JPanel panel) {
-        int startX = 560;
+        int startX = 670;
         int startY = 600;
 
         // Crear la etiqueta para el mensaje
@@ -727,7 +809,7 @@ public class GardenMenu extends JFrame {
         timeLabel = new JLabel();
         timeLabel.setForeground(Color.BLACK);
         timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        timeLabel.setBounds(startX, startY + 25, 200, 30);
+        timeLabel.setBounds(startX + 120, startY, 200, 30);
 
         // Agregar las etiquetas al panel
         panel.add(messageLabel);
