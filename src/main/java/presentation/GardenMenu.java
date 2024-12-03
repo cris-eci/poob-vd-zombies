@@ -3,6 +3,7 @@ package presentation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container; // Add this import
+import java.awt.Cursor;
 import java.awt.Dimension; // Add this import
 import java.awt.Font;
 import java.awt.Graphics;
@@ -40,6 +41,7 @@ import domain.POOBvsZombies;
 import domain.Plants;
 import domain.Player;
 
+
 public class GardenMenu extends JFrame {
     private ArrayList<String> selectedPlants;
     private ArrayList<String> selectedZombies;
@@ -47,6 +49,7 @@ public class GardenMenu extends JFrame {
     private JLabel shovelLabel;
     private Point originalShovelPosition;
     private JPanel[][] gridCells = new JPanel[5][10];
+    private boolean shovelSelected = false;
     private java.util.List<JLabel> movingZombies = new java.util.ArrayList<>();
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
             Arrays.asList(
@@ -149,7 +152,17 @@ public class GardenMenu extends JFrame {
 
         // Add zombie components only if in "PlayerVsPlayer" mode
 
-        if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
+        if ("PlayerVsPlayer".equals(modality)) {
+            //addPlayerInfo(panel);
+            //addScoreLabels(panel);
+            addBrainIcon(panel);
+            addZombieCards(panel);
+            addZombieTable(panel);
+        } else if ("PlayerVsMachine".equals(modality)) {
+            //addPlayerInfo(panel); // Solo mostrar información del jugador
+            //addHordeLabel(panel);
+        } else if ("MachineVsMachine".equals(modality)) {
+            //addHordeLabel(panel);
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
@@ -235,6 +248,16 @@ public class GardenMenu extends JFrame {
         shovelLabel.setBounds(520, 28, 50, 50); // Place at the top right corner
         originalShovelPosition = shovelLabel.getLocation();
 
+
+        shovelLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                shovelSelected = true;
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cambiar el cursor
+                // JOptionPane.showMessageDialog(null, "Pala seleccionada. Haz clic en una planta para removerla.");
+            }
+        });
+
         panel.add(shovelLabel);
     }
 
@@ -312,6 +335,26 @@ public class GardenMenu extends JFrame {
                             return false;
                         }
                     });
+
+                    // Añadir MouseListener a la celda
+                    cellPanel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            if (shovelSelected) {
+                                if (cellPanel.getComponentCount() > 0) {
+                                    // Remover la planta
+                                    cellPanel.removeAll();
+                                    cellPanel.revalidate();
+                                    cellPanel.repaint();
+                                    shovelSelected = false;
+                                    setCursor(Cursor.getDefaultCursor()); // Restablecer el cursor
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "No hay planta en esta celda.");
+                                }
+                            }
+                        }
+                    });
+                    
                 } else if (col == 9) {
                     if ("PlayerVsPlayer".equals(modality)) {
                         // Allow dragging and dropping zombies only in the last column
