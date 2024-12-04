@@ -2,6 +2,7 @@ package domain;
 
 import java.util.ArrayList;
 
+import javax.crypto.Mac;
 import javax.swing.Timer;
 
 public class POOBvsZombies {
@@ -43,6 +44,20 @@ public class POOBvsZombies {
         this.roundTime = this.matchTime / 2;
     }
 
+    public POOBvsZombies(float matchTimeInSeconds, int hordersNumber) {
+        this.players = new ArrayList<Player>();
+        this.entities = new ArrayList<Entity>();
+
+        this.players.add(new PlantsIntelligent());
+        this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds, MachinePlayer.ORIGINAL_ZOMBIES));
+
+        this.modality = "MachineVsMachine";
+        this.winner = "";
+
+        this.entities = new ArrayList<Entity>();
+        this.matchTime = setMatchTime(matchTimeInSeconds);
+        this.roundTime = this.matchTime / 2;
+    }
 
     public int calculateProgress(){
         return 0;

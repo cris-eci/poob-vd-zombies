@@ -17,10 +17,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import domain.POOBvsZombies;
+
 public class PlayerVSMachine extends JFrame {
     private JButton playerNameButton, timeButton, numberButton;
     private JButton startButton;
     private JPanel[] plantPanels; // Array to store plant panels
+    private POOBvsZombies poobvsZombies;
 
     public PlayerVSMachine() {
         // JFrame configuration

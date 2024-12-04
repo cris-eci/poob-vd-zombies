@@ -5,22 +5,18 @@ import java.util.ArrayList;
 public class Zombies extends Team {
     public static final String NAME = "Zombies";
     protected static final int BRAIN_AMOUNT_INCREASE = 50; // Adjusted resource increase for Zombies
-    private static final ArrayList<String> ORIGINAL_ZOMBIES = new ArrayList<>();
-
-    static {
-        ORIGINAL_ZOMBIES.add("Basic");
-        ORIGINAL_ZOMBIES.add("Brainstein");
-        ORIGINAL_ZOMBIES.add("BucketHead");
-        ORIGINAL_ZOMBIES.add("Conehead");
-        ORIGINAL_ZOMBIES.add("ECIZombie");
-    }
+    
 
     public Zombies(int resourceCounter, ArrayList<String> characters){
         super(resourceCounter, characters);
     }
 
     public Zombies(){
-        super(0, ORIGINAL_ZOMBIES);
+        super(0, MachinePlayer.ORIGINAL_ZOMBIES);
+    }
+
+    public Zombies(ArrayList<String> characters){
+        super(0, characters);
     }
 
     @Override

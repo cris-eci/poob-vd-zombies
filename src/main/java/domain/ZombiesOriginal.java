@@ -1,5 +1,7 @@
 package domain;
 
+import java.util.ArrayList;
+
 public class ZombiesOriginal extends HumanPlayer{
     public static final int ORIGINAL_SPAWN_TIME = 10;
     private int hordersNumber;
@@ -8,6 +10,14 @@ public class ZombiesOriginal extends HumanPlayer{
     public ZombiesOriginal(int hordersNumber, float matchTime) {
         super("Original Zombies machine");
         Team zombiesHordersTeam = new Zombies();// El constructor de Zombies no recibe parámetros porque es zombie original
+        this.team = zombiesHordersTeam;
+        this.hordersNumber = hordersNumber;
+        this.horderTime = matchTime / hordersNumber;
+    }
+
+    public ZombiesOriginal(int hordersNumber, float matchTime, ArrayList<String> zombiesMachine) {
+        super("Original Zombies machine");
+        Team zombiesHordersTeam = new Zombies(zombiesMachine); // Assuming Zombies class has a constructor that accepts ArrayList<Zombie>
         this.team = zombiesHordersTeam;
         this.hordersNumber = hordersNumber;
         this.horderTime = matchTime / hordersNumber;
