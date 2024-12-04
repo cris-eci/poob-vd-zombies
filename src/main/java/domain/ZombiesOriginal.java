@@ -16,7 +16,7 @@ public class ZombiesOriginal extends HumanPlayer{
     }
 
     public ZombiesOriginal(int hordersNumber, float matchTime, ArrayList<String> zombiesMachine) {
-        super("Original Zombies machine");
+        super("Smart Zombies machine");
         Team zombiesHordersTeam = new Zombies(zombiesMachine); // Assuming Zombies class has a constructor that accepts ArrayList<Zombie>
         this.team = zombiesHordersTeam;
         this.hordersNumber = hordersNumber;
