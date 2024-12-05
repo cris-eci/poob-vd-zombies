@@ -10,7 +10,7 @@ public class POOBvsZombies {
     private float roundTime;
     private float matchTime;
     private ArrayList<Player> players;
-    private ArrayList<Entity> entities;
+    private ArrayList<ArrayList<Entity>> entities;
 
     public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
         this.players = new ArrayList<Player>();
@@ -108,5 +108,38 @@ public class POOBvsZombies {
 
     public Player getPlayerTwo(){
         return players.get(1);
+    }
+
+    
+    /**
+     * Sets up the entities by initializing a 10x5 matrix filled with null values.
+     * This matrix will be used later for storing entities.
+     */
+    public void setUpEntities() {        
+        for (int i = 0; i < 10; i++) {
+            ArrayList<Entity> row = new ArrayList<Entity>();
+            for (int j = 0; j < 5; j++) {                
+                row.add(null); // 
+            }
+            entities.add(row);
+        }
+    }
+
+    //Initial code for the method addEntity, it should be modified to fit the requirements of the project
+    public void addEntity(int lane, int yPos, Entity entity) {
+        if (lane >= 0 && lane < entities.size() && yPos >= 0 && yPos < entities.get(lane).size()) {
+            entities.get(lane).set(yPos, entity);
+        } else {
+            throw new IndexOutOfBoundsException("Invalid lane or yPos");
+        }
+    }
+
+    //Initial code for the method addEntity, it should be modified to fit the requirements of the projec
+    public void deleteEntity(int xPos, int yPos) {
+        if (xPos >= 0 && xPos < entities.size() && yPos >= 0 && yPos < entities.get(xPos).size()) {
+            entities.get(xPos).set(yPos, null);
+        } else {
+            throw new IndexOutOfBoundsException("Invalid xPos or yPos");
+        }
     }
 }
