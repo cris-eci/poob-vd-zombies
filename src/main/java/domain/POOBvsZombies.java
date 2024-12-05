@@ -14,7 +14,7 @@ public class POOBvsZombies {
 
     public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
         this.players = new ArrayList<Player>();
-        this.entities = new ArrayList<Entity>();
+        this.entities = new ArrayList<ArrayList<Entity>>();
 
         this.players.add(new ZombiesStrategic(namePlayerOne, sunAmount, plants));
         this.players.add(new PlantsStrategic(namePlayerTwo, brainAmount, zombies));
@@ -22,29 +22,26 @@ public class POOBvsZombies {
         this.modality = "PlayerVsPlayer";
         this.winner = "";
 
-        this.entities = new ArrayList<Entity>();
+        //this.entities = new ArrayList<Entity>();
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
     }
 
     public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
         this.players = new ArrayList<Player>();
-        this.entities = new ArrayList<Entity>();
-
         this.players.add(new PlantsStrategic(namePlayerOne, 50, plants));
         this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds));
 
         this.modality = "PlayerVsMachine";
         this.winner = "";
 
-        this.entities = new ArrayList<Entity>();
+        this.entities = new ArrayList<ArrayList<Entity>>();
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
     }
     
     public POOBvsZombies(float matchTimeInSeconds, int hordersNumber) {
-        this.players = new ArrayList<Player>();
-        this.entities = new ArrayList<Entity>();
+        this.players = new ArrayList<Player>();        
 
         this.players.add(new PlantsIntelligent());
         this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds, MachinePlayer.ORIGINAL_ZOMBIES));
@@ -52,7 +49,7 @@ public class POOBvsZombies {
         this.modality = "MachineVsMachine";
         this.winner = "";
 
-        this.entities = new ArrayList<Entity>();
+        this.entities = new ArrayList<ArrayList<Entity>>();
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
     }
@@ -67,6 +64,7 @@ public class POOBvsZombies {
      * @param minutes the number of minutes for the timer
      * @return a Timer object set to the specified duration in milliseconds
      */
+    
     private Timer setRoundTime(int minutes) {
         int milliseconds = minutes * 60 * 1000;
         return new Timer(milliseconds, null);
