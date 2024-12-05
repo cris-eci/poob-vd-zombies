@@ -7,6 +7,7 @@ public class Zombies extends Team {
     protected static final int BRAIN_AMOUNT_INCREASE = 50; // Adjusted resource increase for Zombies
     
 
+    
     public Zombies(int resourceCounter, ArrayList<String> characters){
         super(resourceCounter, characters);
     }

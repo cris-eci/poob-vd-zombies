@@ -4,7 +4,7 @@ public class PlantsIntelligent extends MachinePlayer {
 
     public PlantsIntelligent() {
         super("SmartPlant");
-        Team plantsTeam = new Plants(0, MACHINE_PLANTS);
+        Team plantsTeam = new Plants(100, MACHINE_PLANTS);
         this.team = plantsTeam;
     }
 

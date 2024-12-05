@@ -2,7 +2,6 @@ package domain;
 
 import java.util.ArrayList;
 
-import javax.crypto.Mac;
 import javax.swing.Timer;
 
 public class POOBvsZombies {
@@ -28,7 +27,6 @@ public class POOBvsZombies {
         this.roundTime = this.matchTime / 2;
     }
 
-
     public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<Entity>();
@@ -43,7 +41,7 @@ public class POOBvsZombies {
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
     }
-
+    
     public POOBvsZombies(float matchTimeInSeconds, int hordersNumber) {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<Entity>();
@@ -58,11 +56,21 @@ public class POOBvsZombies {
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
     }
-
+    
     public int calculateProgress(){
         return 0;
     }
 
+    /**
+     * Sets a timer for the specified number of minutes.
+     *
+     * @param minutes the number of minutes for the timer
+     * @return a Timer object set to the specified duration in milliseconds
+     */
+    private Timer setRoundTime(int minutes) {
+        int milliseconds = minutes * 60 * 1000;
+        return new Timer(milliseconds, null);
+    }
 
     /**
      * Converts seconds to minutes and sets the match time.
@@ -78,8 +86,20 @@ public class POOBvsZombies {
         return roundTime;
     }
     
+    public int getHordersNumber() {
+        if (players.size() > 1 && players.get(1) instanceof ZombiesOriginal) {
+            ZombiesOriginal zombiesOriginal = (ZombiesOriginal) players.get(1);
+            return zombiesOriginal.getHordersNumber();
+        }
+        return 0; // Return 0 if not applicable
+    }
+
     public String getModality() {
         return modality;
+    }
+
+    public float getMatchTime() {
+        return matchTime;
     }
 
     public Player getPlayerOne(){

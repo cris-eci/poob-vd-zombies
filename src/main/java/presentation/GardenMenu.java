@@ -166,12 +166,12 @@ public class GardenMenu extends JFrame {
             addZombieTable(panel);
         } else if ("PlayerVsMachine".equals(modality)) {
             addPlayerInfo(panel); // Solo mostrar información del jugador
-            //addHordeLabel(panel);
+            addScoreLabels(panel);
         } else if ("MachineVsMachine".equals(modality)) {
-            //addHordeLabel(panel);
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
+            addScoreLabels(panel);
         }
 
         // addTimerSection(panel, poobvszombies);
@@ -784,14 +784,53 @@ public class GardenMenu extends JFrame {
             this.message = message;
             this.durationInSeconds = durationInSeconds;
         }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public int getDurationInSeconds() {
+            return durationInSeconds;
+        }
     }
 
     // Método para inicializar los temporizadores
     private void initializeTimers(POOBvsZombies poobvsZombies) {
-        timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
-        timerTasks.add(new TimerTask("Round time", (int) poobvsZombies.getRoundTime()));
-        timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
-        timerTasks.add(new TimerTask("Last ronda", (int) poobvsZombies.getRoundTime()));
+        if("PlayerVsPlayer".equals(modality)){
+            timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
+            timerTasks.add(new TimerTask("Round time", (int) poobvsZombies.getRoundTime()));
+            timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
+            timerTasks.add(new TimerTask("Last round", (int) poobvsZombies.getRoundTime()));
+        }
+
+        else if ("PlayerVsMachine".equals(modality) || "MachineVsMachine".equals(modality)){
+            int matchTimeInSeconds = (int) poobvszombies.getMatchTime();
+            int hordersNumber = poobvszombies.getHordersNumber();
+
+            // Primero, 20 segundos para colocar plantas
+            timerTasks.add(new TimerTask("Planting time", 20));
+
+            // Validar que el tiempo total sea al menos 20 segundos y haya al menos una horda
+            if (matchTimeInSeconds < 20 || hordersNumber <= 0) {
+                JOptionPane.showMessageDialog(this, "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.", "Error de Configuración", JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            }
+
+            // Calcular el tiempo restante después de la fase de plantación
+            int remainingTime = matchTimeInSeconds ;
+
+            // Dividir el tiempo restante entre el número de hordas
+            int hordeDuration = remainingTime / hordersNumber;
+            int extraSeconds = remainingTime % hordersNumber; // Para distribuir cualquier segundo sobrante
+
+            for (int i = 1; i <= hordersNumber; i++) {
+                int duration = hordeDuration;
+                if (i <= extraSeconds) {
+                    duration += 1; // Distribuir segundos sobrantes
+                }
+                timerTasks.add(new TimerTask("Horda " + i, duration));
+            }
+        }
     }
 
     // Método para configurar las etiquetas en la interfaz
