@@ -25,4 +25,9 @@ public abstract class Team {
     }
 
     public abstract String getTeamName();
+
+    public int decreaseResourceCounter(int amount){
+        resourceCounter -= amount;
+        return resourceCounter;
+    }
 }
