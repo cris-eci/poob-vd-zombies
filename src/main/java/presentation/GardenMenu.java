@@ -10,19 +10,17 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList; // Add this import
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator; // Add this import
 import java.util.List;
 
-import javax.swing.Box;
+import javax.swing.Box; // Add this import
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,7 +38,6 @@ import javax.swing.border.LineBorder;
 import domain.POOBvsZombies;
 import domain.Plants;
 import domain.Player;
-
 
 public class GardenMenu extends JFrame {
     private ArrayList<String> selectedPlants;
@@ -192,7 +189,7 @@ public class GardenMenu extends JFrame {
                 // int plantIndex = getPlantIndex(selectedPlants[i]);
                 // if (plantIndex != -1) {
                 // Display the card
-                List<String> plant = PLANTS_VIEW.get(0);
+                List<String> plant = null;
 
                 // Buscar la planta en la lista de plantas y asignarla a la variable plant para
                 // tener todas sus posibles representaciones graficas
@@ -203,6 +200,8 @@ public class GardenMenu extends JFrame {
                     }
                 }
 
+                if (plant == null) continue;
+
                 ImageIcon icon = new ImageIcon(plant.get(2));
                 JLabel cardLabel = new JLabel(
                         new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
@@ -211,11 +210,13 @@ public class GardenMenu extends JFrame {
 
                 // Add drag functionality
                 String dragImagePath = plant.get(3);
+
                 cardLabel.setTransferHandler(new TransferHandler("icon") {
                     @Override
                     protected Transferable createTransferable(JComponent c) {
-                        ImageIcon icon = new ImageIcon(dragImagePath);
-                        return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
+                        ImageIcon dragIcon = new ImageIcon(dragImagePath);
+                        EntityData entityData = new EntityData("plant", plantName, dragIcon.getImage());
+                        return new EntityTransferable(entityData);
                     }
 
                     @Override
@@ -254,13 +255,13 @@ public class GardenMenu extends JFrame {
         shovelLabel.setBounds(520, 28, 50, 50); // Place at the top right corner
         originalShovelPosition = shovelLabel.getLocation();
 
-
         shovelLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 shovelSelected = true;
                 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cambiar el cursor
-                // JOptionPane.showMessageDialog(null, "Pala seleccionada. Haz clic en una planta para removerla.");
+                // JOptionPane.showMessageDialog(null, "Pala seleccionada. Haz clic en una
+                // planta para removerla.");
             }
         });
 
@@ -279,6 +280,9 @@ public class GardenMenu extends JFrame {
         // Add cells to the grid with specific restrictions for plants and zombies
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 10; col++) {
+                final int finalRow = row;
+                final int finalCol = col;
+
                 JPanel cellPanel = new JPanel(new BorderLayout());
                 cellPanel.setPreferredSize(new Dimension(50, 50));
                 cellPanel.setOpaque(false);
@@ -298,7 +302,7 @@ public class GardenMenu extends JFrame {
                             if (!support.isDrop()) {
                                 return false;
                             }
-                            if (!support.isDataFlavorSupported(ImageTransferable.IMAGE_FLAVOR)) {
+                            if (!support.isDataFlavorSupported(EntityTransferable.ENTITY_FLAVOR)) {
                                 return false;
                             }
 
@@ -309,9 +313,17 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                ImageTransferable transferable = (ImageTransferable) support.getTransferable()
-                                        .getTransferData(ImageTransferable.IMAGE_FLAVOR);
-                                return "plant".equals(transferable.getType()); // Only accept plants
+                                // El transfaerable es un objeto de tipo EntityTransferable en donde esta
+                                // guardado entre otras cosas, imagen, hicimos que tambien tenga el string del
+                                // nombre de la entidad
+                                // EntityTransferable transferable = (EntityTransferable) support.getTransferable()
+                                //         .getTransferData(EntityTransferable.IMAGE_FLAVOR);
+
+                                // vamos a hacer que al añadir una imagen, se mande a dominio como addEntity
+                                EntityData entityData = (EntityData) support.getTransferable()
+                                        .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+
+                                return "plant".equals(entityData.getType()); // Only accept plants
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -325,9 +337,16 @@ public class GardenMenu extends JFrame {
                             }
 
                             try {
-                                ImageTransferable transferable = (ImageTransferable) support.getTransferable()
-                                        .getTransferData(ImageTransferable.IMAGE_FLAVOR);
-                                Image image = transferable.getImage();
+                                EntityData entityData = (EntityData) support.getTransferable()
+                                .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+                                //poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
+
+                        // Añadir a dominio
+                        poobvszombies.addEntity(finalRow,finalCol, entityData.getName());
+                        showEntityMatrix();
+
+                        Image image = entityData.getImage();
+
                                 JLabel label = new JLabel(new ImageIcon(image));
                                 label.setHorizontalAlignment(JLabel.CENTER);
                                 JPanel targetPanel = (JPanel) support.getComponent();
@@ -360,7 +379,7 @@ public class GardenMenu extends JFrame {
                             }
                         }
                     });
-                    
+
                 } else if (col == 9) {
                     if ("PlayerVsPlayer".equals(modality)) {
                         // Allow dragging and dropping zombies only in the last column
@@ -370,7 +389,7 @@ public class GardenMenu extends JFrame {
                                 if (!support.isDrop()) {
                                     return false;
                                 }
-                                if (!support.isDataFlavorSupported(ImageTransferable.IMAGE_FLAVOR)) {
+                                if (!support.isDataFlavorSupported(EntityTransferable.ENTITY_FLAVOR)) {
                                     return false;
                                 }
 
@@ -381,9 +400,9 @@ public class GardenMenu extends JFrame {
                                 }
 
                                 try {
-                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable()
-                                            .getTransferData(ImageTransferable.IMAGE_FLAVOR);
-                                    return "zombie".equals(transferable.getType()); // Only accept zombies
+                                    EntityData entityData = (EntityData) support.getTransferable()
+                                        .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+                                return "zombie".equals(entityData.getType());
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -397,9 +416,9 @@ public class GardenMenu extends JFrame {
                                 }
 
                                 try {
-                                    ImageTransferable transferable = (ImageTransferable) support.getTransferable()
-                                            .getTransferData(ImageTransferable.IMAGE_FLAVOR);
-                                    Image image = transferable.getImage();
+                                    EntityData entityData = (EntityData) support.getTransferable()
+                                        .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+                                Image image = entityData.getImage();
                                     JLabel zombieLabel = new JLabel(new ImageIcon(image));
                                     zombieLabel.setHorizontalAlignment(JLabel.CENTER);
                                     // Get the cell's position relative to the main panel
@@ -509,14 +528,16 @@ public class GardenMenu extends JFrame {
             if (imagePath.contains("export-icon")) {
                 button.addActionListener(e -> {
                     // Implementar funcionalidad para exportar el estado del juego
-                    JOptionPane.showMessageDialog(this, "Funcionalidad de exportar aún no implementada.", "Exportar", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de exportar aún no implementada.", "Exportar",
+                            JOptionPane.INFORMATION_MESSAGE);
                 });
             }
 
             if (imagePath.contains("save-icon")) {
                 button.addActionListener(e -> {
                     // Implementar funcionalidad para guardar el estado del juego
-                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar",
+                            JOptionPane.INFORMATION_MESSAGE);
                 });
             }
 
@@ -552,33 +573,34 @@ public class GardenMenu extends JFrame {
     }
 
     private void addPlayerInfo(JPanel panel) {
-        if (("PlayerVsPlayer".equals(modality) || "PlayerVsMachine".equals(modality)) || "MachineVsMachine".equals(modality) ) {
-            Player playerOne = poobvszombies.getPlayerOne(); 
-    
+        if (("PlayerVsPlayer".equals(modality) || "PlayerVsMachine".equals(modality))
+                || "MachineVsMachine".equals(modality)) {
+            Player playerOne = poobvszombies.getPlayerOne();
+
             // Etiqueta para el nombre del Jugador 1
             playerOneNameLabel = new JLabel("" + playerOne.getName());
             playerOneNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
             playerOneNameLabel.setForeground(Color.YELLOW);
             playerOneNameLabel.setBounds(480, 595, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneNameLabel);
-    
+
             // Etiqueta para los soles iniciales del Jugador 1
-            playerOneSunsLabel = new JLabel(""+playerOne.getTeam().getResourceCounterAmount());
+            playerOneSunsLabel = new JLabel("" + playerOne.getTeam().getResourceCounterAmount());
             playerOneSunsLabel.setFont(new Font("Arial", Font.BOLD, 16));
             playerOneSunsLabel.setForeground(Color.ORANGE);
             playerOneSunsLabel.setBounds(30, 60, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneSunsLabel);
-    
+
             if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
                 Player playerTwo = poobvszombies.getPlayerTwo();
-    
+
                 // Etiqueta para el nombre del Jugador 2
                 playerTwoNameLabel = new JLabel("" + playerTwo.getName());
                 playerTwoNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
                 playerTwoNameLabel.setForeground(Color.RED);
                 playerTwoNameLabel.setBounds(480, 625, 300, 30); // Ajustar posición y tamaño
                 panel.add(playerTwoNameLabel);
-    
+
                 // Etiqueta para los cerebros iniciales del Jugador 2
                 playerTwoBrainsLabel = new JLabel("" + playerTwo.getTeam().getResourceCounterAmount());
                 playerTwoBrainsLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -594,15 +616,14 @@ public class GardenMenu extends JFrame {
      */
     private void addScoreLabels(JPanel panel) {
         // Etiqueta para el puntaje del Jugador 1
-        if ("PlayerVsPlayer".equals(modality) || "PlayerVsMachine".equals(modality)){
+        if ("PlayerVsPlayer".equals(modality) || "PlayerVsMachine".equals(modality)) {
             playerOneScoreLabel = new JLabel("Score: 0");
             playerOneScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
             playerOneScoreLabel.setForeground(Color.YELLOW);
             playerOneScoreLabel.setBounds(560, 595, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneScoreLabel);
-        
 
-            if("PlayerVsPlayer".equals(modality)){
+            if ("PlayerVsPlayer".equals(modality)) {
                 // Etiqueta para el puntaje del Jugador 2
                 playerTwoScoreLabel = new JLabel("Score: 0");
                 playerTwoScoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -614,43 +635,52 @@ public class GardenMenu extends JFrame {
     }
     // Auxiliary class to handle the Transferable object of image type with type
     // (plant or zombie)
-    private static class ImageTransferable implements Transferable {
-        public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
-        private Image image;
-        private String type; // "plant" or "zombie"
+    // private static class EntityTransferable implements Transferable {
+    // public static final DataFlavor IMAGE_FLAVOR = new
+    // DataFlavor(EntityTransferable.class, "ImageTransferable");
+    // private Image image;
+    // private String type; // "plant" or "zombie"
+    // private String stringDefnitionName;
 
-        public ImageTransferable(Image image, String type) {
-            this.image = image;
-            this.type = type;
-        }
+    // public ImageTransferable(Image image, String type, String
+    // stringDefnitionName) {
+    // this.image = image;
+    // this.type = type;
+    // this.stringDefnitionName = stringDefnitionName;
+    // }
 
-        public String getType() {
-            return type;
-        }
+    // public String getType() {
+    // return type;
+    // }
 
-        public Image getImage() {
-            return image;
-        }
+    // public Image getImage() {
+    // return image;
+    // }
 
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[] { IMAGE_FLAVOR };
-        }
+    // public String getStringDefnitionName() {
+    // return stringDefnitionName;
+    // }
 
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return flavor.equals(IMAGE_FLAVOR);
-        }
+    // @Override
+    // public DataFlavor[] getTransferDataFlavors() {
+    // return new DataFlavor[] { IMAGE_FLAVOR };
+    // }
 
-        @Override
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            if (flavor.equals(IMAGE_FLAVOR)) {
-                return this;
-            } else {
-                throw new UnsupportedFlavorException(flavor);
-            }
-        }
-    }
+    // @Override
+    // public boolean isDataFlavorSupported(DataFlavor flavor) {
+    // return flavor.equals(IMAGE_FLAVOR);
+    // }
+
+    // @Override
+    // public Object getTransferData(DataFlavor flavor) throws
+    // UnsupportedFlavorException {
+    // if (flavor.equals(IMAGE_FLAVOR)) {
+    // return this;
+    // } else {
+    // throw new UnsupportedFlavorException(flavor);
+    // }
+    // }
+    // }
 
     private void addZombieCards(JPanel panel) {
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) && selectedZombies != null) {
@@ -663,13 +693,19 @@ public class GardenMenu extends JFrame {
                     // if (zombieIndex != -1) {
                     // Display the card
 
-                    List<String> zombie = ZOMBIES_VIEW.get(0);
+                    List<String> zombie = null;
                     for (List<String> zombies : ZOMBIES_VIEW) {
+                        // Buscar el zombie en la lista de zombies y asignarlo a la variable zombie para
+                        // tener todas sus posibles representaciones graficas
                         if (zombies.get(0).equals(zombieName)) {
+                            // zombie ahora será un arreglo con todas las representaciones graficas del
+                            // zombie
                             zombie = zombies;
                             break;
                         }
                     }
+
+                    if (zombie == null) continue;
 
                     ImageIcon icon = new ImageIcon(zombie.get(2));
                     JLabel cardLabel = new JLabel(
@@ -679,11 +715,13 @@ public class GardenMenu extends JFrame {
 
                     // Add drag functionality
                     String dragImagePath = zombie.get(3);
+
                     cardLabel.setTransferHandler(new TransferHandler("icon") {
-                        @Override
+                        @Override   
                         protected Transferable createTransferable(JComponent c) {
-                            ImageIcon icon = new ImageIcon(dragImagePath);
-                            return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                            ImageIcon dragIcon = new ImageIcon(dragImagePath);
+                            EntityData entityData = new EntityData("zombie", zombieName, dragIcon.getImage());
+                            return new EntityTransferable(entityData);
                         }
 
                         @Override
@@ -796,28 +834,31 @@ public class GardenMenu extends JFrame {
 
     // Método para inicializar los temporizadores
     private void initializeTimers(POOBvsZombies poobvsZombies) {
-        if("PlayerVsPlayer".equals(modality)){
+        if ("PlayerVsPlayer".equals(modality)) {
             timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
             timerTasks.add(new TimerTask("Round time", (int) poobvsZombies.getRoundTime()));
             timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
             timerTasks.add(new TimerTask("Last round", (int) poobvsZombies.getRoundTime()));
         }
 
-        else if ("PlayerVsMachine".equals(modality) || "MachineVsMachine".equals(modality)){
+        else if ("PlayerVsMachine".equals(modality) || "MachineVsMachine".equals(modality)) {
             int matchTimeInSeconds = (int) poobvszombies.getMatchTime();
             int hordersNumber = poobvszombies.getHordersNumber();
 
             // Primero, 20 segundos para colocar plantas
             timerTasks.add(new TimerTask("Planting time", 20));
 
-            // Validar que el tiempo total sea al menos 20 segundos y haya al menos una horda
+            // Validar que el tiempo total sea al menos 20 segundos y haya al menos una
+            // horda
             if (matchTimeInSeconds < 20 || hordersNumber <= 0) {
-                JOptionPane.showMessageDialog(this, "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.", "Error de Configuración", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.",
+                        "Error de Configuración", JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }
 
             // Calcular el tiempo restante después de la fase de plantación
-            int remainingTime = matchTimeInSeconds ;
+            int remainingTime = matchTimeInSeconds;
 
             // Dividir el tiempo restante entre el número de hordas
             int hordeDuration = remainingTime / hordersNumber;
@@ -909,6 +950,25 @@ public class GardenMenu extends JFrame {
         return String.format("%d:%02d", minutes, remainingSeconds);
     }
 
+    // Method to show the matrix of entities each time an entity is added
+    private void showEntityMatrix() {
+        StringBuilder matrixString = new StringBuilder();
+
+        // Assuming the grid is 5 rows by 10 columns
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 10; col++) {
+                String entity = poobvszombies.getEntity(row, col);
+                matrixString.append(entity != null ? entity : "-");
+                if (col < 9) {
+                    matrixString.append(" ");
+                }
+            }
+            matrixString.append("\n");
+        }
+
+        JOptionPane.showMessageDialog(this, matrixString.toString(), "Entity Matrix", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ArrayList<String> selectedPlants = new ArrayList<>(Arrays.asList(
@@ -937,6 +997,7 @@ public class GardenMenu extends JFrame {
                     namePlayerTwo, brainAmount, selectedZombies);
             GardenMenu frame = new GardenMenu(poobvszombies);
             frame.setVisible(true);
+            
         });
     }
 }

@@ -25,6 +25,7 @@ public class POOBvsZombies {
         //this.entities = new ArrayList<Entity>();
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
+        setUpEntities();
     }
 
     public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
@@ -38,6 +39,7 @@ public class POOBvsZombies {
         this.entities = new ArrayList<ArrayList<Entity>>();
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
+        setUpEntities();
     }
     
     public POOBvsZombies(float matchTimeInSeconds, int hordersNumber) {
@@ -52,6 +54,7 @@ public class POOBvsZombies {
         this.entities = new ArrayList<ArrayList<Entity>>();
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
+        setUpEntities();
     }
     
     public int calculateProgress(){
@@ -64,7 +67,7 @@ public class POOBvsZombies {
      * @param minutes the number of minutes for the timer
      * @return a Timer object set to the specified duration in milliseconds
      */
-    
+
     private Timer setRoundTime(int minutes) {
         int milliseconds = minutes * 60 * 1000;
         return new Timer(milliseconds, null);
@@ -114,17 +117,58 @@ public class POOBvsZombies {
      * This matrix will be used later for storing entities.
      */
     public void setUpEntities() {        
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             ArrayList<Entity> row = new ArrayList<Entity>();
-            for (int j = 0; j < 5; j++) {                
-                row.add(null); // 
+            for (int j = 0; j < 10; j++) {                
+                row.add(null); 
             }
             entities.add(row);
         }
     }
 
+    // Método sobre cargado que me permite recibir un String del entity, convertirlo a un objeto y agregarlo a la matriz de entidades
+    public void addEntity(int lane, int yPos, String entityType) {
+        Entity entity = null;
+        switch (entityType) {
+            case "Basic":
+                entity = new Basic();
+                break;
+            case "Brainstein":
+                entity = new Brainstein();
+                break;
+            case "BucketHead":
+                entity = new Buckethead();
+                break;
+            case "Conehead":
+                entity = new Conehead();
+                break;
+            case "ECIZombie":
+                entity = new ECIZombie();
+                break;
+            case "Sunflower":
+                entity = new Sunflower();
+                break;
+            case "Peashooter":
+                entity = new Peashooter();
+                break;
+            case "WallNut":
+                entity = new WallNut();
+                break;
+            case "PotatoMine":
+                entity = new PotatoMine();
+                break;
+            case "ECIPlant":
+                entity = new ECIPlant();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid entity type: " + entityType);
+        }
+        addEntity(lane, yPos, entity);
+    }
+
     //Initial code for the method addEntity, it should be modified to fit the requirements of the project
-    public void addEntity(int lane, int yPos, Entity entity) {
+    // método que me permite agregar un objeto entity a la matriz de entidades
+    private void addEntity(int lane, int yPos, Entity entity) {
         if (lane >= 0 && lane < entities.size() && yPos >= 0 && yPos < entities.get(lane).size()) {
             entities.get(lane).set(yPos, entity);
         } else {
@@ -139,5 +183,45 @@ public class POOBvsZombies {
         } else {
             throw new IndexOutOfBoundsException("Invalid xPos or yPos");
         }
+    }
+
+    // public Entity getEntity(int xPos, int yPos) {
+    //     if (xPos >= 0 && xPos < entities.size() && yPos >= 0 && yPos < entities.get(xPos).size()) {
+    //         return entities.get(xPos).get(yPos);
+    //     } else {
+    //         throw new IndexOutOfBoundsException("Invalid xPos or yPos");
+    //     }
+    // }
+
+    public String getEntity(int xPos, int yPos) {
+        try {
+            Entity entity = entities.get(xPos).get(yPos);
+            if (entity != null) {
+                if (entity instanceof Basic) {
+                    return "Basic";
+                } else if (entity instanceof Brainstein) {
+                    return "Brainstein";
+                } else if (entity instanceof Buckethead) {
+                    return "BucketHead";
+                } else if (entity instanceof Conehead) {
+                    return "Conehead";
+                } else if (entity instanceof ECIZombie) {
+                    return "ECIZombie";
+                } else if (entity instanceof Sunflower) {
+                    return "Sunflower";
+                } else if (entity instanceof Peashooter) {
+                    return "Peashooter";
+                } else if (entity instanceof WallNut) {
+                    return "WallNut";
+                } else if (entity instanceof PotatoMine) {
+                    return "PotatoMine";
+                } else if (entity instanceof ECIPlant) {
+                    return "ECIPlant";
+                }
+            }
+        } catch (IndexOutOfBoundsException e) {
+            // Position is out of bounds
+        }
+        return null;
     }
 }
