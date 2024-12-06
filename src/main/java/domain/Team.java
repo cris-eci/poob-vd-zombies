@@ -38,12 +38,9 @@ public abstract class Team {
 
     public abstract String getTeamName();
 
-    public void addResource(Resource resource) {
-        if (Resource.SOL.equals(resource.getType())) {
-            resourceCounter += resource.getValue();
-        } else if (Resource.BRAIN.equals(resource.getType())) {
-            resourceCounter += resource.getValue();
-        }
+    // Método para agregar recursos
+    public void addResource(Resource resource){
+        this.resourceCounter += resource.getValue();
     }
 
     public void deductResource(int amount) {

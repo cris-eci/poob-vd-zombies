@@ -370,6 +370,17 @@ public class GardenMenu extends JFrame {
                                 targetPanel.add(label);
                                 targetPanel.revalidate();
                                 targetPanel.repaint();
+
+                                // NUEVO: Deducir recursos
+                                String plantName = getPlantNameFromTransferable(transferable);
+                                Plant plant = createPlantInstance(plantName);
+                                if (plant != null) {
+                                    Player playerOne = poobvszombies.getPlayerOne();
+                                    // Deducir el costo de la planta
+                                    playerOne.getTeam().deductResource(plant.getCost());
+                                    // Actualizar la etiqueta de soles
+                                    playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+                                }
                                 return true;
                             } catch (Exception ex) {
                                 ex.printStackTrace();
@@ -465,6 +476,15 @@ public class GardenMenu extends JFrame {
                                     panel.setComponentZOrder(zombieLabel, 0); // Bring to front if necessary
                                     panel.revalidate();
                                     panel.repaint();
+
+                                    // NUEVO: Deducir recursos
+                                    String zombieName = getZombieNameFromTransferable(transferable);
+                                    Zombie zombie = createZombieInstance(zombieName);
+                                    if (zombie != null) {
+                                        Player playerTwo = poobvszombies.getPlayerTwo();
+                                        playerTwo.getTeam().deductResource(zombie.getCost());
+                                        playerTwoBrainsLabel.setText("" + playerTwo.getTeam().getResourceCounterAmount());
+                                    }
                                     // Add the zombie to the movingZombies list
                                     movingZombies.add(zombieLabel);
                                     return true;
@@ -977,7 +997,8 @@ private void initializeTimers(POOBvsZombies poobvsZombies) {
                 spawnResource(new Resource(Resource.SOL));
             }
             
-            if (currentPhase.contains("Horda"))
+            else if (currentPhase.contains("Horda"))
+                spawnResource(new Resource(Resource.SOL));
                 spawnResource(new Resource(Resource.BRAIN));
             });
             resourceTimer.start();

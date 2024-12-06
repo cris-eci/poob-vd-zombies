@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "POOBvsZombiesGUI",
+            "request": "launch",
+            "mainClass": "presentation.POOBvsZombiesGUI",
+            "projectName": "poob-vs-zombies"
+        },
+        {
+            "type": "java",
             "name": "PlayerVsPlayer",
             "request": "launch",
             "mainClass": "presentation.PlayerVsPlayer",
