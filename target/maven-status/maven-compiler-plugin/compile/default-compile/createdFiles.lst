@@ -1,11 +1,11 @@
 presentation\PlayerVSMachine$3.class
 domain\ZombiesStrategic.class
 presentation\GardenMenu$TimerTask.class
-presentation\GardenMenu$ImageTransferable.class
 presentation\MachineVSMachine.class
 domain\PotatoMine.class
 presentation\GardenMenu.class
 domain\Basic.class
+presentation\EntityData.class
 presentation\MachineVSMachine$BackgroundPanel.class
 presentation\PlayerVsPlayer$2.class
 presentation\MachineVSMachine$2.class
@@ -41,6 +41,7 @@ presentation\PlayerVsPlayer$1.class
 domain\PlantsIntelligent.class
 presentation\GardenMenu$1.class
 presentation\MachineVSMachine$4.class
+presentation\EntityTransferable.class
 presentation\PlayerVsPlayer$BackgroundPanel.class
 domain\Buckethead.class
 presentation\PlayerVsPlayer$PlantPanel.class

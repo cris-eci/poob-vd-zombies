@@ -6,7 +6,7 @@ import javax.swing.Timer;
 
 public class POOBvsZombies {
     private String modality;
-    private String winner;
+    private String winner; 
     private float roundTime;
     private float matchTime;
     private ArrayList<Player> players;
@@ -158,7 +158,10 @@ public class POOBvsZombies {
                 entity = new PotatoMine();
                 break;
             case "ECIPlant":
-                entity = new ECIPlant();
+                entity = new ECIPlant();    
+                break;
+            case "LownMover":
+                entity = new Lownmover();
                 break;
             default:
                 throw new IllegalArgumentException("Invalid entity type: " + entityType);
@@ -217,8 +220,10 @@ public class POOBvsZombies {
                     return "PotatoMine";
                 } else if (entity instanceof ECIPlant) {
                     return "ECIPlant";
+                } else if (entity instanceof Lownmover) {
+                    return "LownMover";
                 }
-            }
+            } 
         } catch (IndexOutOfBoundsException e) {
             // Position is out of bounds
         }

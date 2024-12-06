@@ -200,7 +200,8 @@ public class GardenMenu extends JFrame {
                     }
                 }
 
-                if (plant == null) continue;
+                if (plant == null)
+                    continue;
 
                 ImageIcon icon = new ImageIcon(plant.get(2));
                 JLabel cardLabel = new JLabel(
@@ -294,6 +295,8 @@ public class GardenMenu extends JFrame {
                     Image scaledMowerImage = mowerIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
                     JLabel mowerLabel = new JLabel(new ImageIcon(scaledMowerImage));
                     cellPanel.add(mowerLabel, BorderLayout.CENTER);
+
+                    poobvszombies.addEntity(finalRow, finalCol, "LownMover");
                 } else if (col >= 1 && col <= 8) {
                     // Allow dragging and dropping plants only in columns 1 to 8
                     cellPanel.setTransferHandler(new TransferHandler("icon") {
@@ -316,8 +319,9 @@ public class GardenMenu extends JFrame {
                                 // El transfaerable es un objeto de tipo EntityTransferable en donde esta
                                 // guardado entre otras cosas, imagen, hicimos que tambien tenga el string del
                                 // nombre de la entidad
-                                // EntityTransferable transferable = (EntityTransferable) support.getTransferable()
-                                //         .getTransferData(EntityTransferable.IMAGE_FLAVOR);
+                                // EntityTransferable transferable = (EntityTransferable)
+                                // support.getTransferable()
+                                // .getTransferData(EntityTransferable.IMAGE_FLAVOR);
 
                                 // vamos a hacer que al añadir una imagen, se mande a dominio como addEntity
                                 EntityData entityData = (EntityData) support.getTransferable()
@@ -338,14 +342,14 @@ public class GardenMenu extends JFrame {
 
                             try {
                                 EntityData entityData = (EntityData) support.getTransferable()
-                                .getTransferData(EntityTransferable.ENTITY_FLAVOR);
-                                //poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
+                                        .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+                                // poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
 
-                        // Añadir a dominio
-                        poobvszombies.addEntity(finalRow,finalCol, entityData.getName());
-                        showEntityMatrix();
+                                // Añadir a dominio
+                                poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
+                                showEntityMatrix();
 
-                        Image image = entityData.getImage();
+                                Image image = entityData.getImage();
 
                                 JLabel label = new JLabel(new ImageIcon(image));
                                 label.setHorizontalAlignment(JLabel.CENTER);
@@ -401,8 +405,9 @@ public class GardenMenu extends JFrame {
 
                                 try {
                                     EntityData entityData = (EntityData) support.getTransferable()
-                                        .getTransferData(EntityTransferable.ENTITY_FLAVOR);
-                                return "zombie".equals(entityData.getType());
+                                            .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+
+                                    return "zombie".equals(entityData.getType());
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -417,8 +422,11 @@ public class GardenMenu extends JFrame {
 
                                 try {
                                     EntityData entityData = (EntityData) support.getTransferable()
-                                        .getTransferData(EntityTransferable.ENTITY_FLAVOR);
-                                Image image = entityData.getImage();
+                                            .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+                                    // Añadir a dominio
+                                    poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
+                                    showEntityMatrix();
+                                    Image image = entityData.getImage();
                                     JLabel zombieLabel = new JLabel(new ImageIcon(image));
                                     zombieLabel.setHorizontalAlignment(JLabel.CENTER);
                                     // Get the cell's position relative to the main panel
@@ -705,7 +713,8 @@ public class GardenMenu extends JFrame {
                         }
                     }
 
-                    if (zombie == null) continue;
+                    if (zombie == null)
+                        continue;
 
                     ImageIcon icon = new ImageIcon(zombie.get(2));
                     JLabel cardLabel = new JLabel(
@@ -717,7 +726,7 @@ public class GardenMenu extends JFrame {
                     String dragImagePath = zombie.get(3);
 
                     cardLabel.setTransferHandler(new TransferHandler("icon") {
-                        @Override   
+                        @Override
                         protected Transferable createTransferable(JComponent c) {
                             ImageIcon dragIcon = new ImageIcon(dragImagePath);
                             EntityData entityData = new EntityData("zombie", zombieName, dragIcon.getImage());
@@ -997,7 +1006,7 @@ public class GardenMenu extends JFrame {
                     namePlayerTwo, brainAmount, selectedZombies);
             GardenMenu frame = new GardenMenu(poobvszombies);
             frame.setVisible(true);
-            
+
         });
     }
 }
