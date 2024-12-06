@@ -8,7 +8,7 @@ public class ZombiesOriginal extends HumanPlayer{
     private float horderTime;
 
     public ZombiesOriginal(int hordersNumber, float matchTime) {
-        super("Original Zombies machine");
+        super("OZombies");
         Team zombiesHordersTeam = new Zombies();// El constructor de Zombies no recibe parámetros porque es zombie original
         this.team = zombiesHordersTeam;
         this.hordersNumber = hordersNumber;
@@ -16,13 +16,13 @@ public class ZombiesOriginal extends HumanPlayer{
     }
 
     public ZombiesOriginal(int hordersNumber, float matchTime, ArrayList<String> zombiesMachine) {
-        super("Smart         Zombies machine");
+        super("OZombies");
         Team zombiesHordersTeam = new Zombies(zombiesMachine); // Assuming Zombies class has a constructor that accepts ArrayList<Zombie>
         this.team = zombiesHordersTeam;
         this.hordersNumber = hordersNumber;
         this.horderTime = matchTime / hordersNumber;
     }
-
+    
     public void setOriginalStrategy() {
         // Implementation for setting the original strategy
     }

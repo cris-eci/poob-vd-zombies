@@ -13,7 +13,7 @@ public abstract class Player {
     public String getName(){
         return name;
     }
-
+                    
     public int getScore(){
         return score;
     }
@@ -24,6 +24,7 @@ public abstract class Player {
         return team;
     }
 
-
-
+    public void addToScore(int points) {
+        this.score += points;
+    }
 }

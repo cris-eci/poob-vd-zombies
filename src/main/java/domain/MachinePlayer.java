@@ -1,8 +1,9 @@
 package domain;
+
 import java.util.ArrayList;
 
+public abstract class MachinePlayer extends Player{
 
-public abstract class MachinePlayer extends Player {
     public static final ArrayList<String> MACHINE_PLANTS = new ArrayList<>();
     public static final ArrayList<String> MACHINE_ZOMBIES = new ArrayList<>();
     public static final ArrayList<String> ORIGINAL_ZOMBIES = new ArrayList<>();
@@ -26,6 +27,4 @@ public abstract class MachinePlayer extends Player {
     public MachinePlayer(String name) {
         super(name);
     }
-
-
 }
