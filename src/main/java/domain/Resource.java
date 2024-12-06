@@ -7,7 +7,7 @@ public class Resource extends Entity {
     public static final int BRAIN_VALUE = 50;
 
     private String type;
-
+    private int value;
     public Resource(String type){
         this.type = type;
     }
@@ -16,7 +16,8 @@ public class Resource extends Entity {
         return type;
     }
 
-    public int getValue(){
+    public int Resource(String type){
+        this.type = type;
         if (SOL.equals(type)) {
             return SOL_VALUE;
         } else if (BRAIN.equals(type)) {
@@ -25,6 +26,9 @@ public class Resource extends Entity {
         return 0;
     }
 
+    public int getValue() {
+        return value;
+    }
     public void collect(){
         // Implementar lógica de recolección si es necesario
     }

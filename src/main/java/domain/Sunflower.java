@@ -1,13 +1,16 @@
+// Sunflower
 package domain;
+public class Sunflower extends Plant implements ResourceGenerator {
+    // Produce 25 soles cada 20 segundos
+    private static final int COST = 50;
+    private static final int HEALTH = 300;
 
-public class Sunflower extends Plant implements ResourceGenerator{
-    
-    private Resource resource;
+    public Sunflower() {
+        super(HEALTH, COST);
+    }
 
     @Override
     public void generateResource(int lane) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateResource'");
+        // Lógica para generar soles
     }
-    
 }

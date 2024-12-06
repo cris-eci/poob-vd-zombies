@@ -37,10 +37,22 @@ import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.LineBorder;
 
+import domain.Basic;
+import domain.Brainstein;
+import domain.Buckethead;
+import domain.Conehead;
+import domain.ECIPlant;
+import domain.ECIZombie;
 import domain.POOBvsZombies;
+import domain.Peashooter;
+import domain.Plant;
 import domain.Plants;
 import domain.Player;
+import domain.PotatoMine;
 import domain.Resource;
+import domain.Sunflower;
+import domain.WallNut;
+import domain.Zombie;
 
 
 public class GardenMenu extends JFrame {
@@ -214,11 +226,12 @@ public class GardenMenu extends JFrame {
 
                 // Add drag functionality
                 String dragImagePath = plant.get(3);
+                String currentPlantName = plant.get(0); // Obtener el nombre de la planta
                 cardLabel.setTransferHandler(new TransferHandler("icon") {
                     @Override
                     protected Transferable createTransferable(JComponent c) {
                         ImageIcon icon = new ImageIcon(dragImagePath);
-                        return new ImageTransferable(icon.getImage(), "plant"); // specify type as "plant"
+                        return new ImageTransferable(icon.getImage(), "plant",currentPlantName); // specify type as "plant"
                     }
 
                     @Override
@@ -305,7 +318,7 @@ public class GardenMenu extends JFrame {
                                 return false;
                             }
 
-                            // Validate if the cell already has a plant
+                            // Validar que no haya una planta ya
                             JPanel targetPanel = (JPanel) support.getComponent();
                             if (targetPanel.getComponentCount() > 0) {
                                 return false; // There's already a plant in this cell
@@ -314,13 +327,33 @@ public class GardenMenu extends JFrame {
                             try {
                                 ImageTransferable transferable = (ImageTransferable) support.getTransferable()
                                         .getTransferData(ImageTransferable.IMAGE_FLAVOR);
-                                return "plant".equals(transferable.getType()); // Only accept plants
+                                if (!"plant".equals(transferable.getType())) {
+                                    return false;
+                                }
+
+                                // Aquí identificamos el tipo de planta a colocar
+                                // Supongamos que tienes un método para obtener el nombre de la carta arrastrada.
+                                // Este podría ser pasado en el Transferable o tener un mapeo global.
+                                String plantName = getPlantNameFromTransferable(transferable); // Necesitas implementar este método
+
+                                // Crear instancia de la planta correspondiente
+                                Plant plant = createPlantInstance(plantName);
+                                if (plant == null) return false;
+
+                                // Verificar recursos
+                                Player playerOne = poobvszombies.getPlayerOne();
+                                if (playerOne.getTeam().getResourceCounterAmount() < plant.getCost()) {
+                                    //JOptionPane.showMessageDialog(null, "No tienes suficientes soles para colocar esta planta.");
+                                    return false;
+                                }
+
+                                return true;
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             return false;
                         }
-
                         @Override
                         public boolean importData(TransferSupport support) {
                             if (!canImport(support)) {
@@ -377,7 +410,6 @@ public class GardenMenu extends JFrame {
                                     return false;
                                 }
 
-                                // Validate if the cell already has a zombie
                                 JPanel targetPanel = (JPanel) support.getComponent();
                                 if (targetPanel.getComponentCount() > 0) {
                                     return false; // There's already a zombie in this cell
@@ -386,12 +418,28 @@ public class GardenMenu extends JFrame {
                                 try {
                                     ImageTransferable transferable = (ImageTransferable) support.getTransferable()
                                             .getTransferData(ImageTransferable.IMAGE_FLAVOR);
-                                    return "zombie".equals(transferable.getType()); // Only accept zombies
+                                    if (!"zombie".equals(transferable.getType())) {
+                                        return false;
+                                    }
+
+                                    String zombieName = getZombieNameFromTransferable(transferable);
+                                    Zombie zombie = createZombieInstance(zombieName);
+                                    if (zombie == null) return false;
+
+                                    Player playerTwo = poobvszombies.getPlayerTwo();
+                                    if (playerTwo.getTeam().getResourceCounterAmount() < zombie.getCost()) {
+                                        //JOptionPane.showMessageDialog(null, "No tienes suficientes cerebros para colocar este zombie.");
+                                        return false;
+                                    }
+
+                                    return true;
+
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                                 return false;
                             }
+
 
                             @Override
                             public boolean importData(TransferSupport support) {
@@ -621,10 +669,12 @@ public class GardenMenu extends JFrame {
         public static final DataFlavor IMAGE_FLAVOR = new DataFlavor(ImageTransferable.class, "ImageTransferable");
         private Image image;
         private String type; // "plant" or "zombie"
+        private String name;
 
-        public ImageTransferable(Image image, String type) {
+        public ImageTransferable(Image image, String type, String name) {
             this.image = image;
             this.type = type;
+            this.name = name;
         }
 
         public String getType() {
@@ -633,6 +683,10 @@ public class GardenMenu extends JFrame {
 
         public Image getImage() {
             return image;
+        }
+
+        public String getName(){
+            return name;
         }
 
         @Override
@@ -674,6 +728,10 @@ public class GardenMenu extends JFrame {
                         }
                     }
 
+                    if (zombie == null) {
+                        continue; // Zombie no encontrado, saltar a la siguiente
+                    }
+
                     ImageIcon icon = new ImageIcon(zombie.get(2));
                     JLabel cardLabel = new JLabel(
                             new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
@@ -682,11 +740,12 @@ public class GardenMenu extends JFrame {
 
                     // Add drag functionality
                     String dragImagePath = zombie.get(3);
+                    String currentZombieName = zombie.get(0); // Obtener el nombre del zombie
                     cardLabel.setTransferHandler(new TransferHandler("icon") {
                         @Override
                         protected Transferable createTransferable(JComponent c) {
                             ImageIcon icon = new ImageIcon(dragImagePath);
-                            return new ImageTransferable(icon.getImage(), "zombie"); // specify type as "zombie"
+                            return new ImageTransferable(icon.getImage(), "zombie",currentZombieName); // specify type as "zombie"
                         }
 
                         @Override
@@ -1003,6 +1062,57 @@ private void initializeTimers(POOBvsZombies poobvsZombies) {
         return String.format("%d:%02d", minutes, remainingSeconds);
     }
 
+    private Plant createPlantInstance(String name) {
+        switch (name) {
+            case "Sunflower": return new Sunflower();
+            case "Peashooter": return new Peashooter();
+            case "WallNut": return new WallNut();
+            case "PotatoMine": return new PotatoMine();
+            case "ECIPlant": return new ECIPlant();
+            default: return null;
+        }
+    }
+
+    private Zombie createZombieInstance(String name) {
+        switch (name) {
+            case "Basic": return new Basic();
+            case "Conehead": return new Conehead();
+            case "BucketHead": return new Buckethead();
+            case "Brainstein": return new Brainstein();
+            case "ECIZombie": return new ECIZombie();
+            default: return null;
+        }
+    }
+
+    /**
+     * Método para extraer el nombre de la planta desde el objeto Transferable.
+     * @param transferable El objeto Transferable.
+     * @return El nombre de la planta o null si no se puede extraer.
+     */
+    private String getPlantNameFromTransferable(Transferable transferable) {
+        if (transferable instanceof ImageTransferable) {
+            ImageTransferable imgTransferable = (ImageTransferable) transferable;
+            if ("plant".equals(imgTransferable.getType())) {
+                return imgTransferable.getName();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Método para extraer el nombre del zombie desde el objeto Transferable.
+     * @param transferable El objeto Transferable.
+     * @return El nombre del zombie o null si no se puede extraer.
+     */
+    private String getZombieNameFromTransferable(Transferable transferable) {
+        if (transferable instanceof ImageTransferable) {
+            ImageTransferable imgTransferable = (ImageTransferable) transferable;
+            if ("zombie".equals(imgTransferable.getType())) {
+                return imgTransferable.getName();
+            }
+        }
+        return null;
+    }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ArrayList<String> selectedPlants = new ArrayList<>(Arrays.asList(
