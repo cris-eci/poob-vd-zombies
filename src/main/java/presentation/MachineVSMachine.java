@@ -14,8 +14,7 @@ public class MachineVSMachine extends JFrame {
     private POOBvsZombies poobvsZombies;
 
     // GUI Components
-    private JTextField timeField, quantityField;
-    private JLabel setSunsLabel, setBrainsLabel;
+    private JTextField timeField, quantityField, setSunsField, setBrainsField;
     private JLabel sunsValueLabel, brainsValueLabel;
     private JButton startButton;
     private List<PlantPanel> plantPanelsList;
@@ -45,33 +44,9 @@ public class MachineVSMachine extends JFrame {
         // Campos de texto para tiempo y cantidad de hordas
         timeField = createTextField("Time", 385, 415, 40, 15);
         quantityField = createTextField("Number", 455, 415, 55, 15);
-
+        setSunsField = createTextField("Amount of suns", 150, 487, 100, 20);
+        setBrainsField = createTextField("Amount of brains", 654, 484, 107, 20);
         
-        // Etiquetas para "Amount of suns" y "Amount of brains"
-        //setSunsLabel = new JLabel("Amount of suns:");
-        //setSunsLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        //setSunsLabel.setForeground(Color.WHITE);
-        //setSunsLabel.setBounds(65, 487, 100, 20);
-        //backgroundPanel.add(setSunsLabel);
-
-        //setBrainsLabel = new JLabel("Amount of brains:");
-        //setBrainsLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        //setBrainsLabel.setForeground(Color.WHITE);
-        //setBrainsLabel.setBounds(520, 485, 130, 20);
-        //backgroundPanel.add(setBrainsLabel);
-
-        // Valores fijos para suns y brains
-        sunsValueLabel = new JLabel("100");
-        sunsValueLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        sunsValueLabel.setForeground(Color.WHITE);
-        sunsValueLabel.setBounds(175, 487, 50, 20);
-        backgroundPanel.add(sunsValueLabel);
-
-        brainsValueLabel = new JLabel("200");
-        brainsValueLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        brainsValueLabel.setForeground(Color.WHITE);
-        brainsValueLabel.setBounds(690, 485, 50, 20);
-        backgroundPanel.add(brainsValueLabel);
 
         // Botón START
         startButton = new JButton("¡START!");
@@ -83,6 +58,8 @@ public class MachineVSMachine extends JFrame {
         backgroundPanel.add(startButton);
         backgroundPanel.add(timeField);
         backgroundPanel.add(quantityField);
+        backgroundPanel.add(setSunsField);
+        backgroundPanel.add(setBrainsField);
         
 
         // Etiquetas
@@ -116,6 +93,8 @@ public class MachineVSMachine extends JFrame {
 		// Añadir FocusListeners a los campos de tiempo y cantidad
         addTextFieldListeners(timeField);
         addTextFieldListeners(quantityField);
+        addTextFieldListeners(setSunsField);
+        addTextFieldListeners(setBrainsField);
     }
 
     // Método para manejar el inicio del juego
@@ -289,16 +268,18 @@ public class MachineVSMachine extends JFrame {
         panel.add(button);
     }
 
+    // Método para habilitar el botón START si todos los campos tienen valores
     private void checkFields() {
         boolean timeFilled = !timeField.getText().isEmpty() && !timeField.getText().equals("Time");
         boolean quantityFilled = !quantityField.getText().isEmpty() && !quantityField.getText().equals("Number");
+        boolean sunsFilled = !setSunsField.getText().isEmpty() && !setSunsField.getText().equals("Amount of suns");
+        boolean brainsFilled = !setBrainsField.getText().isEmpty() && !setBrainsField.getText().equals("Amount of brains");
 
-        // Dado que las plantas y zombies están preseleccionados y no se pueden modificar,
-        // simplemente verificamos que existan.
+        // En este modo, las plantas y zombies están preseleccionados
         boolean atLeastOnePlantSelected = plantPanelsList.size() >= 1;
         boolean atLeastOneZombieSelected = zombiePanelsList.size() >= 1;
 
-        startButton.setEnabled(timeFilled && quantityFilled &&
+        startButton.setEnabled(timeFilled && quantityFilled && sunsFilled && brainsFilled &&
                                atLeastOnePlantSelected && atLeastOneZombieSelected);
     }
 

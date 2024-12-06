@@ -24,6 +24,7 @@ public abstract class Player {
         return team;
     }
 
-
-
+    public void addToScore(int points) {
+        this.score += points;
+    }
 }

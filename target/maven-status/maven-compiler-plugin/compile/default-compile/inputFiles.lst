@@ -6,6 +6,7 @@ C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Conehead.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\ECIPlant.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\ECIZombie.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Entity.java
+C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\GamePhase.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\HumanPlayer.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Lownmover.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\MachinePlayer.java
@@ -21,6 +22,7 @@ C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\PotatoMine.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\ProjectTile.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Resource.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\ResourceGenerator.java
+C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\ResourceType.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Shooter.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Strategy.java
 C:\Users\Usuario\Downloads\poob-vs-zombies\src\main\java\domain\Sunflower.java

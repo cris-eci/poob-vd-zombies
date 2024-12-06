@@ -55,6 +55,7 @@ presentation\PlayerVsPlayer$SelectablePanel$1.class
 presentation\PlayerVSMachine$PlantPanel.class
 domain\Brainstein.class
 domain\Zombie.class
+domain\GamePhase.class
 domain\ZombiesOriginal.class
 presentation\GardenMenu$10.class
 presentation\GardenMenu$6.class
@@ -71,4 +72,5 @@ presentation\GardenMenu$3.class
 presentation\GardenMenu$9.class
 domain\MachinePlayer.class
 presentation\MachineVSMachine$1.class
+domain\ResourceType.class
 presentation\MachineVSMachine$PlantPanel.class

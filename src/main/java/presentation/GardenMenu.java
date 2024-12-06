@@ -40,6 +40,7 @@ import javax.swing.border.LineBorder;
 import domain.POOBvsZombies;
 import domain.Plants;
 import domain.Player;
+import domain.Resource;
 
 
 public class GardenMenu extends JFrame {
@@ -796,45 +797,136 @@ public class GardenMenu extends JFrame {
         }
     }
 
-    // Método para inicializar los temporizadores
-    private void initializeTimers(POOBvsZombies poobvsZombies) {
-        if("PlayerVsPlayer".equals(modality)){
-            timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
-            timerTasks.add(new TimerTask("Round time", (int) poobvsZombies.getRoundTime()));
-            timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
-            timerTasks.add(new TimerTask("Last round", (int) poobvsZombies.getRoundTime()));
-        }
+    // Método para crear y mostrar el recurso en el tablero
+private void spawnResource(Resource resource) {
+    // Seleccionar una celda aleatoria (5 filas, columnas de 1 a 9)
+    int row = (int) (Math.random() * 5); 
+    int col = 1 + (int) (Math.random() * 9); 
 
-        else if ("PlayerVsMachine".equals(modality) || "MachineVsMachine".equals(modality)){
-            int matchTimeInSeconds = (int) poobvszombies.getMatchTime();
-            int hordersNumber = poobvszombies.getHordersNumber();
-
-            // Primero, 20 segundos para colocar plantas
-            timerTasks.add(new TimerTask("Planting time", 20));
-
-            // Validar que el tiempo total sea al menos 20 segundos y haya al menos una horda
-            if (matchTimeInSeconds < 20 || hordersNumber <= 0) {
-                JOptionPane.showMessageDialog(this, "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.", "Error de Configuración", JOptionPane.ERROR_MESSAGE);
-                System.exit(1);
-            }
-
-            // Calcular el tiempo restante después de la fase de plantación
-            int remainingTime = matchTimeInSeconds ;
-
-            // Dividir el tiempo restante entre el número de hordas
-            int hordeDuration = remainingTime / hordersNumber;
-            int extraSeconds = remainingTime % hordersNumber; // Para distribuir cualquier segundo sobrante
-
-            for (int i = 1; i <= hordersNumber; i++) {
-                int duration = hordeDuration;
-                if (i <= extraSeconds) {
-                    duration += 1; // Distribuir segundos sobrantes
-                }
-                timerTasks.add(new TimerTask("Horda " + i, duration));
-            }
-        }
+    final JPanel targetCell = gridCells[row][col];
+            if (targetCell.getComponentCount() > 0) {
+                // Si la celda está ocupada, intentar nuevamente (una única reintento por simplicidad)
+                row = (int) (Math.random() * 5); 
+                col = 1 + (int) (Math.random() * 9); 
+                JPanel newTargetCell = gridCells[row][col];
     }
 
+    // Crear JLabel con la imagen del recurso
+    String imagePath = (resource.getType().equals(Resource.SOL)) ? "resources/images/sun.png" : "resources/images/brain.png";
+    ImageIcon icon = new ImageIcon(imagePath);
+    Image scaledImage = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+    JLabel resourceLabel = new JLabel(new ImageIcon(scaledImage));
+    resourceLabel.setHorizontalAlignment(JLabel.CENTER);
+    targetCell.add(resourceLabel);
+    targetCell.revalidate();
+    targetCell.repaint();
+
+    // Timer de 3 segundos para recoger el recurso automáticamente
+    Timer collectTimer = new Timer(3000, (ActionEvent e) -> {
+        // Remover el recurso del tablero
+        targetCell.remove(resourceLabel);
+        targetCell.revalidate();
+        targetCell.repaint();
+
+        // Llamar al método collect del recurso
+        resource.collect();
+
+        // Sumar valor al equipo correspondiente
+        // Determinar a quién sumar:
+        // Asumiendo: PlayerOne = Plantas, PlayerTwo = Zombies
+        // Si es SOL -> plantas (PlayerOne), si es BRAIN -> zombies (PlayerTwo)
+        Player playerOne = poobvszombies.getPlayerOne();
+        Player playerTwo = poobvszombies.getPlayerTwo();
+
+        if (Resource.SOL.equals(resource.getType())) {
+            // Sumar al equipo de plantas
+            playerOne.getTeam().addResource(resource);
+            playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+        } else if (Resource.BRAIN.equals(resource.getType())) {
+            // Sumar al equipo de zombies
+            playerTwo.getTeam().addResource(resource);
+            playerTwoBrainsLabel.setText("" + playerTwo.getTeam().getResourceCounterAmount());
+        }
+
+        ((Timer) e.getSource()).stop();
+    });
+    collectTimer.setRepeats(false);
+    collectTimer.start();
+}
+    // Método para inicializar los temporizadores
+private void initializeTimers(POOBvsZombies poobvsZombies) {
+    if ("PlayerVsPlayer".equals(modality)) {
+        timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
+        timerTasks.add(new TimerTask("Round time", (int) poobvsZombies.getRoundTime()));
+        timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
+        timerTasks.add(new TimerTask("Last round", (int) poobvsZombies.getRoundTime()));
+        
+        // Timer para generar recursos cada 10s en PlayerVsPlayer
+        Timer resourceTimer = new Timer(10000, e -> {
+            String currentPhase = messageLabel.getText(); 
+            if (currentPhase.contains("Planting time")) {
+                // Planting time -> soles
+                spawnResource(new Resource(Resource.SOL));
+            } else if (currentPhase.contains("Round") || currentPhase.contains("Last round")) {
+                // Round time/Last round -> cerebros
+                spawnResource(new Resource(Resource.BRAIN));
+            }
+        });
+        resourceTimer.start();
+
+    } else if ("PlayerVsMachine".equals(modality) || "MachineVsMachine".equals(modality)) {
+        int matchTimeInSeconds = (int) poobvsZombies.getMatchTime();
+        int hordersNumber = poobvsZombies.getHordersNumber();
+
+        // Primero, 20 segundos para colocar plantas
+        timerTasks.add(new TimerTask("Planting time", 20));
+
+        // Validar que el tiempo total sea al menos 20 segundos y haya al menos una horda
+        if (matchTimeInSeconds < 20 || hordersNumber <= 0) {
+            JOptionPane.showMessageDialog(this, "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.", "Error de Configuración", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+        
+        // Calcular el tiempo restante después de la fase de plantación
+        int remainingTime = matchTimeInSeconds;
+
+        // Dividir el tiempo restante entre el número de hordas
+        int hordeDuration = remainingTime / hordersNumber;
+        int extraSeconds = remainingTime % hordersNumber; // Para segundos sobrantes
+
+        for (int i = 1; i <= hordersNumber; i++) {
+            int duration = hordeDuration;
+            if (i <= extraSeconds) {
+                duration += 1; // Distribuir segundos sobrantes
+            }
+            timerTasks.add(new TimerTask("Horda " + i, duration));
+        }
+
+        // Timers para generar recursos cada 10s en PlayerVsMachine o MachineVsMachine
+        if ("PlayerVsMachine".equals(modality)) {
+            // En PlayerVsMachine: Soles cada 10 segundos
+            Timer resourceTimer = new Timer(10000, e -> {
+                spawnResource(new Resource(Resource.SOL));
+            });
+            resourceTimer.start();
+
+        } else if ("MachineVsMachine".equals(modality)) {
+            // En MachineVsMachine: Soles y Cerebros cada 10 segundos
+            Timer resourceTimer = new Timer(10000, e -> {
+                String currentPhase = messageLabel.getText(); 
+            if (currentPhase.contains("Planting time")){
+                spawnResource(new Resource(Resource.SOL));
+            }
+            
+            if (currentPhase.contains("Horda"))
+                spawnResource(new Resource(Resource.BRAIN));
+            });
+            resourceTimer.start();
+        }
+    }
+}
+
+   
     // Método para configurar las etiquetas en la interfaz
     private void setupTimerLabels(JPanel panel) {
         int startX = 670;
