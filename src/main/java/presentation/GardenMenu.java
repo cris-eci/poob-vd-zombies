@@ -425,6 +425,9 @@ public class GardenMenu extends JFrame {
                                     cellPanel.removeAll();
                                     cellPanel.revalidate();
                                     cellPanel.repaint();
+
+                                    poobvszombies.deleteEntity(finalRow, finalCol);
+                                    
                                     shovelSelected = false;
                                     setCursor(Cursor.getDefaultCursor()); // Restablecer el cursor
                                 } else {
@@ -726,54 +729,6 @@ public class GardenMenu extends JFrame {
             }
         }
     }
-    // Auxiliary class to handle the Transferable object of image type with type
-    // (plant or zombie)
-    // private static class EntityTransferable implements Transferable {
-    // public static final DataFlavor IMAGE_FLAVOR = new
-    // DataFlavor(EntityTransferable.class, "ImageTransferable");
-    // private Image image;
-    // private String type; // "plant" or "zombie"
-    // private String stringDefnitionName;
-
-    // public ImageTransferable(Image image, String type, String
-    // stringDefnitionName) {
-    // this.image = image;
-    // this.type = type;
-    // this.stringDefnitionName = stringDefnitionName;
-    // }
-
-    // public String getType() {
-    // return type;
-    // }
-
-    // public Image getImage() {
-    // return image;
-    // }
-
-    // public String getStringDefnitionName() {
-    // return stringDefnitionName;
-    // }
-
-    // @Override
-    // public DataFlavor[] getTransferDataFlavors() {
-    // return new DataFlavor[] { IMAGE_FLAVOR };
-    // }
-
-    // @Override
-    // public boolean isDataFlavorSupported(DataFlavor flavor) {
-    // return flavor.equals(IMAGE_FLAVOR);
-    // }
-
-    // @Override
-    // public Object getTransferData(DataFlavor flavor) throws
-    // UnsupportedFlavorException {
-    // if (flavor.equals(IMAGE_FLAVOR)) {
-    // return this;
-    // } else {
-    // throw new UnsupportedFlavorException(flavor);
-    // }
-    // }
-    // }
 
     private void addZombieCards(JPanel panel) {
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) && selectedZombies != null) {

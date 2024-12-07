@@ -188,7 +188,9 @@ public class POOBvsZombies {
     //Initial code for the method addEntity, it should be modified to fit the requirements of the projec
     public void deleteEntity(int xPos, int yPos) {
         if (xPos >= 0 && xPos < entities.size() && yPos >= 0 && yPos < entities.get(xPos).size()) {
+
             entities.get(xPos).set(yPos, null);
+            
         } else {
             throw new IndexOutOfBoundsException("Invalid xPos or yPos");
         }
