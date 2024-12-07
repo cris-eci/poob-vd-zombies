@@ -6,6 +6,7 @@ public class ZombiesOriginal extends HumanPlayer{
     public static final int ORIGINAL_SPAWN_TIME = 10;
     private int hordersNumber;
     private float horderTime;
+    
 
     public ZombiesOriginal(int hordersNumber, float matchTime) {
         super("OZombies");
@@ -15,9 +16,9 @@ public class ZombiesOriginal extends HumanPlayer{
         this.horderTime = matchTime / hordersNumber;
     }
 
-    public ZombiesOriginal(int hordersNumber, float matchTime, ArrayList<String> zombiesMachine) {
+    public ZombiesOriginal(int hordersNumber, float matchTime, ArrayList<String> zombiesMachine, int brains) {
         super("OZombies");
-        Team zombiesHordersTeam = new Zombies(zombiesMachine); // Assuming Zombies class has a constructor that accepts ArrayList<Zombie>
+        Team zombiesHordersTeam = new Zombies(zombiesMachine, brains); // Assuming Zombies class has a constructor that accepts ArrayList<Zombie>
         this.team = zombiesHordersTeam;
         this.hordersNumber = hordersNumber;
         this.horderTime = matchTime / hordersNumber;

@@ -8,16 +8,16 @@ public class Zombies extends Team {
     
 
     
-    public Zombies(int resourceCounter, ArrayList<String> characters){
-        super(resourceCounter, characters);
-    }
+    // public Zombies(int resourceCounter, ArrayList<String> characters){
+    //     super(resourceCounter, characters);
+    // }
 
     public Zombies(){
-        super(0, MachinePlayer.ORIGINAL_ZOMBIES);
+        super(MachinePlayer.ORIGINAL_ZOMBIES);
     }
 
-    public Zombies(ArrayList<String> characters){
-        super(0, characters);
+    public Zombies(ArrayList<String> characters,int brains){
+        super(brains, characters);
     }
 
     @Override

@@ -181,11 +181,13 @@ public class GardenMenu extends JFrame {
             addPlayerInfo(panel); // Solo mostrar información del jugador
             addScoreLabels(panel);
         } else if ("MachineVsMachine".equals(modality)) {
+            addPlayerInfo(panel);
+            addScoreLabels(panel);
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
-            addScoreLabels(panel);
-            addPlayerInfo(panel);
+            
+            
             
         }
 
@@ -640,7 +642,7 @@ public class GardenMenu extends JFrame {
             playerOneSunsLabel.setBounds(30, 60, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneSunsLabel);
     
-            if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) || "PlayerVsMachine".equals(modality)) {
+            if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
                 Player playerTwo = poobvszombies.getPlayerTwo();
     
                 // Etiqueta para el nombre del Jugador 2
@@ -656,6 +658,17 @@ public class GardenMenu extends JFrame {
                 playerTwoBrainsLabel.setForeground(Color.MAGENTA);
                 playerTwoBrainsLabel.setBounds(50, 620, 300, 30); // Ajustar posición y tamaño
                 panel.add(playerTwoBrainsLabel);
+            }
+
+            if ("PlayerVsMachine".equals(modality)) {
+                Player playerTwo = poobvszombies.getPlayerTwo();
+    
+                // Etiqueta para el nombre del Jugador 2
+                playerTwoNameLabel = new JLabel("" + playerTwo.getName());
+                playerTwoNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerTwoNameLabel.setForeground(Color.RED);
+                playerTwoNameLabel.setBounds(480, 625, 300, 30); // Ajustar posición y tamaño
+                panel.add(playerTwoNameLabel);
             }
         }
     }

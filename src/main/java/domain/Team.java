@@ -12,7 +12,9 @@ public abstract class Team {
 
     // public static final String SOL = "SOL";
     // public static final String BRAIN = "BRAIN";
-
+    public Team(ArrayList<String> characters){
+        this.characters = characters;
+    }
     public Team(int resourceCounter, ArrayList<String> characters){
         this.resourceCounter = resourceCounter;
         this.characters = characters;

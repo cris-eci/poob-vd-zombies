@@ -103,6 +103,8 @@ public class MachineVSMachine extends JFrame {
             // Obtener valores ingresados
             int matchTime = Integer.parseInt(timeField.getText());
             int hordeNumber = Integer.parseInt(quantityField.getText());
+            int sunAmount = Integer.parseInt(setSunsField.getText());
+            int brainAmount = Integer.parseInt(setBrainsField.getText());
 
             // Plantas y Zombies seleccionados (preseleccionados)
             ArrayList<String> selectedPlants = getSelectedPlantNames();
@@ -111,16 +113,16 @@ public class MachineVSMachine extends JFrame {
             // Crear instancia de POOBvsZombies para MachineVsMachine
             poobvsZombies = new POOBvsZombies(
                     matchTime,
-                    hordeNumber
+                    hordeNumber,sunAmount,brainAmount
             );
 
             // Agregar plantas y zombies seleccionados al POOBvsZombies
             poobvsZombies.getPlayerOne().getTeam().setCharacters(selectedPlants);
             poobvsZombies.getPlayerTwo().getTeam().setCharacters(selectedZombies);
 
-            // Setear suns y brains fijos
-            poobvsZombies.getPlayerOne().getTeam().setResourceCounter(100); // Suns
-            poobvsZombies.getPlayerTwo().getTeam().setResourceCounter(200); // Brains
+            // // Setear suns y brains fijos
+            // poobvsZombies.getPlayerOne().getTeam().setResourceCounter(100); // Suns
+            // poobvsZombies.getPlayerTwo().getTeam().setResourceCounter(200); // Brains
 
             // Abrir el GardenMenu con la configuración
             new GardenMenu(poobvsZombies).setVisible(true);
