@@ -37,11 +37,12 @@ public class POOBvsZombies {
         setUpEntities();
     }
     
-    public POOBvsZombies(float matchTimeInSeconds, int hordersNumber) {
-        this.players = new ArrayList<Player>();        
+    public POOBvsZombies(float matchTimeInSeconds, int hordersNumber, int suns, int brains) {
+        this.players = new ArrayList<Player>();
+        this.entities = new ArrayList<ArrayList<Entity>>();
 
-        this.players.add(new PlantsIntelligent());
-        this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds, MachinePlayer.ORIGINAL_ZOMBIES));
+        this.players.add(new PlantsIntelligent(suns));
+        this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds, MachinePlayer.ORIGINAL_ZOMBIES,brains));
 
         this.modality = "MachineVsMachine";
         this.winner = "";

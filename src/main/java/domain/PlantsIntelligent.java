@@ -2,9 +2,10 @@ package domain;
 
 public class PlantsIntelligent extends MachinePlayer {
 
-    public PlantsIntelligent() {
+
+    public PlantsIntelligent(int suns) {
         super("StPlant");
-        Team plantsTeam = new Plants(100, MACHINE_PLANTS);
+        Team plantsTeam = new Plants(suns, MACHINE_PLANTS);
         this.team = plantsTeam;
     }
 

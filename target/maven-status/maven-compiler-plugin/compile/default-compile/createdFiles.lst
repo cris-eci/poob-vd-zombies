@@ -1,18 +1,11 @@
 presentation\PlayerVSMachine$3.class
 domain\ZombiesStrategic.class
 presentation\GardenMenu$TimerTask.class
-<<<<<<< HEAD
-=======
-presentation\GardenMenu$ImageTransferable.class
->>>>>>> d115da18fe5d76cdec87d35094eaac5decbae0a8
 presentation\MachineVSMachine.class
 domain\PotatoMine.class
 presentation\GardenMenu.class
 domain\Basic.class
-<<<<<<< HEAD
 presentation\EntityData.class
-=======
->>>>>>> d115da18fe5d76cdec87d35094eaac5decbae0a8
 presentation\MachineVSMachine$BackgroundPanel.class
 presentation\PlayerVsPlayer$2.class
 presentation\MachineVSMachine$2.class
@@ -48,10 +41,7 @@ presentation\PlayerVsPlayer$1.class
 domain\PlantsIntelligent.class
 presentation\GardenMenu$1.class
 presentation\MachineVSMachine$4.class
-<<<<<<< HEAD
 presentation\EntityTransferable.class
-=======
->>>>>>> d115da18fe5d76cdec87d35094eaac5decbae0a8
 presentation\PlayerVsPlayer$BackgroundPanel.class
 domain\Buckethead.class
 presentation\PlayerVsPlayer$PlantPanel.class
@@ -66,10 +56,6 @@ presentation\PlayerVsPlayer$SelectablePanel$1.class
 presentation\PlayerVSMachine$PlantPanel.class
 domain\Brainstein.class
 domain\Zombie.class
-<<<<<<< HEAD
-=======
-domain\GamePhase.class
->>>>>>> d115da18fe5d76cdec87d35094eaac5decbae0a8
 domain\ZombiesOriginal.class
 presentation\GardenMenu$10.class
 presentation\GardenMenu$6.class
@@ -86,8 +72,4 @@ presentation\GardenMenu$3.class
 presentation\GardenMenu$9.class
 domain\MachinePlayer.class
 presentation\MachineVSMachine$1.class
-<<<<<<< HEAD
-=======
-domain\ResourceType.class
->>>>>>> d115da18fe5d76cdec87d35094eaac5decbae0a8
 presentation\MachineVSMachine$PlantPanel.class

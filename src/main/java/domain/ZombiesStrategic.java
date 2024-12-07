@@ -20,7 +20,7 @@ public class ZombiesStrategic extends HumanPlayer {
     public ZombiesStrategic(String name, int brains, ArrayList<String> zombies) {
         // brains are the resources for the zombies in zombies team
         super(name);
-        Team zombiesTeam = new Zombies(brains, zombies);
+        Team zombiesTeam = new Zombies(zombies,brains);
         this.team = zombiesTeam;
     }
 
