@@ -12,6 +12,7 @@ public class POOBvsZombies {
     private ArrayList<Player> players;
     private ArrayList<ArrayList<Entity>> entities;
 
+    // player vs player
     public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Entity>>();
@@ -28,14 +29,24 @@ public class POOBvsZombies {
         setUpEntities();
     }
 
+    // player vs machine
     public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
         this.players = new ArrayList<Player>();
-        this.players.add(new PlantsStrategic(namePlayerOne, 50, plants));
         this.entities = new ArrayList<ArrayList<Entity>>();
+
+        this.players.add(new PlantsStrategic(namePlayerOne, 50, plants));
+        this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds));
+
+        this.modality = "PlayerVsMachine";
+        this.winner = "";
+
         this.matchTime = setMatchTime(matchTimeInSeconds);
         this.roundTime = this.matchTime / 2;
         setUpEntities();
+
     }
+
+    
     
     public POOBvsZombies(float matchTimeInSeconds, int hordersNumber, int suns, int brains) {
         this.players = new ArrayList<Player>();
