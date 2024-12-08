@@ -2,10 +2,9 @@ package presentation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container; // Add this import
-import java.awt.Cursor;
-import java.awt.Dimension; // Add this import
-import java.awt.Font;
+import java.awt.Cursor; // Add this import
+import java.awt.Dimension;
+import java.awt.Font; // Add this import
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -17,12 +16,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator; // Add this import
 import java.util.List;
 
 import javax.swing.Box; // Add this import
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JButton; // Add this import
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -194,7 +192,7 @@ public class GardenMenu extends JFrame {
         startSequentialTimers(0);
 
         add(panel);
-        startZombieMovement();
+        //startZombieMovement();
     }
 
     private void addPlantsCards(JPanel panel) {
@@ -386,7 +384,7 @@ public class GardenMenu extends JFrame {
 
                                 // Añadir a dominio
                                 poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                showEntityMatrix();
+                                //showEntityMatrix();
 
                                 Image image = entityData.getImage();
 
@@ -490,7 +488,7 @@ public class GardenMenu extends JFrame {
                                             .getTransferData(EntityTransferable.ENTITY_FLAVOR);
                                     // Añadir a dominio
                                     poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                    showEntityMatrix();
+                                    //showEntityMatrix();
                                     Image image = entityData.getImage();
                                     JLabel zombieLabel = new JLabel(new ImageIcon(image));
                                     zombieLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -836,29 +834,29 @@ public class GardenMenu extends JFrame {
         }
     }
 
-    private void startZombieMovement() {
-        Timer timer = new Timer(100, e -> {
-            Iterator<JLabel> iterator = movingZombies.iterator();
-            while (iterator.hasNext()) {
-                JLabel zombie = iterator.next();
-                Point location = zombie.getLocation();
-                if (location.x > 0) {
-                    // Move zombie to the left
-                    zombie.setLocation(location.x - 5, location.y);
-                } else {
-                    // Remove zombie safely
-                    Container parent = zombie.getParent();
-                    if (parent != null) {
-                        parent.remove(zombie);
-                        parent.revalidate();
-                        parent.repaint();
-                    }
-                    iterator.remove();
-                }
-            }
-        });
-        timer.start();
-    }
+    // private void startZombieMovement() {
+    //     Timer timer = new Timer(100, e -> {
+    //         Iterator<JLabel> iterator = movingZombies.iterator();
+    //         while (iterator.hasNext()) {
+    //             JLabel zombie = iterator.next();
+    //             Point location = zombie.getLocation();
+    //             if (location.x > 0) {
+    //                 // Move zombie to the left
+    //                 zombie.setLocation(location.x - 5, location.y);
+    //             } else {
+    //                 // Remove zombie safely
+    //                 Container parent = zombie.getParent();
+    //                 if (parent != null) {
+    //                     parent.remove(zombie);
+    //                     parent.revalidate();
+    //                     parent.repaint();
+    //                 }
+    //                 iterator.remove();
+    //             }
+    //         }
+    //     });
+    //     timer.start();
+    // }
 
     // Clase interna para representar cada temporizador
     private class TimerTask {
