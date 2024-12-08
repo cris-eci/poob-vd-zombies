@@ -44,7 +44,8 @@ public class ZombieThreadManager {
                 zombieLabel.setLocation(finalX, finalY);
             });
             try {
-                Thread.sleep(50);
+                // Wait 100ms - 0.1s or zombie movement speed
+                Thread.sleep(150);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
