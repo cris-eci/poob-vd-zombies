@@ -49,6 +49,7 @@ import domain.Resource;
 import domain.Sunflower;
 import domain.WallNut;
 import domain.Zombie;
+import domain.ZombieThreadManager;
 
 public class GardenMenu extends JFrame {
     private ArrayList<String> selectedPlants;
@@ -63,6 +64,9 @@ public class GardenMenu extends JFrame {
     private JLabel playerOneNameLabel, playerTwoNameLabel;
     private JLabel playerOneSunsLabel, playerTwoBrainsLabel;
     private JLabel playerOneScoreLabel, playerTwoScoreLabel;
+
+    // UPDATE
+    private ZombieThreadManager zombieThreadManager;
 
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
             Arrays.asList(
@@ -129,6 +133,9 @@ public class GardenMenu extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        // UPDATE
+        this.poobvszombies = poobvszombies;
+        this.zombieThreadManager = new ZombieThreadManager(poobvszombies, this);
 
         this.poobvszombies = poobvszombies;
         this.modality = poobvszombies.getModality();
@@ -181,9 +188,7 @@ public class GardenMenu extends JFrame {
             addBrainIcon(panel);
             addZombieCards(panel);
             addZombieTable(panel);
-            
-            
-            
+
         }
 
         // addTimerSection(panel, poobvszombies);
@@ -192,7 +197,7 @@ public class GardenMenu extends JFrame {
         startSequentialTimers(0);
 
         add(panel);
-        //startZombieMovement();
+        // startZombieMovement();
     }
 
     private void addPlantsCards(JPanel panel) {
@@ -384,7 +389,7 @@ public class GardenMenu extends JFrame {
 
                                 // Añadir a dominio
                                 poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                //showEntityMatrix();
+                                // showEntityMatrix();
 
                                 Image image = entityData.getImage();
 
@@ -425,7 +430,7 @@ public class GardenMenu extends JFrame {
                                     cellPanel.repaint();
 
                                     poobvszombies.deleteEntity(finalRow, finalCol);
-                                    
+
                                     shovelSelected = false;
                                     setCursor(Cursor.getDefaultCursor()); // Restablecer el cursor
                                 } else {
@@ -486,28 +491,50 @@ public class GardenMenu extends JFrame {
                                 try {
                                     EntityData entityData = (EntityData) support.getTransferable()
                                             .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+
+                                    String zombieName = entityData.getName();
+                                    Zombie zombie = createZombieInstance(zombieName);
                                     // Añadir a dominio
-                                    poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                    //showEntityMatrix();
+                                    poobvszombies.addEntity(finalRow, finalCol, zombieName);
+
+                                    // showEntityMatrix();
+                                    // Image image = entityData.getImage();
+                                    // JLabel zombieLabel = new JLabel(new ImageIcon(image));
+                                    // zombieLabel.setHorizontalAlignment(JLabel.CENTER);
+                                    // // Get the cell's position relative to the main panel
+                                    // JPanel targetCell = (JPanel) support.getComponent();
+                                    // Point cellLocation = targetCell.getLocation();
+                                    // int x = gridPanel.getX() + cellLocation.x;
+                                    // int y = gridPanel.getY() + cellLocation.y;
+                                    // // Set the zombie's bounds
+                                    // zombieLabel.setBounds(x, y, targetCell.getWidth(), targetCell.getHeight());
+                                    // // Add the zombie to the main panel
+                                    // panel.add(zombieLabel);
+                                    // panel.setComponentZOrder(zombieLabel, 0); // Bring to front if necessary
+                                    // panel.revalidate();
+                                    // panel.repaint();
+
+                                    // Crear el JLabel del zombi
                                     Image image = entityData.getImage();
                                     JLabel zombieLabel = new JLabel(new ImageIcon(image));
                                     zombieLabel.setHorizontalAlignment(JLabel.CENTER);
-                                    // Get the cell's position relative to the main panel
+
                                     JPanel targetCell = (JPanel) support.getComponent();
                                     Point cellLocation = targetCell.getLocation();
                                     int x = gridPanel.getX() + cellLocation.x;
                                     int y = gridPanel.getY() + cellLocation.y;
-                                    // Set the zombie's bounds
                                     zombieLabel.setBounds(x, y, targetCell.getWidth(), targetCell.getHeight());
-                                    // Add the zombie to the main panel
+
                                     panel.add(zombieLabel);
-                                    panel.setComponentZOrder(zombieLabel, 0); // Bring to front if necessary
+                                    panel.setComponentZOrder(zombieLabel, 0);
                                     panel.revalidate();
                                     panel.repaint();
 
+                                    // Registrar el zombi en el ZombieThreadManager para moverlo
+                                    zombieThreadManager.registerZombie(finalRow, zombie, zombieLabel);
                                     // NUEVO: Deducir recursos
-                                    String zombieName = entityData.getName();
-                                    Zombie zombie = createZombieInstance(zombieName);
+                                    // String zombieName = entityData.getName();
+                                    // Zombie zombie = createZombieInstance(zombieName);
                                     if (zombie != null) {
                                         Player playerTwo = poobvszombies.getPlayerTwo();
                                         playerTwo.getTeam().deductResource(zombie.getCost());
@@ -634,7 +661,7 @@ public class GardenMenu extends JFrame {
                         pvpMenu.setVisible(true);
                     } else {
                         MachineVSMachine mvsmMenu = new MachineVSMachine();
-                        //mvsmMenu.setVisible(true);
+                        // mvsmMenu.setVisible(true);
                     }
                 });
             }
@@ -671,7 +698,7 @@ public class GardenMenu extends JFrame {
             playerOneSunsLabel.setForeground(Color.ORANGE);
             playerOneSunsLabel.setBounds(30, 60, 300, 30); // Ajustar posición y tamaño
             panel.add(playerOneSunsLabel);
-    
+
             if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
                 Player playerTwo = poobvszombies.getPlayerTwo();
 
@@ -692,7 +719,7 @@ public class GardenMenu extends JFrame {
 
             if ("PlayerVsMachine".equals(modality)) {
                 Player playerTwo = poobvszombies.getPlayerTwo();
-    
+
                 // Etiqueta para el nombre del Jugador 2
                 playerTwoNameLabel = new JLabel("" + playerTwo.getName());
                 playerTwoNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -835,27 +862,27 @@ public class GardenMenu extends JFrame {
     }
 
     // private void startZombieMovement() {
-    //     Timer timer = new Timer(100, e -> {
-    //         Iterator<JLabel> iterator = movingZombies.iterator();
-    //         while (iterator.hasNext()) {
-    //             JLabel zombie = iterator.next();
-    //             Point location = zombie.getLocation();
-    //             if (location.x > 0) {
-    //                 // Move zombie to the left
-    //                 zombie.setLocation(location.x - 5, location.y);
-    //             } else {
-    //                 // Remove zombie safely
-    //                 Container parent = zombie.getParent();
-    //                 if (parent != null) {
-    //                     parent.remove(zombie);
-    //                     parent.revalidate();
-    //                     parent.repaint();
-    //                 }
-    //                 iterator.remove();
-    //             }
-    //         }
-    //     });
-    //     timer.start();
+    // Timer timer = new Timer(100, e -> {
+    // Iterator<JLabel> iterator = movingZombies.iterator();
+    // while (iterator.hasNext()) {
+    // JLabel zombie = iterator.next();
+    // Point location = zombie.getLocation();
+    // if (location.x > 0) {
+    // // Move zombie to the left
+    // zombie.setLocation(location.x - 5, location.y);
+    // } else {+
+    // // Remove zombie safely
+    // Container parent = zombie.getParent();
+    // if (parent != null) {
+    // parent.remove(zombie);
+    // parent.revalidate();
+    // parent.repaint();
+    // }
+    // iterator.remove();
+    // }
+    // }
+    // });
+    // timer.start();
     // }
 
     // Clase interna para representar cada temporizador
@@ -959,7 +986,8 @@ public class GardenMenu extends JFrame {
 
         } else if ("PlayerVsMachine".equals(modality) || "MachineVsMachine".equals(modality)) {
             int matchTimeInSeconds = (int) poobvsZombies.getMatchTime();
-            int hordersNumber = poobvsZombies.getHordersNumber();
+            //int hordersNumber = poobvsZombies.getHordersNumber();
+            int hordersNumber = 0;
 
             // Primero, 20 segundos para colocar plantas
             timerTasks.add(new TimerTask("Planting time", 20));
@@ -1141,6 +1169,14 @@ public class GardenMenu extends JFrame {
                 return null;
         }
     }
+    
+    public void removePlantAt(int row, int col) {
+        JPanel cell = gridCells[row][col];
+        cell.removeAll();
+        cell.revalidate();
+        cell.repaint();
+    }
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -1173,3 +1209,4 @@ public class GardenMenu extends JFrame {
         });
     }
 }
+

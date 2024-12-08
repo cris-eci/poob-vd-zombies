@@ -177,5 +177,20 @@ public class POOBvsZombies {
         }
         return -1;
     }
+
+    public Plant getPlantAt(int row, int col) {
+        if (row<0||row>=5||col<0||col>=9) return null; // En la ultima col no hay plantas
+        Object obj = entities.get(row).get(col);
+        if (obj instanceof Plant) {
+            return (Plant)obj;
+        }
+        return null;
+    }
+    
+    public void removeEntity(int row, int col) {
+        if (row<0||row>=5||col<0||col>=10) return;
+        entities.get(row).set(col,null);
+    }
+
     
 }
