@@ -1,6 +1,8 @@
 package domain;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.Timer;
 
@@ -10,12 +12,18 @@ public class POOBvsZombies {
     private float roundTime;
     private float matchTime;
     private ArrayList<Player> players;
-    private ArrayList<ArrayList<Entity>> entities;
+        // Ahora `entities` será:
+    // - Para col 0-8: ArrayList<Entity>
+    // - Para col 9: ArrayList<Queue<Zombie>>
+    // Mantenemos la lógica previa, pero ajustamos
+    private ArrayList<ArrayList<Object>> entities; 
+    // En col<9 guardaremos Entity o null.
+    // En col==9 guardaremos Queue<Zombie>.
 
     // player vs player
     public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
         this.players = new ArrayList<Player>();
-        this.entities = new ArrayList<ArrayList<Entity>>();
+        this.entities = new ArrayList<ArrayList<Object>>();
 
         this.players.add(new ZombiesStrategic(namePlayerOne, sunAmount, plants));
         this.players.add(new PlantsStrategic(namePlayerTwo, brainAmount, zombies));
@@ -31,37 +39,37 @@ public class POOBvsZombies {
 
     // player vs machine
     public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
-        this.players = new ArrayList<Player>();
-        this.entities = new ArrayList<ArrayList<Entity>>();
+        // this.players = new ArrayList<Player>();
+        // this.entities = new ArrayList<ArrayList<Entity>>();
 
-        this.players.add(new PlantsStrategic(namePlayerOne, 50, plants));
-        this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds));
+        // this.players.add(new PlantsStrategic(namePlayerOne, 50, plants));
+        // this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds));
 
-        this.modality = "PlayerVsMachine";
-        this.winner = "";
+        // this.modality = "PlayerVsMachine";
+        // this.winner = "";
 
-        this.matchTime = setMatchTime(matchTimeInSeconds);
-        this.roundTime = this.matchTime / 2;
-        setUpEntities();
+        // this.matchTime = setMatchTime(matchTimeInSeconds);
+        // this.roundTime = this.matchTime / 2;
+        // setUpEntities();
 
     }
 
     
     
     public POOBvsZombies(float matchTimeInSeconds, int hordersNumber, int suns, int brains) {
-        this.players = new ArrayList<Player>();
-        this.entities = new ArrayList<ArrayList<Entity>>();
+        // this.players = new ArrayList<Player>();
+        // this.entities = new ArrayList<ArrayList<Entity>>();
 
-        this.players.add(new PlantsIntelligent(suns));
-        this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds, MachinePlayer.ORIGINAL_ZOMBIES,brains));
+        // this.players.add(new PlantsIntelligent(suns));
+        // this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds, MachinePlayer.ORIGINAL_ZOMBIES,brains));
 
-        this.modality = "MachineVsMachine";
-        this.winner = "";
+        // this.modality = "MachineVsMachine";
+        // this.winner = "";
 
-        this.entities = new ArrayList<ArrayList<Entity>>();
-        this.matchTime = setMatchTime(matchTimeInSeconds);
-        this.roundTime = this.matchTime / 2;
-        setUpEntities();
+        // this.entities = new ArrayList<ArrayList<Entity>>();
+        // this.matchTime = setMatchTime(matchTimeInSeconds);
+        // this.roundTime = this.matchTime / 2;
+        // setUpEntities();
     }
     
     public int calculateProgress(){
