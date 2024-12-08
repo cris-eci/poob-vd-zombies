@@ -164,12 +164,12 @@ public class POOBvsZombies {
     }
 
     /**
-     * Encuentra la primera planta en la fila dada.
-     * Recorre de col=0 a col=8, si encuentra una planta retorna esa col.
+     * Encuentra la planta más cercana hacia la última columna en la fila dada.
+     * Recorre de col=8 a col=0, si encuentra una planta retorna esa col.
      * Si no encuentra, retorna -1
      */
     public int getFirstPlantInRow(int row) {
-        for (int col = 0; col<9; col++) {
+        for (int col = 8; col >= 0; col--) {
             Object obj = entities.get(row).get(col);
             if (obj instanceof Plant) {
                 return col;
@@ -177,4 +177,5 @@ public class POOBvsZombies {
         }
         return -1;
     }
+    
 }
