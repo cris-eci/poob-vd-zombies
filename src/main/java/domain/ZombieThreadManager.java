@@ -16,7 +16,7 @@ public class ZombieThreadManager {
     }
 
     public void registerZombie(int row, Zombie zombie, JLabel zombieLabel) {
-        Thread t = new Thread(()-> zombieLogic(row, zombie, zombieLabel));
+        Thread t = new Thread(() -> zombieLogic(row, zombie, zombieLabel));
         t.start();
     }
 
@@ -25,7 +25,12 @@ public class ZombieThreadManager {
             // Buscar la planta más cercana
             int plantCol = game.getFirstPlantInRow(row);
             if (plantCol == -1) {
-                // No hay más plantas, el zombi se queda quieto.
+                // No hay más plantas, mover hasta el final (col=0) si no está ya allí
+                int currentCol = getCurrentColumn(zombieLabel.getX());
+                if (currentCol > 0) {
+                    moveZombie(row, 0, zombieLabel);
+                }
+                // Ya está al final, detener el hilo
                 break;
             }
 
@@ -34,16 +39,24 @@ public class ZombieThreadManager {
 
             // Ahora el zombi está adyacente a la planta. Atacar.
             attackPlant(row, plantCol, zombie, zombieLabel);
-            // Si la planta murió, se remueve y el loop continua para buscar la siguiente.
+            // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
         }
+    }
+
+    /**
+     * Calcula la columna actual del zombie basándose en su posición X.
+     */
+    private int getCurrentColumn(int xPosition) {
+        int cellWidth = 80;
+        int gridStartX = 40;
+        return Math.max(0, (xPosition - gridStartX) / cellWidth);
     }
 
     private void moveZombie(int row, int targetCol, JLabel zombieLabel) {
         int cellWidth = 80;
-        int cellHeight = 100;
-        int startX = zombieLabel.getX(); // Tomamos la posición actual
+        int startX = zombieLabel.getX(); // Posición actual X
         int startY = zombieLabel.getY();
-        int endX = 40 + targetCol*cellWidth;
+        int endX = 40 + targetCol * cellWidth;
 
         int currentX = startX;
         int currentY = startY;
@@ -56,6 +69,7 @@ public class ZombieThreadManager {
                 zombieLabel.setLocation(finalX, finalY);
             });
             try {
+                // Espera de 150ms para controlar la velocidad de movimiento
                 Thread.sleep(150);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
