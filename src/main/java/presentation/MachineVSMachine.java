@@ -15,7 +15,7 @@ public class MachineVSMachine extends JFrame {
 
     // GUI Components
     private JTextField timeField, quantityField, setSunsField, setBrainsField;
-    private JLabel sunsValueLabel, brainsValueLabel;
+    //private JLabel sunsValueLabel, brainsValueLabel;
     private JButton startButton;
     private List<PlantPanel> plantPanelsList;
     private List<ZombiePanel> zombiePanelsList;
