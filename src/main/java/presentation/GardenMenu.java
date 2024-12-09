@@ -46,6 +46,7 @@ import domain.ECIPlant;
 import domain.ECIZombie;
 import domain.Entity;
 import domain.POOBvsZombies;
+import domain.POOBvsZombiesException;
 import domain.Peashooter;
 import domain.Plant;
 import domain.Plants;
@@ -642,26 +643,23 @@ public class GardenMenu extends JFrame {
             inputPanel.add(Box.createHorizontalStrut(15)); // Space between fields
             inputPanel.add(new JLabel("Column (1-9):"));
             inputPanel.add(colField);
-
+    
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant",
                     JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     int row = Integer.parseInt(rowField.getText());
                     int col = Integer.parseInt(colField.getText());
-
+    
                     // Validate limits and conditions
                     if (row < 0 || row > 4 || col < 1 || col > 9) {
-                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
+                        throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_COORDINATES);
                     } else if (col == 0) {
-                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                        throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_LAWNMOWER);
                     } else {
                         JPanel targetPanel = gridCells[row][col];
                         if (targetPanel.getComponentCount() == 0) {
-                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error",
-                                    JOptionPane.ERROR_MESSAGE);
+                            throw new POOBvsZombiesException(POOBvsZombiesException.NO_PLANT_TO_REMOVE);
                         } else {
                             // Remove the plant
                             // Obtener la entidad de dominio
@@ -674,7 +672,7 @@ public class GardenMenu extends JFrame {
                                     entityTimers.remove(entity);
                                 }
                             }
-
+    
                             // Remover la planta visualmente
                             targetPanel.removeAll();
                             targetPanel.revalidate();
@@ -683,14 +681,20 @@ public class GardenMenu extends JFrame {
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    try {
+                        throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+                    } catch (POOBvsZombiesException exc) {
+                        JOptionPane.showMessageDialog(this, exc.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (POOBvsZombiesException exc) {
+                    JOptionPane.showMessageDialog(this, exc.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-
+    
         panel.add(useShovelButton);
     }
+    
 
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
@@ -742,7 +746,7 @@ public class GardenMenu extends JFrame {
                         pvpMenu.setVisible(true);
                     } else {
                         MachineVSMachine mvsmMenu = new MachineVSMachine();
-                        //mvsmMenu.setVisible(true);
+                        mvsmMenu.setVisible(true);
                     }
                 });
             }
@@ -1122,11 +1126,14 @@ public class GardenMenu extends JFrame {
 
             // Validar que el tiempo total sea al menos 20 segundos y haya al menos una
             // horda
-            if (matchTimeInSeconds < 20 || hordersNumber <= 0) {
-                JOptionPane.showMessageDialog(this,
-                        "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.",
-                        "Error de Configuración", JOptionPane.ERROR_MESSAGE);
-                System.exit(1);
+            if (matchTimeInSeconds < 1 || hordersNumber <= 0) {
+                try {
+                    throw new POOBvsZombiesException(POOBvsZombiesException.TIME_LIMIT);
+                } catch (POOBvsZombiesException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
             }
 
             // Calcular el tiempo restante después de la fase de plantación

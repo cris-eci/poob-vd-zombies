@@ -16,8 +16,6 @@ import java.util.List;
 
 import java.util.Arrays;
 
-import domain.Zombies;
-
 public class PlayerVsPlayer extends JFrame {
 
     // Domain Layer
@@ -108,21 +106,23 @@ public class PlayerVsPlayer extends JFrame {
         addTextFieldListeners(setBrainsField);
     }
 
-    // Action Methods
     private void actionStart() {
         try {
-            // Collect Values
+            // Recoger valores de los campos
             String namePlayerOne = playerOneName.getText();
             String namePlayerTwo = playerTwoName.getText();
             int matchTimer = Integer.parseInt(matchTime.getText());
             int sunAmount = Integer.parseInt(setSunsField.getText());
             int brainAmount = Integer.parseInt(setBrainsField.getText());
 
-            // Selected Plants and Zombies
+            if(matchTimer < 0 || sunAmount < 0 || brainAmount < 0){
+                throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+            }
+            // Plantas y zombis seleccionados
             ArrayList<String> selectedPlants = getSelectedItems(plantPanelsList);
             ArrayList<String> selectedZombies = getSelectedItems(zombiePanelsList);
 
-            // Create POOBvsZombies Instance
+            // Crear instancia de POOBvsZombies
             poobvsZombies = new POOBvsZombies(
                     matchTimer,
                     namePlayerOne,
@@ -132,25 +132,22 @@ public class PlayerVsPlayer extends JFrame {
                     brainAmount,
                     selectedZombies);
 
-            // Proceed to the next step (e.g., open GardenMenu)
-            // For example:
+            // Continuar con el siguiente paso (ejemplo: abrir GardenMenu)
             new GardenMenu(poobvsZombies).setVisible(true);
             dispose();
 
-            // Display Success Message
-            // JOptionPane.showMessageDialog(this,
-            //         "Game initialized successfully!" + " " + namePlayerOne + " " + namePlayerTwo + " " + matchTimer
-            //                 + " " + sunAmount + " " + brainAmount + " " + selectedPlants + " " + selectedZombies,
-            //         "Success", JOptionPane.INFORMATION_MESSAGE);
-
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error",
-                    JOptionPane.WARNING_MESSAGE);
+            // Lanza una excepción personalizada en vez de NumberFormatException
+            try {
+                throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+            } catch (POOBvsZombiesException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     // Helper Methods
     private JTextField createTextField(String placeholder, int x, int y, int width, int height) {

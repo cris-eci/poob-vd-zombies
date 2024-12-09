@@ -96,6 +96,9 @@ public class PlayerVSMachine extends JFrame {
             int matchTime = Integer.parseInt(matchTimeField.getText());
             int hordeNumber = Integer.parseInt(hordeNumberField.getText());
 
+            if (matchTime < 1 || hordeNumber < 1) {
+                throw new POOBvsZombiesException(POOBvsZombiesException.TIME_LIMIT);
+            }
             // Selected Plants
             ArrayList<String> selectedPlants = getSelectedItems(plantPanelsList);
 
@@ -116,8 +119,12 @@ public class PlayerVSMachine extends JFrame {
             dispose();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error",
-                    JOptionPane.WARNING_MESSAGE);
+            try{
+                throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+            }
+            catch (POOBvsZombiesException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
