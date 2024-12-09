@@ -93,7 +93,7 @@ public class POOBvsZombies {
             case "WallNut": return new WallNut();
             case "PotatoMine": return new PotatoMine();
             case "ECIPlant": return new ECIPlant();
-            case "LownMover": return new Lownmover();
+            case "Lawnmower": return new Lawnmower();
             default:
                 throw new IllegalArgumentException("Invalid entity type: " + entityType);
         }
@@ -159,7 +159,7 @@ public class POOBvsZombies {
         if (entity instanceof WallNut) return "WallNut";
         if (entity instanceof PotatoMine) return "PotatoMine";
         if (entity instanceof ECIPlant) return "ECIPlant";
-        if (entity instanceof Lownmover) return "LownMover";
+        if (entity instanceof Lawnmower) return "Lawnmower";
         return null;
     }
 
