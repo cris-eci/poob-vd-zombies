@@ -317,7 +317,7 @@ public class GardenMenu extends JFrame {
                     JLabel mowerLabel = new JLabel(new ImageIcon(scaledMowerImage));
                     cellPanel.add(mowerLabel, BorderLayout.CENTER);
 
-                    poobvszombies.addEntity(finalRow, finalCol, "LownMover");
+                    poobvszombies.addEntity(finalRow, finalCol, "Lawnmower");
                 } else if (col >= 1 && col <= 8) {
                     // Allow dragging and dropping plants only in columns 1 to 8
                     cellPanel.setTransferHandler(new TransferHandler("icon") {
@@ -389,7 +389,7 @@ public class GardenMenu extends JFrame {
 
                                 // Añadir a dominio
                                 poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                // showEntityMatrix();
+                                 //showEntityMatrix();
 
                                 Image image = entityData.getImage();
 
@@ -1175,6 +1175,39 @@ public class GardenMenu extends JFrame {
         cell.removeAll();
         cell.revalidate();
         cell.repaint();
+    }
+
+
+    // public void removeZombiesFromRow(int row) {
+    //     List<JLabel> zombiesToRemove = new ArrayList<>();
+    //     for (JLabel zombieLabel : movingZombies) {
+    //         int zombieRow = getZombieRow(zombieLabel);
+    //         if (zombieRow == row) {
+    //             zombiesToRemove.add(zombieLabel);
+    //         }
+    //     }
+    //     for (JLabel zombieLabel : zombiesToRemove) {
+    //         panel.remove(zombieLabel);
+    //         movingZombies.remove(zombieLabel);
+    //     }
+    //     panel.revalidate();
+    //     panel.repaint();
+    //     zombieThreadManager.removeZombiesFromRow(row);
+    //     for (int col = 0; col < 10; col++) {
+    //         String entity = poobvszombies.getEntity(row, col);
+    //         if (entity != null && entity.startsWith("Zombie")) {
+    //             poobvszombies.deleteEntity(row, col);
+    //         }
+    //     }
+    // }
+
+    private int getZombieRow(JLabel zombieLabel) {
+        Point location = zombieLabel.getLocation();
+        int gridStartY = 80;
+        int cellHeight = (500 + 20) / 5;
+        int relativeY = location.y - gridStartY;
+        int row = relativeY / cellHeight;
+        return row;
     }
     
 

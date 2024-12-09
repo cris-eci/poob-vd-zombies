@@ -1,5 +1,11 @@
 package domain;
 
+import java.awt.Container;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
@@ -10,6 +16,39 @@ public class ZombieThreadManager {
     private POOBvsZombies game;
     private GardenMenu garden;
 
+    // Almacenamos los hilos segun su columna
+    private Map<Integer, List<Thread>> zombieThreadsByRow = new HashMap<>();
+    // Almacenamos los JLabels de los zombies para poder moverlos o quitarlos
+    private Map<Thread, JLabel> threadToLabelMap = new HashMap<>();
+
+    public void terminateZombiesInRow(int row) {
+        List<Thread> threads;
+        synchronized (zombieThreadsByRow) {
+            threads = zombieThreadsByRow.remove(row);
+        }
+        if (threads != null) {
+            for (Thread thread : threads) {
+                
+                thread.interrupt();
+                JLabel zombieLabel = threadToLabelMap.remove(thread);
+                // Eliminar el zombieLabel de la interfaz gráfica
+                if (zombieLabel != null) {
+                    SwingUtilities.invokeLater(() -> {
+                        Container parent = zombieLabel.getParent();
+                        if (parent != null) {
+                            parent.remove(zombieLabel);
+                            parent.revalidate();
+                            parent.repaint();
+                        }
+                    });
+                }                
+            }
+        }
+        SwingUtilities.invokeLater(() -> {
+            //garden.removeZombiesInRow(row);
+        });
+    }
+
     public ZombieThreadManager(POOBvsZombies game, GardenMenu garden) {
         this.game = game;
         this.garden = garden;
@@ -17,6 +56,14 @@ public class ZombieThreadManager {
 
     public void registerZombie(int row, Zombie zombie, JLabel zombieLabel) {
         Thread t = new Thread(() -> zombieLogic(row, zombie, zombieLabel));
+        // almacenamos el hilo recien creado.
+        synchronized (zombieThreadsByRow) {
+        zombieThreadsByRow.computeIfAbsent(row, k -> new ArrayList<>()).add(t);
+    }
+    // almacenamos el JLabel del zombie para poder moverlo o quitarlo
+    synchronized (threadToLabelMap) {
+        threadToLabelMap.put(t, zombieLabel);
+    }
         t.start();
     }
 
@@ -32,7 +79,22 @@ public class ZombieThreadManager {
                 if (currentCol > 0) {
                     moveZombie(row, 0, zombieLabel);
                 }
+
+                if (game.getLawnmowerInRow(row)) {
+                    game.removeZombiesInRow(row);
+                    terminateZombiesInRow(row);
+                    // Eliminar el zombieLabel de la interfaz gráfica
+                    SwingUtilities.invokeLater(() -> {
+                        Container parent = zombieLabel.getParent();
+                        if (parent != null) {
+                            parent.remove(zombieLabel);
+                            parent.revalidate();
+                            parent.repaint();
+                        }
+                    });
+                }
                 // Ya está al final, detener el hilo
+
                 break;
             }
 
@@ -120,4 +182,6 @@ public class ZombieThreadManager {
             }
         }
     }
+
+
 }

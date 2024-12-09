@@ -192,5 +192,27 @@ public class POOBvsZombies {
         entities.get(row).set(col,null);
     }
 
-    
+    public boolean getLawnmowerInRow(int row) {
+        if (row < 0 || row >= entities.size()) {
+            throw new IndexOutOfBoundsException("Invalid row index: " + row);
+        }
+        Object obj = entities.get(row).get(0);
+        if (obj instanceof Lawnmower) {
+            entities.get(row).set(0, null);
+            return true;
+        }
+        return false;
+    }
+
+    public void removeZombiesInRow(int row) {
+        if (row < 0 || row >= 5) {
+            throw new IndexOutOfBoundsException("Invalid row index: " + row);
+        }
+        Queue<Zombie> queue = getZombieQueue(row, 9);
+        while (!queue.isEmpty()) {
+            queue.poll();
+        }
+
+        
+    }
 }
