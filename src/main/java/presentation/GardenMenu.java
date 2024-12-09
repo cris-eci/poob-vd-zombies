@@ -132,6 +132,9 @@ public class GardenMenu extends JFrame {
     // Etiquetas para mostrar el mensaje y el tiempo
     private JLabel messageLabel;
     private JLabel timeLabel;
+    // Añade este mapa en la declaración de variables de la clase GardenMenu
+    private Map<Entity, Timer> imageChangeTimers = new HashMap<>();
+
 
     public GardenMenu(POOBvsZombies poobvszombies) {
         setTitle("Garden Menu");
@@ -425,6 +428,50 @@ public class GardenMenu extends JFrame {
                                     entityTimers.put(plant, plantTimer);
                                     plantTimer.start();
                                 }
+                                if (plant instanceof PotatoMine) {
+                                    Timer imageChangeTimer = new Timer(14000, new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            System.out.println("Timer disparado para cambiar la imagen de PotatoMine.");
+                                            
+                                            // Crear el ImageIcon directamente con el GIF animado
+                                            ImageIcon newIcon = new ImageIcon("resources/images/plants/PotatoMine/potato-mineAnimated.gif");
+                                            
+                                            // Verificar que la imagen se haya cargado correctamente
+                                            if (newIcon.getIconWidth() == -1) {
+                                                System.err.println("No se pudo cargar la imagen: resources/images/plants/PotatoMine/potato-mineAnimated.gif");
+                                                return;
+                                            } else {
+                                                System.out.println("Imagen potato-mineAnimated.gif cargada correctamente.");
+                                            }
+                                
+                                            // Asignar el ImageIcon directamente sin escalar
+                                            label.setIcon(newIcon);
+                                            
+                                            // Ajustar el tamaño del JLabel si es necesario
+                                            label.setPreferredSize(new Dimension(newIcon.getIconWidth()-10, newIcon.getIconHeight()-10));
+                                            label.revalidate();
+                                            label.repaint();
+                                            System.out.println("Icono del JLabel actualizado con el GIF animado.");
+                                
+                                            // Traer el JLabel al frente
+                                            targetPanel.setComponentZOrder(label, 0);
+                                            targetPanel.revalidate();
+                                            targetPanel.repaint();
+                                            System.out.println("JLabel traído al frente.");
+                                
+                                            // Detener el Timer ya que es una acción única
+                                            ((Timer) e.getSource()).stop();
+                                            System.out.println("Timer de cambio de imagen detenido.");
+                                        }
+                                    });
+                                    imageChangeTimer.setRepeats(false); // Ejecutar solo una vez
+                                    imageChangeTimer.start();
+                                    imageChangeTimers.put(plant, imageChangeTimer);
+                                    System.out.println("Timer de cambio de imagen iniciado para PotatoMine.");
+                                }
+                                
+                                
                                 return true;
                             } catch (Exception ex) {
                                 ex.printStackTrace();
@@ -433,20 +480,31 @@ public class GardenMenu extends JFrame {
                         }
                     });
 
-                   // Dentro del MouseListener para usar la pala
+                   // Dentro del MouseListener para usar la pala en la clase GardenMenu
                     cellPanel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             if (shovelSelected) {
                                 if (cellPanel.getComponentCount() > 0) {
                                     // Obtener la entidad de dominio
-                                    Entity entity = poobvszombies.getEntitiesMatrix().get(finalRow).get(finalCol);
+                                    Entity entity = poobvszombies.getEntitiesMatrix().get(finalRow).get(finalCol);  
                                     if (entity != null) {
-                                        // Detener y remover el Timer asociado
-                                        Timer timer = entityTimers.get(entity);
-                                        if (timer != null) {
-                                            timer.stop();
+                                        // Detener y remover el Timer asociado (generación de recursos)
+                                        Timer resourceTimer = entityTimers.get(entity);
+                                        if (resourceTimer != null) {
+                                            resourceTimer.stop();
                                             entityTimers.remove(entity);
+                                            System.out.println("Timer de recursos detenido y removido para la entidad: " + entity.getName());
+                                        }
+
+                                        // Detener y remover el Timer de cambio de imagen si es PotatoMine
+                                        if (entity instanceof PotatoMine) {
+                                            Timer imageChangeTimer = imageChangeTimers.get(entity);
+                                            if (imageChangeTimer != null) {
+                                                imageChangeTimer.stop();
+                                                imageChangeTimers.remove(entity);
+                                                System.out.println("Timer de cambio de imagen detenido y removido para PotatoMine.");
+                                            }
                                         }
                                     }
 
@@ -457,6 +515,7 @@ public class GardenMenu extends JFrame {
                                     poobvszombies.deleteEntity(finalRow, finalCol); // Implementa este método en POOBvsZombies
                                     shovelSelected = false;
                                     setCursor(Cursor.getDefaultCursor()); // Restablecer el cursor
+                                    System.out.println("Planta eliminada en la celda (" + finalRow + ", " + finalCol + ").");
                                 } else {
                                     JOptionPane.showMessageDialog(null, "No hay planta en esta celda.");
                                 }
