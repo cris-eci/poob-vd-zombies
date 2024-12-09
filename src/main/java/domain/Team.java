@@ -19,7 +19,6 @@ public abstract class Team {
         this.resourceCounter = resourceCounter;
         this.characters = characters;
     }
-
     public abstract void increaseResourceAmount();
 
     public int getResourceCounterAmount(){
