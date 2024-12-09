@@ -22,6 +22,8 @@ public class ZombieThreadManager {
 
     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
         while (true) {
+            if (!(zombie instanceof Brainstein)){
+                
             // Buscar la planta más cercana
             int plantCol = game.getFirstPlantInRow(row);
             if (plantCol == -1) {
@@ -40,6 +42,17 @@ public class ZombieThreadManager {
             // Ahora el zombi está adyacente a la planta. Atacar.
             attackPlant(row, plantCol, zombie, zombieLabel);
             // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
+            } else {
+                // Brainstein no ataca, solo genera recursos
+                ((Brainstein) zombie).generateResource(row);
+                // Esperar 2 segundos antes de generar otro recurso
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }   
         }
     }
 
