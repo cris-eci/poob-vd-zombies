@@ -44,9 +44,6 @@ public class ZombieThreadManager {
                 }                
             }
         }
-        SwingUtilities.invokeLater(() -> {
-            //garden.removeZombiesInRow(row);
-        });
     }
 
     public ZombieThreadManager(POOBvsZombies game, GardenMenu garden) {
@@ -83,15 +80,7 @@ public class ZombieThreadManager {
                 if (game.getLawnmowerInRow(row)) {
                     game.removeZombiesInRow(row);
                     terminateZombiesInRow(row);
-                    // Eliminar el zombieLabel de la interfaz gráfica
-                    SwingUtilities.invokeLater(() -> {
-                        Container parent = zombieLabel.getParent();
-                        if (parent != null) {
-                            parent.remove(zombieLabel);
-                            parent.revalidate();
-                            parent.repaint();
-                        }
-                    });
+                    garden.deleteLawnmover(row);
                 }
                 // Ya está al final, detener el hilo
 
