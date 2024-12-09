@@ -127,6 +127,9 @@ public class GardenMenu extends JFrame {
     private JLabel messageLabel;
     private JLabel timeLabel;
 
+    // Arreglo estatico de lawnmovers para poder acceder a ellos desde cualquier parte
+    private JLabel[] lawnmowersArrayJLabels = new JLabel[5];
+
     public GardenMenu(POOBvsZombies poobvszombies) {
         setTitle("Garden Menu");
         setSize(900, 700);
@@ -290,6 +293,22 @@ public class GardenMenu extends JFrame {
         panel.add(shovelLabel);
     }
 
+    // Method to delete a lawnmower from the interface and the domain, it is gonna be used in ZombieThreadManager
+    public void deleteLawnmover(int row) {
+        if (row >= 0 && row < lawnmowersArrayJLabels.length) {
+            JLabel lawnmowerLabel = lawnmowersArrayJLabels[row];
+            if (lawnmowerLabel != null) {
+                JPanel parentPanel = (JPanel) lawnmowerLabel.getParent();
+                if (parentPanel != null) {
+                    parentPanel.remove(lawnmowerLabel);
+                    parentPanel.revalidate();
+                    parentPanel.repaint();
+                }
+                poobvszombies.deleteEntity(row, 0);
+                lawnmowersArrayJLabels[row] = null;
+            }
+        }
+    }
     private void addGridLayout(JPanel panel) {
         // Create a panel with a 5x10 GridLayout
         JPanel gridPanel = new JPanel(new GridLayout(5, 10, 5, 5)); // 5 rows, 10 columns, 5px spacing
@@ -316,6 +335,10 @@ public class GardenMenu extends JFrame {
                     Image scaledMowerImage = mowerIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
                     JLabel mowerLabel = new JLabel(new ImageIcon(scaledMowerImage));
                     cellPanel.add(mowerLabel, BorderLayout.CENTER);
+
+                    // Add the lawnmower to the array
+                    lawnmowersArrayJLabels[row] = mowerLabel;
+
 
                     poobvszombies.addEntity(finalRow, finalCol, "Lawnmower");
                 } else if (col >= 1 && col <= 8) {
