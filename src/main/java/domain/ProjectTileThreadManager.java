@@ -1,20 +1,13 @@
 
 package domain;
 
-import java.awt.Container;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import domain.POOBvsZombies;
-import domain.Peashooter;
-import domain.Zombie;
 import presentation.GardenMenu;
 
 public class ProjectTileThreadManager {
@@ -145,6 +138,7 @@ public class ProjectTileThreadManager {
             public void actionPerformed(ActionEvent e) {
                 if (currentX[0] < targetXpos) {
                     currentX[0] += step;
+                    System.out.println(currentX[0] + "," +targetXpos);
                     //projectTileLabel.setLocation(currentX[0], projectTileLabel.getY());
                 } else {
                     timer.stop();
