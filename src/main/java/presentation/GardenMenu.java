@@ -418,21 +418,22 @@ public class GardenMenu extends JFrame {
                                 // poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
 
                                 // Añadir a dominio
-                                poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                 //showEntityMatrix();
-                                if (entityData.getName().equals("Peashooter")){
-                                    ProjectTile uselessProjectTile = new ProjectTile();
-                                //projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile);
-                                }
-
+                                
                                 Image image = entityData.getImage();
-
+                                
                                 JLabel label = new JLabel(new ImageIcon(image));
                                 label.setHorizontalAlignment(JLabel.CENTER);
                                 JPanel targetPanel = (JPanel) support.getComponent();
                                 targetPanel.add(label);
                                 targetPanel.revalidate();
                                 targetPanel.repaint();
+                                
+                                poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
+                                 //showEntityMatrix();
+                                if (entityData.getName().equals("Peashooter")){
+                                    ProjectTile uselessProjectTile = new ProjectTile();
+                                projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile, targetPanel.getX());
+                                }
 
                                 // NUEVO: Deducir recursos
                                 String plantName = entityData.getName();
