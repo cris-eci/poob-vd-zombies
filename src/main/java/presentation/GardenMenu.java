@@ -422,7 +422,7 @@ public class GardenMenu extends JFrame {
                                  //showEntityMatrix();
                                 if (entityData.getName().equals("Peashooter")){
                                     ProjectTile uselessProjectTile = new ProjectTile();
-                                projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile);
+                                //projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile);
                                 }
 
                                 Image image = entityData.getImage();

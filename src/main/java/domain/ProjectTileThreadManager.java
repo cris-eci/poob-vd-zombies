@@ -1,5 +1,6 @@
 
 package domain;
+
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -79,18 +80,9 @@ public class ProjectTileThreadManager {
                 // Verificar si el zombie murió
                 if (targetZombie.health <= 0) {
                     // zombie muerto, salir del while interno para buscar otro zombie
-                    //zombieThreadManager.deleteZombie(targetZombieThread, targetZombieLabel, targetZombie, row);
-                    if (targetZombieLabel != null) {
-                        targetZombieThread.interrupt();
-                            SwingUtilities.invokeLater(() -> {
-                                Container parent = targetZombieLabel.getParent();
-                                if (parent != null) {
-                                    parent.remove(targetZombieLabel);
-                                    parent.revalidate();
-                                    parent.repaint();
-                                }
-                            });
-                        }
+                    // zombieThreadManager.deleteZombie(targetZombieThread, targetZombieLabel,
+                    // targetZombie, row);
+                    zombieThreadManager.terminateZombie(targetZombieThread);
                     break;
                 }
 
@@ -117,7 +109,8 @@ public class ProjectTileThreadManager {
 
         // Calcular la posición inicial (X) del pea con respecto al row.
         // Aquí asumiendo que la peashooter está en (row, col)
-        // Debes ajustar 'calculateOriginXPos' para que coincida con donde está la Peashooter.
+        // Debes ajustar 'calculateOriginXPos' para que coincida con donde está la
+        // Peashooter.
         int originXPos = calculateOriginXPos(row);
         projectTileLabel.setLocation(originXPos, yPos);
         projectTileLabel.setSize(30, 30); // tamaño del proyectil
@@ -130,16 +123,16 @@ public class ProjectTileThreadManager {
     private int calculateOriginXPos(int row) {
         // Ajustar según tu diseño:
         int baseX = 120; // por ejemplo, la peashooter está en la columna 1 => x=120 px
-        int rowSpacing = 100; 
+        int rowSpacing = 100;
         // Si necesitas que sea fijo, simplifícalo:
         // return 120; // si todas las peashooter se ponen en columna 1
         return baseX;
     }
 
     private void moveProjectTile(int originxPos, int targetXpos, JLabel projectTileLabel) {
-        int delay = 50; 
-        final int step = 5; 
-        final int[] currentX = {originxPos};
+        int delay = 50;
+        final int step = 5;
+        final int[] currentX = { originxPos };
 
         Timer timer = new Timer(delay, null);
         timer.addActionListener(new ActionListener() {
@@ -150,7 +143,8 @@ public class ProjectTileThreadManager {
                     projectTileLabel.setLocation(currentX[0], projectTileLabel.getY());
                 } else {
                     timer.stop();
-                    // El proyectil llegó al zombie, no resetear aquí ya que se elimina tras el impacto
+                    // El proyectil llegó al zombie, no resetear aquí ya que se elimina tras el
+                    // impacto
                 }
             }
         });

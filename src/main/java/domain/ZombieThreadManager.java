@@ -48,8 +48,6 @@ public class ZombieThreadManager {
         }
     }
 
-
-
     public ZombieThreadManager(POOBvsZombies game, GardenMenu garden) {
         this.game = game;
         this.garden = garden;
@@ -65,7 +63,8 @@ public class ZombieThreadManager {
         synchronized (threadToLabelMap) {
             threadToLabelMap.put(t, zombieLabel);
         }
-        // almacenamos el zombie para poder acceder a sus atributos en su respectivo hilo
+        // almacenamos el zombie para poder acceder a sus atributos en su respectivo
+        // hilo
         synchronized (threadToZombieMap) {
             threadToZombieMap.put(t, zombie);
         }
@@ -73,46 +72,72 @@ public class ZombieThreadManager {
     }
 
     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
-        while (true) {
-            if (!(zombie instanceof Brainstein)) {
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (!(zombie instanceof Brainstein)) {
+                    // Buscar la planta más cercana
+                    int plantCol = game.getFirstPlantInRow(row);
+                    if (plantCol == -1) {
+                        // No hay más plantas, mover hasta el final (col=0) si no está ya allí
+                        int currentCol = getCurrentColumn(zombieLabel.getX());
+                        if (currentCol > 0) {
+                            moveZombie(row, 0, zombieLabel);
+                        }
+                        // Si es el primer zombi de la fila, activar la cortadora de césped y hacer que
+                        // se elimine la podadora.But it's me that I get to die with me. What you do?
+                        if (game.getLawnmowerInRow(row)) {
+                            game.removeZombiesInRow(row);
+                            terminateZombiesInRow(row);
+                            garden.deleteLawnmover(row);
+                        }
+                        // Ya está al final, detener el hilo
 
-                // Buscar la planta más cercana
-                int plantCol = game.getFirstPlantInRow(row);
-                if (plantCol == -1) {
-                    // No hay más plantas, mover hasta el final (col=0) si no está ya allí
-                    int currentCol = getCurrentColumn(zombieLabel.getX());
-                    if (currentCol > 0) {
-                        moveZombie(row, 0, zombieLabel);
+                        break;
                     }
-                    // Si es el primer zombi de la fila, activar la cortadora de césped y hacer que
-                    // se elimine la podadora.But it's me that I get to die with me. What you do?
-                    if (game.getLawnmowerInRow(row)) {
-                        game.removeZombiesInRow(row);
-                        terminateZombiesInRow(row);
-                        garden.deleteLawnmover(row);
+
+                    int targetCol = plantCol + 1;
+                    moveZombie(row, targetCol, zombieLabel);
+
+                    // Ahora el zombi está adyacente a la planta. Atacar.
+                    attackPlant(row, plantCol, zombie, zombieLabel);
+                    // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
+                } else {
+                    // Brainstein no ataca, solo genera recursos
+                    ((Brainstein) zombie).generateResource(row);
+                    // Esperar 2 segundos antes de generar otro recurso
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
                     }
-                    // Ya está al final, detener el hilo
-
-                    break;
-                }
-
-                int targetCol = plantCol + 1;
-                moveZombie(row, targetCol, zombieLabel);
-
-                // Ahora el zombi está adyacente a la planta. Atacar.
-                attackPlant(row, plantCol, zombie, zombieLabel);
-                // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
-            } else {
-                // Brainstein no ataca, solo genera recursos
-                ((Brainstein) zombie).generateResource(row);
-                // Esperar 2 segundos antes de generar otro recurso
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
                 }
             }
+        } finally {
+            // Cleanup for this zombie
+            synchronized (zombieThreadsByRow) {
+                List<Thread> threads = zombieThreadsByRow.get(row);
+                if (threads != null) {
+                    threads.remove(Thread.currentThread());
+                    if (threads.isEmpty()) {
+                        zombieThreadsByRow.remove(row);
+                    }
+                }
+            }
+            synchronized (threadToLabelMap) {
+                threadToLabelMap.remove(Thread.currentThread());
+            }
+            synchronized (threadToZombieMap) {
+                threadToZombieMap.remove(Thread.currentThread());
+            }
+            SwingUtilities.invokeLater(() -> {
+                Container parent = zombieLabel.getParent();
+                if (parent != null) {
+                    parent.remove(zombieLabel);
+                    parent.revalidate();
+                    parent.repaint();
+                }
+            });
         }
     }
 
@@ -201,7 +226,7 @@ public class ZombieThreadManager {
             zombieTarget.add(zombieLabel);
             zombieTarget.add(zombie);
 
-            // como puedo acceder al zombie en este array?
+         
         }
         return zombieTarget;
     }
@@ -217,6 +242,10 @@ public class ZombieThreadManager {
         } else {
             throw new IllegalArgumentException("Zombie thread not found or has no associated JLabel.");
         }
+    }
+
+    public void terminateZombie(Thread thread) {
+        thread.interrupt();
     }
 
 }
