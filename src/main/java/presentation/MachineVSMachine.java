@@ -111,10 +111,10 @@ public class MachineVSMachine extends JFrame {
             ArrayList<String> selectedZombies = getSelectedZombieNames();
 
             // Crear instancia de POOBvsZombies para MachineVsMachine
-            poobvsZombies = new POOBvsZombies(
-                    matchTime,
-                    hordeNumber,sunAmount,brainAmount
-            );
+            // poobvsZombies = new POOBvsZombies(
+            //         matchTime,
+            //         hordeNumber,sunAmount,brainAmount
+            // );
 
             // Agregar plantas y zombies seleccionados al POOBvsZombies
             poobvsZombies.getPlayerOne().getTeam().setCharacters(selectedPlants);
