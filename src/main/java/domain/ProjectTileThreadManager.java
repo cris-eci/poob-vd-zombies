@@ -49,6 +49,11 @@ public class ProjectTileThreadManager {
                 continue;
             }
 
+            // Si sigue vivo, esperar 3 segundos y volver a disparar
+            if (game.getEntity(row, yPos) == null) {
+                Thread.currentThread().interrupt();
+                return;
+            }
             Thread targetZombieThread = (Thread) firstZombie.get(0);
             JLabel targetZombieLabel = (JLabel) firstZombie.get(1);
             Zombie targetZombie = (Zombie) firstZombie.get(2);
@@ -87,7 +92,6 @@ public class ProjectTileThreadManager {
                     break;
                 }
 
-                // Si sigue vivo, esperar 3 segundos y volver a disparar
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
@@ -152,3 +156,4 @@ public class ProjectTileThreadManager {
         timer.start();
     }
 }
+
