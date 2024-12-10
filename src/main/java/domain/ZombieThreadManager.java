@@ -20,6 +20,8 @@ public class ZombieThreadManager {
     private Map<Integer, List<Thread>> zombieThreadsByRow = new HashMap<>();
     // Almacenamos los JLabels de los zombies para poder moverlos o quitarlos
     private Map<Thread, JLabel> threadToLabelMap = new HashMap<>();
+    // Almacenamos los zombies para poder acceder a ellos despues y a sus atributos
+    private Map<Thread, Zombie> threadToZombieMap = new HashMap<>();
 
     public void terminateZombiesInRow(int row) {
         List<Thread> threads;
@@ -28,7 +30,7 @@ public class ZombieThreadManager {
         }
         if (threads != null) {
             for (Thread thread : threads) {
-                
+
                 thread.interrupt();
                 JLabel zombieLabel = threadToLabelMap.remove(thread);
                 // Eliminar el zombieLabel de la interfaz gráfica
@@ -41,7 +43,7 @@ public class ZombieThreadManager {
                             parent.repaint();
                         }
                     });
-                }                
+                }
             }
         }
     }
@@ -55,44 +57,49 @@ public class ZombieThreadManager {
         Thread t = new Thread(() -> zombieLogic(row, zombie, zombieLabel));
         // almacenamos el hilo recien creado.
         synchronized (zombieThreadsByRow) {
-        zombieThreadsByRow.computeIfAbsent(row, k -> new ArrayList<>()).add(t);
-    }
-    // almacenamos el JLabel del zombie para poder moverlo o quitarlo
-    synchronized (threadToLabelMap) {
-        threadToLabelMap.put(t, zombieLabel);
-    }
+            zombieThreadsByRow.computeIfAbsent(row, k -> new ArrayList<>()).add(t);
+        }
+        // almacenamos el JLabel del zombie para poder moverlo o quitarlo
+        synchronized (threadToLabelMap) {
+            threadToLabelMap.put(t, zombieLabel);
+        }
+        // almacenamos el zombie para poder acceder a sus atributos en su respectivo hilo
+        synchronized (threadToZombieMap) {
+            threadToZombieMap.put(t, zombie);
+        }
         t.start();
     }
 
     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
         while (true) {
-            if (!(zombie instanceof Brainstein)){
-                
-            // Buscar la planta más cercana
-            int plantCol = game.getFirstPlantInRow(row);
-            if (plantCol == -1) {
-                // No hay más plantas, mover hasta el final (col=0) si no está ya allí
-                int currentCol = getCurrentColumn(zombieLabel.getX());
-                if (currentCol > 0) {
-                    moveZombie(row, 0, zombieLabel);
+            if (!(zombie instanceof Brainstein)) {
+
+                // Buscar la planta más cercana
+                int plantCol = game.getFirstPlantInRow(row);
+                if (plantCol == -1) {
+                    // No hay más plantas, mover hasta el final (col=0) si no está ya allí
+                    int currentCol = getCurrentColumn(zombieLabel.getX());
+                    if (currentCol > 0) {
+                        moveZombie(row, 0, zombieLabel);
+                    }
+                    // Si es el primer zombi de la fila, activar la cortadora de césped y hacer que
+                    // se elimine la podadora.But it's me that I get to die with me. What you do?
+                    if (game.getLawnmowerInRow(row)) {
+                        game.removeZombiesInRow(row);
+                        terminateZombiesInRow(row);
+                        garden.deleteLawnmover(row);
+                    }
+                    // Ya está al final, detener el hilo
+
+                    break;
                 }
-                // Si es el primer zombi de la fila, activar la cortadora de césped y hacer que se elimine la podadora.
-                if (game.getLawnmowerInRow(row)) {
-                    game.removeZombiesInRow(row);
-                    terminateZombiesInRow(row);
-                    garden.deleteLawnmover(row);
-                }
-                // Ya está al final, detener el hilo
 
-                break;
-            }
+                int targetCol = plantCol + 1;
+                moveZombie(row, targetCol, zombieLabel);
 
-            int targetCol = plantCol + 1; 
-            moveZombie(row, targetCol, zombieLabel);
-
-            // Ahora el zombi está adyacente a la planta. Atacar.
-            attackPlant(row, plantCol, zombie, zombieLabel);
-            // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
+                // Ahora el zombi está adyacente a la planta. Atacar.
+                attackPlant(row, plantCol, zombie, zombieLabel);
+                // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
             } else {
                 // Brainstein no ataca, solo genera recursos
                 ((Brainstein) zombie).generateResource(row);
@@ -103,7 +110,7 @@ public class ZombieThreadManager {
                     Thread.currentThread().interrupt();
                     return;
                 }
-            }   
+            }
         }
     }
 
@@ -172,5 +179,42 @@ public class ZombieThreadManager {
         }
     }
 
+    public ArrayList<Object> getFirstZombieInRow(int row) {
+        ArrayList<Object> zombieTarget = new ArrayList<>();
+        List<Thread> threadsInRow;
+        synchronized (zombieThreadsByRow) {
+            threadsInRow = zombieThreadsByRow.get(row);
+        }
+        if (threadsInRow != null && !threadsInRow.isEmpty()) {
+            Thread firstThread = threadsInRow.get(0);
+            JLabel zombieLabel;
+            synchronized (threadToLabelMap) {
+                zombieLabel = threadToLabelMap.get(firstThread);
+            }
+            Zombie zombie;
+            synchronized (threadToZombieMap) {
+                zombie = threadToZombieMap.get(firstThread);
+            }
+            zombieTarget.add(firstThread);
+            zombieTarget.add(zombieLabel);
+            zombieTarget.add(zombie);
+
+            // como puedo acceder al zombie en este array?
+        }
+        return zombieTarget;
+    }
+
+    // método para obtener la posición X de un zombie, dado su hilo.
+    public int getZombieXPosition(Thread zombieThread) {
+        JLabel zombieLabel;
+        synchronized (threadToLabelMap) {
+            zombieLabel = threadToLabelMap.get(zombieThread);
+        }
+        if (zombieLabel != null) {
+            return zombieLabel.getX();
+        } else {
+            throw new IllegalArgumentException("Zombie thread not found or has no associated JLabel.");
+        }
+    }
 
 }

@@ -45,6 +45,8 @@ import domain.Plant;
 import domain.Plants;
 import domain.Player;
 import domain.PotatoMine;
+import domain.ProjectTile;
+import domain.ProjectTileThreadManager;
 import domain.Resource;
 import domain.Sunflower;
 import domain.WallNut;
@@ -67,6 +69,8 @@ public class GardenMenu extends JFrame {
 
     // UPDATE
     private ZombieThreadManager zombieThreadManager;
+
+    private ProjectTileThreadManager projectTileThreadManager;
 
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
             Arrays.asList(
@@ -139,6 +143,9 @@ public class GardenMenu extends JFrame {
         // UPDATE
         this.poobvszombies = poobvszombies;
         this.zombieThreadManager = new ZombieThreadManager(poobvszombies, this);
+
+        // Inicializar ProjectTileThreadManager
+        this.projectTileThreadManager = new ProjectTileThreadManager(poobvszombies, this, zombieThreadManager);
 
         this.poobvszombies = poobvszombies;
         this.modality = poobvszombies.getModality();
@@ -413,6 +420,10 @@ public class GardenMenu extends JFrame {
                                 // Añadir a dominio
                                 poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
                                  //showEntityMatrix();
+                                if (entityData.getName().equals("Peashooter")){
+                                    ProjectTile uselessProjectTile = new ProjectTile();
+                                projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile);
+                                }
 
                                 Image image = entityData.getImage();
 
