@@ -27,14 +27,14 @@ public class ProjectTileThreadManager {
         this.zombieThreadManager = zombieThreadManager;
     }
 
-    public void registerProjectTile(int row, int yPos, ProjectTile projectTile, int graphicXPosition) {
+    public void registerProjectTile(int row, int yPos, ProjectTile projectTile, int graphicXPosition, int graficYPosition) {
         // Iniciar el hilo que gestionará la lógica del disparo
         //this.projectTileLabel = createAndRegisterProjectTile(row, yPos);
-        Thread t = new Thread(() -> projectTileLogic(row, yPos, projectTile, graphicXPosition));
+        Thread t = new Thread(() -> projectTileLogic(row, yPos, projectTile, graphicXPosition, graficYPosition));
         t.start();
     }
 
-    private void projectTileLogic(int row, int yPos, ProjectTile projectTile, int graphicXPosition) {
+    private void projectTileLogic(int row, int yPos, ProjectTile projectTile, int graphicXPosition, int graficYPosition) {
         while (true) {
             ArrayList<Object> firstZombie = zombieThreadManager.getFirstZombieInRow(row);
 
@@ -58,7 +58,7 @@ public class ProjectTileThreadManager {
             JLabel targetZombieLabel = (JLabel) firstZombie.get(1);
             Zombie targetZombie = (Zombie) firstZombie.get(2);
 
-            JLabel projectTileLabel = this.projectTileLabel = createAndRegisterProjectTile(row, yPos, targetZombieLabel);
+            JLabel projectTileLabel = this.projectTileLabel = createAndRegisterProjectTile(graphicXPosition,graficYPosition, targetZombieLabel);
 
             // Mientras el zombie esté vivo, disparar
             while (targetZombie.health > 0) {
@@ -66,11 +66,12 @@ public class ProjectTileThreadManager {
                 // JLabel projectTileLabel = createAndRegisterProjectTile(row, yPos);
 
                 int originXpos = graphicXPosition;
+                int originYpos = graficYPosition;
                 int targetXpos = targetZombieLabel.getX();
 
                 // Mover el proyectil hacia el zombie
                 // moveProjectTile(originXpos, targetXpos, projectTileLabel);
-                moveProjectTile(originXpos, targetXpos, projectTileLabel, targetZombie, targetZombieThread);
+                moveProjectTile(originXpos + 95, targetXpos, projectTileLabel, targetZombie, targetZombieThread);
 
                 // Hacer daño al zombie
                 //targetZombie.takeDamage(Peashooter.DAMAGE);
@@ -120,14 +121,14 @@ public class ProjectTileThreadManager {
     
         JLabel projectTileLabel = new JLabel(scaledIcon);
     
-        int originXPos = calculateOriginXPos(yPos);
-        projectTileLabel.setSize(30, 30);
+        //int originXPos = calculateOriginXPos(yPos);
+        //projectTileLabel.setSize(30, 30);
     
         SwingUtilities.invokeLater(() -> {
             Container parent = zombieLabel.getParent();
             if (parent != null) {
                 parent.setLayout(null); // Ensure absolute positioning
-                projectTileLabel.setBounds(originXPos, yPos, 30, 30);
+                projectTileLabel.setBounds(row+600, yPos+95, 30, 30);
                 parent.add(projectTileLabel);
                 parent.setComponentZOrder(projectTileLabel, 0); // Bring to front if necessary
                 parent.revalidate();
@@ -229,7 +230,7 @@ private int calculateOriginXPos(int yPos) {
 
     private void moveProjectTile(int originxPos, int targetXpos, JLabel projectTileLabel, Zombie targetZombie,
             Thread targetZombieThread) {
-        int delay = 10;
+        int delay = 20;
         final int step = 5;
         final int[] currentX = { originxPos };
 

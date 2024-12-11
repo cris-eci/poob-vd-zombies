@@ -432,7 +432,7 @@ public class GardenMenu extends JFrame {
                                  //showEntityMatrix();
                                 if (entityData.getName().equals("Peashooter")){
                                     ProjectTile uselessProjectTile = new ProjectTile();
-                                projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile, targetPanel.getX());
+                                projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile, targetPanel.getX(), targetPanel.getY());
                                 }
 
                                 // NUEVO: Deducir recursos
