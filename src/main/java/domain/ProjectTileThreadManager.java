@@ -3,6 +3,7 @@ package domain;
 
 import java.awt.Container;
 import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class ProjectTileThreadManager {
 
     public void registerProjectTile(int row, int yPos, ProjectTile projectTile, int graphicXPosition) {
         // Iniciar el hilo que gestionará la lógica del disparo
-        this.projectTileLabel = createAndRegisterProjectTile(row, yPos);
+        //this.projectTileLabel = createAndRegisterProjectTile(row, yPos);
         Thread t = new Thread(() -> projectTileLogic(row, yPos, projectTile, graphicXPosition));
         t.start();
     }
@@ -56,6 +57,8 @@ public class ProjectTileThreadManager {
             Thread targetZombieThread = (Thread) firstZombie.get(0);
             JLabel targetZombieLabel = (JLabel) firstZombie.get(1);
             Zombie targetZombie = (Zombie) firstZombie.get(2);
+
+            JLabel projectTileLabel = this.projectTileLabel = createAndRegisterProjectTile(row, yPos, targetZombieLabel);
 
             // Mientras el zombie esté vivo, disparar
             while (targetZombie.health > 0) {
@@ -107,24 +110,59 @@ public class ProjectTileThreadManager {
         }
     }
 
-    private JLabel createAndRegisterProjectTile(int row, int yPos) {
-    ImageIcon icon = new ImageIcon("resources/images/pea.png");
-    Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-    ImageIcon scaledIcon = new ImageIcon(scaledImage);
+    private JLabel createAndRegisterProjectTile(int row, int yPos, JLabel zombieLabel) {
+        ImageIcon icon = new ImageIcon("resources/images/pea.png");
+        if (icon.getImageLoadStatus() != MediaTracker.COMPLETE) {
+            System.err.println("Failed to load image: /resources/images/pea.png");
+        }
+        Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+    
+        JLabel projectTileLabel = new JLabel(scaledIcon);
+    
+        int originXPos = calculateOriginXPos(yPos);
+        projectTileLabel.setSize(30, 30);
+    
+        SwingUtilities.invokeLater(() -> {
+            Container parent = zombieLabel.getParent();
+            if (parent != null) {
+                parent.setLayout(null); // Ensure absolute positioning
+                projectTileLabel.setBounds(originXPos, yPos, 30, 30);
+                parent.add(projectTileLabel);
+                parent.setComponentZOrder(projectTileLabel, 0); // Bring to front if necessary
+                parent.revalidate();
+                parent.repaint();
+            }
+        });
+        return projectTileLabel;
+    }
 
-    JLabel projectTileLabel = new JLabel(scaledIcon);
+//     private JLabel createAndRegisterProjectTile(int row, int yPos,JLabel zombieLabel) {
+//     ImageIcon icon = new ImageIcon("resources/images/pea.png");
+//     Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+//     ImageIcon scaledIcon = new ImageIcon(scaledImage);
 
-    int originXPos = calculateOriginXPos(yPos);
-    projectTileLabel.setLocation(originXPos, yPos);
-    projectTileLabel.setSize(30, 30);
+//     JLabel projectTileLabel = new JLabel(scaledIcon);
 
-    SwingUtilities.invokeLater(() -> {
-        garden.getContentPane().add(projectTileLabel);
-        garden.revalidate();
-        garden.repaint();
-    });
-    return projectTileLabel;
-}
+//     int originXPos = calculateOriginXPos(yPos);
+//     projectTileLabel.setLocation(originXPos, yPos);
+//     projectTileLabel.setSize(30, 30);
+
+//     SwingUtilities.invokeLater(() -> {
+//         Container parent = zombieLabel.getParent();
+//         // garden.getContentPane().add(projectTileLabel);
+//         // garden.revalidate();    
+//         // garden.repaint();
+//         if (parent != null) {
+//             projectTileLabel.setBounds( 95, 95, 30, 30);
+//             parent  .setComponentZOrder(projectTileLabel, 0); // Bring to front if necessary
+//             parent.add(projectTileLabel);
+//             parent.revalidate();
+//             parent.repaint();
+//         }
+//     });
+//     return projectTileLabel;
+// }
 
 private int calculateOriginXPos(int yPos) {
     // Adjust based on your grid's layout
