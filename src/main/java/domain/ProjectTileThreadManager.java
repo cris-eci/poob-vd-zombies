@@ -180,7 +180,7 @@ public class ProjectTileThreadManager {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return;
-            }
+            }   
         }
     
         // Upon impact
