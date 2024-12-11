@@ -120,6 +120,7 @@ public class ProjectTileThreadManager {
 
     SwingUtilities.invokeLater(() -> {
         garden.getContentPane().add(projectTileLabel);
+        garden.revalidate();
         garden.repaint();
     });
     return projectTileLabel;
