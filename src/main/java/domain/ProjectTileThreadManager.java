@@ -79,11 +79,6 @@ public class ProjectTileThreadManager {
                 }
             }
 
-            // if (targetZombie.health <= 0) {
-            //     break;
-            // }
-            // aquí se termina el while del zombie actual.
-            // El loop externo while(true) volverá a chequear si hay otro zombie.
         }
     }
 
@@ -116,54 +111,6 @@ public class ProjectTileThreadManager {
         return projectTileLabel;
     }
 
-
-    // private void moveProjectTile(int originxPos, int targetXpos, JLabel projectTileLabel, Zombie targetZombie,
-    //         Thread targetZombieThread) {
-
-    //     // Remove the projectile from the GUI
-    //     SwingUtilities.invokeLater(() -> {
-    //         Container parent = projectTileLabel.getParent();
-    //         if (parent != null) {
-    //             parent.add(projectTileLabel);
-    //             parent.revalidate();
-    //             parent.repaint();
-    //         }
-    //     });        
-    //     int delay = 20;
-    //     final int step = 5;
-    //     final int[] currentX = { originxPos };
-
-    //     Timer timer = new Timer(delay, null);
-    //     timer.addActionListener(new ActionListener() {
-    //         @Override
-    //         public void actionPerformed(ActionEvent e) {
-    //             if (currentX[0] < targetXpos) {
-    //                 currentX[0] += step;
-    //                 projectTileLabel.setLocation(currentX[0], projectTileLabel.getY());
-    //             } else {
-    //                 timer.stop();
-    //                 // Projectile reached the zombie, apply damage
-    //                 targetZombie.takeDamage(Peashooter.DAMAGE);
-
-    //                 // Check if zombie is dead
-    //                 if (targetZombie.health <= 0) {
-    //                     zombieThreadManager.terminateZombie(targetZombieThread);
-    //                 }
-
-    //                 // Remove the projectile from the GUI
-    //                 SwingUtilities.invokeLater(() -> {
-    //                     Container parent = projectTileLabel.getParent();
-    //                     if (parent != null) {
-    //                         parent.remove(projectTileLabel);
-    //                         parent.revalidate();
-    //                         parent.repaint();
-    //                     }
-    //                 });
-    //             }
-    //         }
-    //     });
-    //     timer.start();
-    // }
     private void moveProjectTile(int originXpos, int targetXpos, JLabel projectTileLabel, Zombie targetZombie, Thread targetZombieThread) {
         int currentX = originXpos;
     
