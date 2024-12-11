@@ -1,11 +1,13 @@
 package domain;
 
 import java.awt.Container;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
@@ -74,7 +76,15 @@ public class ZombieThreadManager {
     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
         try {
             while (!Thread.currentThread().isInterrupted()) {
+
+
                 if (!(zombie instanceof Brainstein)) {
+                    
+                    // if (zombie instanceof ECIZombie) {
+                    //     // Start attacking immediately
+                    //     attackPlantWithProjectile(row,(ECIZombie) zombie, zombieLabel);
+                    //}
+
                     // Buscar la planta más cercana
                     int plantCol = game.getFirstPlantInRow(row);
                     if (plantCol == -1) {
@@ -97,10 +107,13 @@ public class ZombieThreadManager {
 
                     int targetCol = plantCol + 1;
                     moveZombie(row, targetCol, zombieLabel);
-                     // If the zombie is supposed to move, ensure it's alive
-        
-                    // Ahora el zombi está adyacente a la planta. Atacar.
-                    attackPlant(row, plantCol, zombie, zombieLabel);
+                    // If the zombie is supposed to move, ensure it's alive
+                    if (zombie instanceof ECIZombie) {
+                        attackPlantWithProjectile(row,(ECIZombie) zombie, zombieLabel);
+                    } else {
+                        // Ahora el zombi está adyacente a la planta. Atacar.
+                        attackPlant(row, plantCol, zombie, zombieLabel);
+                    }
                     // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
                 } else {
                     // Brainstein no ataca, solo genera recursos
@@ -166,6 +179,7 @@ public class ZombieThreadManager {
             int finalY = currentY;
             SwingUtilities.invokeLater(() -> {
                 zombieLabel.setLocation(finalX, finalY);
+                //System.err.println( "Zombie: " + finalX + " " + finalY);
             });
             try {
                 // Espera de 150ms para controlar la velocidad de movimiento
@@ -228,7 +242,6 @@ public class ZombieThreadManager {
             zombieTarget.add(zombieLabel);
             zombieTarget.add(zombie);
 
-         
         }
         return zombieTarget;
     }
@@ -249,5 +262,202 @@ public class ZombieThreadManager {
     public void terminateZombie(Thread thread) {
         thread.interrupt();
     }
+
+    // private void attackPlantWithProjectile(int row, int plantCol, ECIZombie zombie, JLabel zombieLabel) {
+    //     Plant targetPlant = game.getPlantAt(row, plantCol);
+    //     if (targetPlant == null) {
+    //         return;
+    //     }
+
+    //     // Create a thread for the projectile attack
+    //     Thread projectileThread = new Thread(() -> {
+    //         try {
+    //             while (!Thread.currentThread().isInterrupted() && zombie.getHealth() > 0 && !targetPlant.isDead()) {
+    //                 // Create the projectile
+    //                 JLabel projectileLabel = createProjectileLabel(zombieLabel.getX(), zombieLabel.getY());
+
+    //                 // Move the projectile towards the plant
+    //                 moveProjectile(projectileLabel, zombieLabel.getX(),/*  targetPlant.getGraphicXPosition()*/10);
+                    
+    //                 // Apply damage upon impact
+    //                 targetPlant.takeDamage(zombie.getDamage());
+
+    //                 // Remove projectile from GUI
+    //                 SwingUtilities.invokeLater(() -> {
+    //                     Container parent = projectileLabel.getParent();
+    //                     if (parent != null) {
+    //                         parent.remove(projectileLabel);
+    //                         parent.revalidate();
+    //                         parent.repaint();
+    //                     }
+    //                 });
+
+    //                 if (targetPlant.isDead()) {
+    //                     game.removeEntity(row, plantCol);
+    //                     SwingUtilities.invokeLater(() -> {
+    //                         garden.removePlantAt(row, plantCol);
+    //                     });
+    //                 }
+
+    //                 // Wait before next attack
+    //                 Thread.sleep(2000);
+    //             }
+    //         } catch (InterruptedException e) {
+    //             Thread.currentThread().interrupt();
+    //         }
+    //     });
+
+    //     projectileThread.start();
+    // }
+
+    private void attackPlantWithProjectile(int row, ECIZombie zombie, JLabel zombieLabel) {
+        Thread projectileThread = new Thread(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted() && zombie.getHealth() > 0) {
+                    int plantCol = game.getFirstPlantInRow(row);
+                    if (plantCol == -1) {
+                        // No plants in the row
+                        Thread.sleep(1000);
+                        continue;
+                    }
+    
+                    Plant targetPlant = game.getPlantAt(row, plantCol);
+                    if (targetPlant == null || targetPlant.isDead()) {
+                        // Plant is dead or doesn't exist
+                        Thread.sleep(1000);
+                        continue;
+                    }
+    
+                    // Get current positions
+                    int startX = zombieLabel.getX();
+                    int startY = zombieLabel.getY();
+                    //int targetX = getPlantGraphicXPosition(row, plantCol);
+                    //int targetY = getPlantGraphicYPosition(row, plantCol);
+
+                    int targetX = 10;
+    
+                    int targetY = 10;
+                    // Create and display the projectile
+                    JLabel projectileLabel = createProjectileLabel(startX, startY);
+    
+                    // Move the projectile towards the plant
+                    boolean hit = moveProjectile(projectileLabel, startX, targetX, startY, targetY);
+    
+                    // Remove projectile from GUI
+                    SwingUtilities.invokeLater(() -> {
+                        Container parent = projectileLabel.getParent();
+                        if (parent != null) {
+                            parent.remove(projectileLabel);
+                            parent.revalidate();
+                            parent.repaint();
+                        }
+                    });
+    
+                    if (hit) {
+                        // Apply damage upon impact
+                        targetPlant.takeDamage(zombie.getDamage());
+    
+                        if (targetPlant.isDead()) {
+                            game.removeEntity(row, plantCol);
+                            SwingUtilities.invokeLater(() -> {
+                                garden.removePlantAt(row, plantCol);
+                            });
+                        }
+                    }
+    
+                    // Wait before shooting again
+                    Thread.sleep(2000); // Adjust delay as needed
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+            // Start the projectile thread
+    projectileThread.start();
+    }
+
+    private JLabel createProjectileLabel(int startX, int startY) {
+        ImageIcon icon = new ImageIcon("resources/images/pea.png");
+        Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+        JLabel projectileLabel = new JLabel(scaledIcon);
+        projectileLabel.setSize(30, 30);
+        projectileLabel.setLocation(startX, startY);
+
+        SwingUtilities.invokeLater(() -> {
+            garden.getContentPane().add(projectileLabel);
+            garden.getContentPane().setComponentZOrder(projectileLabel, 0);
+            garden.getContentPane().revalidate();
+            garden.getContentPane().repaint();
+        });
+
+        return projectileLabel;
+    }
+
+    // private void moveProjectile(JLabel projectileLabel, int startX, int targetX) {
+    //     int currentX = startX;
+
+    //     while (currentX > targetX) {
+    //         currentX -= 5; // Adjust speed as needed
+    //         int finalX = currentX;
+    //         SwingUtilities.invokeLater(() -> {
+    //             projectileLabel.setLocation(finalX, projectileLabel.getY());
+    //         });
+
+    //         try {
+    //             Thread.sleep(30); // Adjust for smoothness
+    //         } catch (InterruptedException e) {
+    //             Thread.currentThread().interrupt();
+    //             return;
+    //         }
+    //     }
+    // }
+    private boolean moveProjectile(
+    JLabel projectileLabel,
+    int startX,
+    int targetX,
+    int startY,
+    int targetY
+) {
+    int currentX = startX;
+    int currentY = startY;
+
+    int deltaX = targetX - startX;
+    int deltaY = targetY - startY;
+    double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    double steps = distance / 5; // Adjust speed as needed
+    double stepX = deltaX / steps;
+    double stepY = deltaY / steps;
+
+    for (int i = 0; i < steps; i++) {
+        currentX += stepX;
+        currentY += stepY;
+        int finalX = (int) currentX;
+        int finalY = (int) currentY;
+        System.err.println("Proyectil: " + finalX + " " + finalY);  
+
+        SwingUtilities.invokeLater(() -> {
+            projectileLabel.setLocation(finalX, finalY);
+        });
+
+        try {
+            Thread.sleep(30); // Adjust for smoothness
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    // Projectile reached the target
+    return true;
+}
+
+    // public int getPlantGraphicXPosition(int row, int col) {
+    //     // Implement this to return the X position of the plant's JLabel
+    //     // This might involve accessing the plant's JLabel in the garden
+    //     JLabel plantLabel = garden.getPlantLabelAt(row, col);
+    //     return plantLabel != null ? plantLabel.getX() : 0;
+    // }
 
 }
