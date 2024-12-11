@@ -98,9 +98,7 @@ public class ZombieThreadManager {
                     int targetCol = plantCol + 1;
                     moveZombie(row, targetCol, zombieLabel);
                      // If the zombie is supposed to move, ensure it's alive
-            // if (zombie.getHealth() <= 0) {
-            //     break;
-            // }
+        
                     // Ahora el zombi está adyacente a la planta. Atacar.
                     attackPlant(row, plantCol, zombie, zombieLabel);
                     // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
