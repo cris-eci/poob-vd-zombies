@@ -81,7 +81,7 @@ public class POOBvsZombiesGUI extends JFrame {
         addTopRightButtons(panel);
 
         // Play background music if it is not already playing
-        playMusic("resources/sound/pvzSound.wav");
+        //playMusic("resources/sound/pvzSound.wav");
     }
 
     // Helper method to create buttons with consistent styling

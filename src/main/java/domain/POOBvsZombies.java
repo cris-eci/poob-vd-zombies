@@ -9,6 +9,7 @@ import java.util.Queue;
 import javax.swing.Timer;
 
 import presentation.GardenMenu;
+import presentation.POOBvsZombiesGUI;
 
 public class POOBvsZombies {
     private String modality;
@@ -56,6 +57,8 @@ public class POOBvsZombies {
         this.roundTime = this.matchTime / 2;
         setUpEntities();
 
+        ((ZombiesOriginal) players.get(1)).startAutomaticHordes(this);
+
         instance = this;
     }
     
@@ -73,6 +76,10 @@ public class POOBvsZombies {
         this.roundTime = this.matchTime / 2;
         setUpEntities();
 
+
+        ((PlantsIntelligent) players.get(0)).startAutomaticPlanting(this);
+        ((ZombiesOriginal) players.get(1)).startAutomaticHordes(this);
+
         instance = this;
     }
 
@@ -80,7 +87,61 @@ public class POOBvsZombies {
     public static POOBvsZombies getInstance() {
         return instance;
     }
+    public Zombie createZombieInstance(String zombieType) {
+        switch (zombieType) {
+            case "Basic":
+                return new Basic();
+            case "Brainstein":
+                return new Brainstein();
+            case "BucketHead":
+                return new Buckethead();
+            case "Conehead":
+                return new Conehead();
+            case "ECIZombie":
+                return new ECIZombie();
+            default:
+                throw new IllegalArgumentException("Tipo de zombie inválido: " + zombieType);
+        }
+    }
+
+    public Plant createPlantInstance(String plantType) {
+        switch (plantType) {
+            case "Sunflower":
+                return new Sunflower();
+            case "Peashooter":
+                return new Peashooter();
+            case "WallNut":
+                return new WallNut();
+            case "PotatoMine":
+                return new PotatoMine();
+            case "ECIPlant":
+                return new ECIPlant();
+            default:
+                return null;
+        }
+    }
+
+    public void spawnZombieUI(int row, int col, Zombie zombie) {
+        // Asegurarnos que gardenMenu no sea nulo
+        if (gardenMenu != null) {
+            gardenMenu.spawnZombieAutomatically(row, col, zombie);
+        }
+    }
     
+    /**
+     * Método para visualizar una planta automáticamente en la interfaz gráfica.
+     *
+     * @param row   Fila donde se coloca la planta.
+     * @param col   Columna donde se coloca la planta.
+     * @param plant Instancia de la planta a visualizar.
+     */
+    public void spawnPlantUI(int row, int col, Plant plant) {
+        // Asegurarse de que gardenMenu no sea nulo
+        if (gardenMenu != null) {
+            gardenMenu.spawnPlantAutomatically(row, col, plant);
+        }
+    }
+
     public int calculateProgress(){
         return 0;
     }
@@ -122,6 +183,68 @@ public class POOBvsZombies {
         return players.get(1);
     }
 
+    public void calculateScores() {
+        // Jugador 1 (Plantas)
+        Player plantsPlayer = players.get(0);
+        int plantsResources = plantsPlayer.getTeam().getResourceCounterAmount(); // Recursos actuales
+        int plantsValue = calculateEntitiesValue(entities, true); // Sumar valor de las plantas en el tablero
+        int plantsScore = (int) ((plantsResources + plantsValue) * 1.5); // Multiplicar por 1.5
+        plantsPlayer.setScore(plantsScore);
+    
+        // Jugador 2 (Zombies)
+        Player zombiesPlayer = players.get(1);
+        int zombiesResources = zombiesPlayer.getTeam().getResourceCounterAmount(); // Recursos actuales
+        int zombiesValue = calculateEntitiesValue(entities, false); // Sumar valor de los zombies en el tablero
+        int zombiesScore = (zombiesResources + zombiesValue); // Sin multiplicar por 1.5
+        zombiesPlayer.setScore(zombiesScore);
+    }
+    
+    
+    public String determineWinner() {
+        Player plantsPlayer = players.get(0);
+        Player zombiesPlayer = players.get(1);
+    
+        int plantsScore = plantsPlayer.getScore();
+        int zombiesScore = zombiesPlayer.getScore();
+    
+        if (plantsScore > zombiesScore) {
+            winner = plantsPlayer.getName();
+            return "¡Las plantas han ganado! Puntaje: " + plantsScore + " vs " + zombiesScore;
+        } else if (plantsScore < zombiesScore) {
+            winner = zombiesPlayer.getName();
+            return "¡Los zombies han ganado! Puntaje: " + zombiesScore + " vs " + plantsScore;
+        } else {
+            winner = "Empate";
+            return "¡Es un empate! Ambos jugadores tienen puntaje: " + plantsScore;
+        }
+    }
+    
+    
+
+    public void endGame(String winnerMessage) {
+        calculateScores(); // Calcula los puntajes finales
+        if (gardenMenu != null) {
+            gardenMenu.showWinnerMessage(winnerMessage);
+        }
+        POOBvsZombiesGUI pooBvsZombiesGUI = new POOBvsZombiesGUI();
+        pooBvsZombiesGUI.setVisible(true);
+    }
+
+    private int calculateEntitiesValue(ArrayList<ArrayList<Object>> entities, boolean isPlant) {
+        int totalValue = 0;
+        for (ArrayList<Object> row : entities) {
+            for (Object obj : row) {
+                if (obj instanceof Plant && isPlant) {
+                    totalValue += ((Plant) obj).getCost(); // Sumar costo de la planta
+                } else if (obj instanceof Zombie && !isPlant) {
+                    totalValue += ((Zombie) obj).getCost(); // Sumar costo del zombie
+                }
+            }
+        }
+        return totalValue;
+    }
+    
+    
     public void setUpEntities() {
         for (int i = 0; i < 5; i++) {
             ArrayList<Object> row = new ArrayList<Object>();
@@ -159,21 +282,35 @@ public class POOBvsZombies {
         }
     }
 
-    private void addEntity(int lane, int yPos, Entity entity) {
-        if (lane<0 || lane>=5 || yPos<0 || yPos>=10) throw new IndexOutOfBoundsException("Invalid lane or yPos");
-        if (yPos<9) {
+    public void addEntity(int lane, int yPos, Entity entity) {
+        if (lane < 0 || lane >= 5 || yPos < 0 || yPos >= 10) {
+            throw new IndexOutOfBoundsException("Invalid lane or yPos");
+        }
+    
+        if (yPos < 9) {
             entities.get(lane).set(yPos, entity);
+            if (entity instanceof Plant) {
+                Player plantsPlayer = players.get(0);
+                plantsPlayer.setScore(plantsPlayer.getScore() + ((Plant) entity).getCost());
+            } else if (entity instanceof Zombie) {
+                Player zombiesPlayer = players.get(1);
+                zombiesPlayer.setScore(zombiesPlayer.getScore() + ((Zombie) entity).getCost());
+            }
         } else {
-            // Ultima columna: agregamos cola de zombies
+            // Última columna: agregamos cola de zombies
             if (entity instanceof Zombie) {
                 Queue<Zombie> queue = getZombieQueue(lane, 9);
-                queue.offer((Zombie)entity);
+                queue.offer((Zombie) entity);
+               // Sumar costo del zombie al puntaje de OZombies
+                Player zombiesPlayer = players.get(1); // OZombies es siempre el segundo jugador
+                zombiesPlayer.addToScore(((Zombie) entity).getCost());
+                gardenMenu.updateScoreLabels(); // Actualizar los puntajes visuales
             } else {
-                // si se agregara algo que no es zombi (ej: error)
-                throw new IllegalArgumentException("Only zombies can be added to last column");
+                throw new IllegalArgumentException("Only zombies can be added to the last column");
             }
         }
     }
+    
 
     public void deleteEntity(int xPos, int yPos) {
         if (xPos<0||xPos>=5||yPos<0||yPos>=10) throw new IndexOutOfBoundsException("Invalid xPos or yPos");
@@ -385,6 +522,10 @@ public class POOBvsZombies {
 
     public void setGardenMenu(GardenMenu gardenMenu) {
         this.gardenMenu = gardenMenu;
+    }
+
+    public GardenMenu getGardenMenu() {
+        return gardenMenu;
     }
 
     public boolean getLawnmowerInRow(int row) {

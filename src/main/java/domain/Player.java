@@ -27,4 +27,8 @@ public abstract class Player {
     public void addToScore(int points) {
         this.score += points;
     }
+    public void setScore(int score) {
+        this.score = score;
+    }
+    
 }

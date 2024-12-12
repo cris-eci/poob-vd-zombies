@@ -1,9 +1,9 @@
 // Peashooter
 package domain;
 public class Peashooter extends Plant implements Shooter {
-    private static final int COST = 100;
-    private static final int HEALTH = 300;
-    private static final int DAMAGE = 20; // Daño por proyectil
+    public static final int COST = 100;
+    public static final int HEALTH = 300;
+    public static final int DAMAGE = 20; // Daño por proyectil
 
     public Peashooter() {
         super(HEALTH, COST);
