@@ -1,10 +1,9 @@
-// ECIPlant
 package domain;
+
 public class ECIPlant extends Sunflower {
-    // ECIPlant es una Sunflower modificada
-    // Cost = 75, Health = 150, genera sol de valor 50
     private static final int COST = 75;
     private static final int HEALTH = 150;
+    private boolean extraSunsGenerated = false;
 
     public ECIPlant() {
         super();
@@ -13,7 +12,16 @@ public class ECIPlant extends Sunflower {
     }
 
     @Override
-    public void generateResource(int lane) {
-        // Generar un sol más grande (50)
+    public Resource generateResource(int lane) {
+        // Genera un sol grande de 50
+        return new Resource(Resource.BIG_SOL, 50) ;
+    }
+
+    public boolean hasGeneratedExtraSuns() {
+        return extraSunsGenerated;
+    }
+
+    public void setExtraSunsGenerated(boolean flag) {
+        this.extraSunsGenerated = flag;
     }
 }

@@ -6,7 +6,7 @@ public class ECIZombie extends Zombie implements Shooter {
     private static final int DAMAGE = 50;
 
     public ECIZombie() {
-        super(HEALTH, COST, DAMAGE);
+        super(HEALTH, COST, 0);
     }
 
     @Override

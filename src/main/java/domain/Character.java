@@ -20,4 +20,12 @@ public abstract class Character extends Entity {
     public void shoot(int line){
         // Disparar
     }
+
+    public void takeDamage(int damage) {
+        this.health -= damage;
+    }
+
+    public boolean isDead() {
+        return health <= 0;
+    }
 }
