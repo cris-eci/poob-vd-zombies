@@ -65,8 +65,6 @@ public class ZombieThreadManager {
         synchronized (threadToLabelMap) {
             threadToLabelMap.put(t, zombieLabel);
         }
-            t.start();
-        
 
         // almacenamos el zombie para poder acceder a sus atributos en su respectivo
         // hilo
@@ -159,6 +157,10 @@ public class ZombieThreadManager {
                 threadToLabelMap.remove(Thread.currentThread());
             }
             synchronized (threadToZombieMap) {
+                threadToZombieMap.remove(Thread.currentThread());
+            }
+
+            synchronized (threadToZombieMap){
                 threadToZombieMap.remove(Thread.currentThread());
             }
             SwingUtilities.invokeLater(() -> {
