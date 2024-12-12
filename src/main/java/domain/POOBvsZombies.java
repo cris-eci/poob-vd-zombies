@@ -25,6 +25,9 @@ public class POOBvsZombies {
     // Mapa para gestionar timers individuales por entidad
     private Map<Entity, Timer> entityTimers = new HashMap<>();
 
+    // Referencia a GardenMenu
+    private GardenMenu gardenMenu;
+
     // Constructors
     public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
         this.players = new ArrayList<Player>();
@@ -87,6 +90,7 @@ public class POOBvsZombies {
     public static POOBvsZombies getInstance() {
         return instance;
     }
+    
     public Zombie createZombieInstance(String zombieType) {
         switch (zombieType) {
             case "Basic":
@@ -517,8 +521,7 @@ public class POOBvsZombies {
         }
     }
 
-    // Referencia a GardenMenu
-    private GardenMenu gardenMenu;
+    
 
     public void setGardenMenu(GardenMenu gardenMenu) {
         this.gardenMenu = gardenMenu;
