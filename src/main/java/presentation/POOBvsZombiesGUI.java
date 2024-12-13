@@ -21,10 +21,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+/**
+ * POOBvsZombiesGUI is the main graphical user interface for the POOBvsZombies game.
+ * It extends JFrame and sets up the main menu with various options for the user to choose from.
+ * The GUI includes buttons for different game modes and top-right buttons for importing and opening game states.
+ * It also supports background music playback.
+ */
 public class POOBvsZombiesGUI extends JFrame {
 
     private static Clip clip;
 
+    /**
+     * POOBvsZombiesGUI is the main graphical user interface for the POOB vs Zombies game.
+     * It sets up the main menu with options for different game modes and handles the
+     * transitions to the respective game mode menus.
+     */
     public POOBvsZombiesGUI() {
         setTitle("POOBvsZombies");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,6 +96,14 @@ public class POOBvsZombiesGUI extends JFrame {
     }
 
     // Helper method to create buttons with consistent styling
+    /**
+     * Creates a menu button with specified main text, subtext, and vertical position.
+     *
+     * @param mainText The main text to be displayed on the button.
+     * @param subText The subtext to be displayed below the main text on the button.
+     * @param yPosition The vertical position of the button.
+     * @return A JButton configured with the specified text, position, and styles.
+     */
     private static JButton createMenuButton(String mainText, String subText, int yPosition) {
         JButton button = new JButton();
 
@@ -113,6 +132,13 @@ public class POOBvsZombiesGUI extends JFrame {
         return button;
     }
 
+    /**
+     * Adds buttons to the top-right corner of the specified panel.
+     * The buttons are created using images specified in the buttonImagePaths array.
+     * Each button is assigned an action listener that displays a message dialog when clicked.
+     *
+     * @param panel the JPanel to which the buttons will be added
+     */
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
                 "resources/images/buttons/import-icon.png", // Import
@@ -154,6 +180,12 @@ public class POOBvsZombiesGUI extends JFrame {
     }
 
     // Method to play background music
+    /**
+     * Plays the music from the specified file path. If the music is already playing, it will not start again.
+     * The music will loop continuously.
+     *
+     * @param filePath the path to the music file to be played
+     */
     private void playMusic(String filePath) {
         if (clip == null) {
             try {
@@ -172,6 +204,13 @@ public class POOBvsZombiesGUI extends JFrame {
         }
     }
 
+    /**
+     * The main method that serves as the entry point for the application.
+     * It schedules a job for the event-dispatching thread to create and show
+     * the GUI for the POOBvsZombies application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             POOBvsZombiesGUI POOBvsZombiesGUI = new POOBvsZombiesGUI();

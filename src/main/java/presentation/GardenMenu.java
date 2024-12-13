@@ -1725,6 +1725,25 @@ public class GardenMenu extends JFrame {
     //         }
     //     });
     // }
+
+    public JPanel getMainPanel() {
+        return (JPanel) getContentPane().getComponent(0); 
+        // Suponiendo que el panel principal es el primer componente del contentPane
+        // Ajusta según tu estructura
+    }
+    
+    public JLabel getPlantLabelAt(int row, int col) {
+        if (row < 0 || row >= 5 || col < 0 || col >= 10) return null;
+        JPanel cell = gridCells[row][col];
+        if (cell != null && cell.getComponentCount() > 0) {
+            java.awt.Component comp = cell.getComponent(0);
+            if (comp instanceof JLabel) {
+                return (JLabel) comp;
+            }
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ArrayList<String> selectedPlants = new ArrayList<>(Arrays.asList(

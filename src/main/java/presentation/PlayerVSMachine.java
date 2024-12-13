@@ -8,6 +8,11 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The PlayerVSMachine class represents a graphical user interface (GUI) for the Player vs Machine mode in the POOBvsZombies game.
+ * It extends JFrame and provides various GUI components and actions for configuring and starting a game.
+ * The GUI includes text fields for player name, match time, and horde number, as well as plant selection panels.
+ */
 public class PlayerVSMachine extends JFrame {
 
     // Domain Layer
@@ -18,11 +23,20 @@ public class PlayerVSMachine extends JFrame {
     private JButton startButton;
     private List<PlantPanel> plantPanelsList;
 
+    /**
+     * Constructor for the PlayerVSMachine class.
+     * Initializes the game by preparing the necessary elements and actions.
+     */
     public PlayerVSMachine() {
         prepareElements();
         prepareActions();
     }
 
+    /**
+     * Prepares and initializes the elements of the Player vs Machine window.
+     * This method sets up the window configuration, background panel, text fields,
+     * buttons, labels, and plant panels. It also adds the components to the background panel.
+     */
     private void prepareElements() {
         // Window Configuration
         setTitle("Player vs Machine");
@@ -66,6 +80,13 @@ public class PlayerVSMachine extends JFrame {
         addTopRightButtons(backgroundPanel);
     }
 
+    /**
+     * Prepares the actions for the player vs machine interface.
+     * This method sets up the following actions:
+     * - Window closing action: Hides the window and exits the application.
+     * - Start button action: Initiates the start action when the start button is pressed.
+     * - Text fields document listeners: Adds listeners to the player name, match time, and horde number text fields.
+     */
     private void prepareActions() {
         // Window Closing Action
         addWindowListener(new WindowAdapter() {
@@ -89,6 +110,16 @@ public class PlayerVSMachine extends JFrame {
     }
 
     // Action Methods
+    /**
+     * Initiates the start action for the Player vs Machine game mode.
+     * 
+     * This method collects input values from the user interface, validates them,
+     * and creates an instance of the POOBvsZombies game with the specified parameters.
+     * If the inputs are invalid or an error occurs, appropriate error messages are displayed.
+     * 
+     * @throws POOBvsZombiesException if the match time or horde number is less than 1,
+     *                                or if the inputs are invalid.
+     */
     private void actionStart() {
         try {
             // Collect Values
@@ -132,6 +163,16 @@ public class PlayerVSMachine extends JFrame {
     }
 
     // Helper Methods
+    /**
+     * Creates a customized JTextField with specified placeholder text, position, and size.
+     *
+     * @param placeholder the placeholder text to be displayed in the text field
+     * @param x the x-coordinate of the text field's position
+     * @param y the y-coordinate of the text field's position
+     * @param width the width of the text field
+     * @param height the height of the text field
+     * @return a customized JTextField with the specified properties
+     */
     private JTextField createTextField(String placeholder, int x, int y, int width, int height) {
         JTextField textField = new JTextField(placeholder);
         textField.setFont(new Font("Arial", Font.BOLD, 13));
@@ -142,6 +183,14 @@ public class PlayerVSMachine extends JFrame {
         return textField;
     }
 
+    /**
+     * Adds focus listeners to a JTextField to handle placeholder text behavior.
+     * When the text field gains focus, if the current text is the placeholder, it clears the text.
+     * When the text field loses focus, if the current text is empty, it sets the text back to the placeholder.
+     * Also calls the checkFields() method when the text field loses focus.
+     *
+     * @param textField the JTextField to which the focus listeners will be added
+     */
     private void addTextFieldListeners(JTextField textField) {
         String placeholder = textField.getText();
         textField.addFocusListener(new FocusAdapter() {
@@ -160,6 +209,18 @@ public class PlayerVSMachine extends JFrame {
         });
     }
 
+    /**
+     * Adds various labels to the specified JPanel.
+     *
+     * @param panel the JPanel to which the labels will be added
+     *
+     * The labels added are:
+     * - Info Label: Provides information about the game behavior and configuration options.
+     * - "SELECT PLANTS" Label: Indicates the section where players can select their plants.
+     * - Player Name Label: Label for the player's name input field.
+     * - Time Label: Label for the time configuration input field.
+     * - Number Label: Label for the number configuration input field.
+     */
     private void addLabels(JPanel panel) {
         // Info Label
         JLabel infoLabel = new JLabel("<html>"
@@ -203,6 +264,17 @@ public class PlayerVSMachine extends JFrame {
         panel.add(numberLabel);
     }
 
+    /**
+     * Adds plant panels to the specified parent panel.
+     *
+     * This method creates a plant selection panel, sets its bounds, layout, and opacity,
+     * and then iterates through the list of plants defined in GardenMenu.PLANTS_VIEW.
+     * For each plant, it creates a PlantPanel with the plant's image path and name,
+     * adds it to the plant selection panel, and also adds it to the plantPanelsList.
+     * Finally, the plant selection panel is added to the specified parent panel.
+     *
+     * @param panel the parent panel to which the plant selection panel will be added
+     */
     private void addPlantPanels(JPanel panel) {
         JPanel plantSelectionPanel = new JPanel();
         plantSelectionPanel.setBounds(115, 590, 600, 150);
@@ -219,6 +291,13 @@ public class PlayerVSMachine extends JFrame {
         panel.add(plantSelectionPanel);
     }
 
+    /**
+     * Adds a button to the top-right corner of the specified JPanel.
+     * The button uses an image icon and is configured to be transparent and borderless.
+     * When clicked, the button will close the current window and open the main menu.
+     *
+     * @param panel the JPanel to which the button will be added
+     */
     private void addTopRightButtons(JPanel panel) {
         String buttonImagePath = "resources/images/buttons/return-icon.png";
         int x = 830;
@@ -244,6 +323,17 @@ public class PlayerVSMachine extends JFrame {
         panel.add(button);
     }
 
+    /**
+     * Checks if the necessary fields are filled and enables or disables the start button accordingly.
+     * 
+     * This method performs the following checks:
+     * 1. At least one plant is selected from the list of plant panels.
+     * 2. The player name field is not empty and does not contain the default text "Player Name".
+     * 3. The match time field is not empty and does not contain the default text "Time".
+     * 4. The horde number field is not empty and does not contain the default text "Number".
+     * 
+     * If all the above conditions are met, the start button is enabled. Otherwise, it is disabled.
+     */
     private void checkFields() {
         boolean atLeastOnePlantSelected = false;
         for (PlantPanel plantPanel : plantPanelsList) {
@@ -263,6 +353,12 @@ public class PlayerVSMachine extends JFrame {
         startButton.setEnabled(atLeastOnePlantSelected && playerNameFilled && matchTimeFilled && hordeNumberFilled);
     }
 
+    /**
+     * Retrieves the names of the selected plants from a list of PlantPanel objects.
+     *
+     * @param panels the list of PlantPanel objects to check for selection
+     * @return an ArrayList containing the names of the selected plants
+     */
     private ArrayList<String> getSelectedItems(List<PlantPanel> panels) {
         ArrayList<String> selectedItems = new ArrayList<>();
         for (PlantPanel panel : panels) {
@@ -274,6 +370,10 @@ public class PlayerVSMachine extends JFrame {
     }
 
     // Custom Classes
+    /**
+     * BackgroundPanel is a custom JPanel that displays a background image.
+     * The image is loaded from the specified file path and scaled to fit the panel.
+     */
     private class BackgroundPanel extends JPanel {
         private Image backgroundImage;
 
@@ -289,12 +389,23 @@ public class PlayerVSMachine extends JFrame {
         }
     }
 
+    /**
+     * The PlantPanel class represents a custom JPanel that displays a plant image
+     * and allows the user to select or deselect the plant by clicking on it.
+     * The panel changes its appearance based on the selection state.
+     */
     class PlantPanel extends JPanel {
         private boolean selected = false;
         private Image plantImage;
         private String plantPath;
         private String plantName;
 
+        /**
+         * Constructs a PlantPanel with the specified image path and plant name.
+         *
+         * @param imagePath the path to the image file for the plant
+         * @param plantName the name of the plant
+         */
         public PlantPanel(String imagePath, String plantName) {
             this.plantPath = imagePath;
             this.plantName = plantName;
@@ -339,6 +450,13 @@ public class PlayerVSMachine extends JFrame {
 
     }
 
+    /**
+     * The main method that serves as the entry point for the application.
+     * It schedules a job for the event-dispatching thread to create and show
+     * the PlayerVSMachine frame.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             PlayerVSMachine frame = new PlayerVSMachine();

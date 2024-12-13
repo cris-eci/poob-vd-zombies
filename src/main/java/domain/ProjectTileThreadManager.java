@@ -12,18 +12,38 @@ import javax.swing.SwingUtilities;
 
 import presentation.GardenMenu;
 
+/**
+ * The ProjectTileThreadManager class represents the resource that shoot Peashooter and ECIZombie.
+ * It serves as a controller for the projectile logic in the game.
+ */
 public class ProjectTileThreadManager {
     private POOBvsZombies game;
     private GardenMenu garden;
     private ZombieThreadManager zombieThreadManager;
     private JLabel projectTileLabel;
 
+    /**
+     * Manages the threads for projectiles in the POOB vs Zombies game.
+     *
+     * @param game The instance of the POOBvsZombies game.
+     * @param garden The GardenMenu instance where the game is played.
+     * @param zombieThreadManager The manager for zombie threads.
+     */
     public ProjectTileThreadManager(POOBvsZombies game, GardenMenu garden, ZombieThreadManager zombieThreadManager) {
         this.game = game;
         this.garden = garden;
         this.zombieThreadManager = zombieThreadManager;
     }
 
+    /**
+     * Registers a projectile and starts a new thread to handle its logic.
+     *
+     * @param row The row position where the projectile is registered.
+     * @param yPos The y-coordinate position of the projectile.
+     * @param projectTile The projectile object to be registered.
+     * @param graphicXPosition The x-coordinate position for the graphical representation of the projectile.
+     * @param graficYPosition The y-coordinate position for the graphical representation of the projectile.
+     */
     public void registerProjectTile(int row, int yPos, ProjectTile projectTile, int graphicXPosition, int graficYPosition) {
         // Iniciar el hilo que gestionará la lógica del disparo
         //this.projectTileLabel = createAndRegisterProjectTile(row, yPos);
@@ -31,6 +51,15 @@ public class ProjectTileThreadManager {
         t.start();
     }
 
+    /**
+     * Manages the logic for a projectile in the game, targeting zombies in a specific row.
+     *
+     * @param row The row in which the projectile is being fired.
+     * @param yPos The y-position of the projectile.
+     * @param projectTile The projectile object.
+     * @param graphicXPosition The x-position of the projectile in the graphical interface.
+     * @param graficYPosition The y-position of the projectile in the graphical interface.
+     */
     private void projectTileLogic(int row, int yPos, ProjectTile projectTile, int graphicXPosition, int graficYPosition) {
         while (true) {
             ArrayList<Object> firstZombie = zombieThreadManager.getFirstZombieInRow(row);
@@ -82,6 +111,14 @@ public class ProjectTileThreadManager {
         }
     }
 
+    /**
+     * Creates and registers a projectile tile (Peashooter projectile) at the specified position.
+     *
+     * @param row The x-coordinate for the initial position of the projectile.
+     * @param yPos The y-coordinate for the initial position of the projectile.
+     * @param zombieLabel The JLabel representing the zombie, used to get the parent container.
+     * @return The JLabel representing the projectile tile.
+     */
     private JLabel createAndRegisterProjectTile(int row, int yPos, JLabel zombieLabel) {
         ImageIcon icon = new ImageIcon("resources/images/pea.png");
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE) {
@@ -95,7 +132,7 @@ public class ProjectTileThreadManager {
         //int originXPos = calculateOriginXPos(yPos);
         //projectTileLabel.setSize(30, 30);
          // Set the initial position of the projectile (Peashooter's position)
-    projectTileLabel.setBounds(row+95, yPos+95, 30, 30);
+        projectTileLabel.setBounds(row+95, yPos+95, 30, 30);
     
         SwingUtilities.invokeLater(() -> {
             Container parent = zombieLabel.getParent();
@@ -111,6 +148,16 @@ public class ProjectTileThreadManager {
         return projectTileLabel;
     }
 
+    /**
+     * Moves a projectile from its origin position to the target position, updating its location
+     * on the GUI and handling the impact with the target zombie.
+     *
+     * @param originXpos The starting X position of the projectile.
+     * @param targetXpos The target X position where the projectile should stop.
+     * @param projectTileLabel The JLabel representing the projectile in the GUI.
+     * @param targetZombie The zombie that the projectile is targeting.
+     * @param targetZombieThread The thread managing the target zombie.
+     */
     private void moveProjectTile(int originXpos, int targetXpos, JLabel projectTileLabel, Zombie targetZombie, Thread targetZombieThread) {
         int currentX = originXpos;
     

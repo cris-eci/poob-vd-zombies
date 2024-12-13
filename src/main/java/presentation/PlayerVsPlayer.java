@@ -3,19 +3,45 @@ package presentation;
 import domain.*;
 
 import javax.swing.*;
-//import javax.swing.event.DocumentEvent;
-//import javax.swing.event.DocumentListener;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
-
-
-//import java.util.Arrays;
-
+/**
+ * The PlayerVsPlayer class represents a graphical user interface (GUI) for a player versus player mode in the POOBvsZombies game.
+ * It extends JFrame and provides various GUI components for players to input their names, match time, and resources,
+ * as well as select plants and zombies for the game.
+ * 
+ * The class includes methods to prepare the GUI elements, handle user actions, and validate input fields.
+ * It also contains nested classes for custom panels and selectable items.
+ * 
+ */
+/**
+ * The PlayerVsPlayer class represents the player vs player game mode in the POOBvsZombies game.
+ * It extends JFrame and provides a graphical user interface for setting up and starting a player vs player match.
+ * 
+ * The class includes the following main components:
+ * - Domain Layer: An instance of POOBvsZombies to manage the game logic.
+ * - GUI Components: Text fields for player names, match time, suns, and brains; buttons for starting the game; and panels for selecting plants and zombies.
+ * 
+ * The class provides methods to:
+ * - Initialize and prepare the GUI elements.
+ * - Set up actions for the GUI components.
+ * - Start the game by collecting and validating input values, and initializing the game instance.
+ * - Add custom components such as background panel, labels, plant and zombie panels, and top-right buttons.
+ * - Check if all required fields are filled and enable the start button accordingly.
+ * - Retrieve selected items from the plant and zombie panels.
+ * 
+ * The class also includes custom inner classes for:
+ * - BackgroundPanel: A JPanel that displays a background image.
+ * - SelectablePanel: An abstract class for panels that can be selected or deselected by clicking.
+ * - PlantPanel: A subclass of SelectablePanel for displaying plant images.
+ * - ZombiePanel: A subclass of SelectablePanel for displaying zombie images.
+ * 
+ * The main method launches the PlayerVsPlayer window.
+ */
 public class PlayerVsPlayer extends JFrame {
 
     // Domain Layer
@@ -28,11 +54,21 @@ public class PlayerVsPlayer extends JFrame {
     private List<ZombiePanel> zombiePanelsList;
 
 
+    /**
+     * Constructor for the PlayerVsPlayer class.
+     * Initializes the player vs player game mode by preparing the necessary elements and actions.
+     */
     public PlayerVsPlayer() {
         prepareElements();
         prepareActions();
     }
 
+    /**
+     * Prepares and initializes the elements for the Player vs Player game window.
+     * This method sets up the window configuration, background panel, text fields,
+     * buttons, labels, and panels for plants and zombies. It also adds the necessary
+     * components to the background panel.
+     */
     private void prepareElements() {
         // Window Configuration
         setTitle("Player vs Player");
@@ -82,6 +118,14 @@ public class PlayerVsPlayer extends JFrame {
         addTopRightButtons(backgroundPanel);
     }
 
+    /**
+     * Prepares the actions for the PlayerVsPlayer window.
+     * 
+     * This method sets up the following actions:
+     * - Window closing action: Closes the window and exits the application.
+     * - Start button action: Initiates the start action when the start button is pressed.
+     * - Text fields document listeners: Adds listeners to the text fields for player names, match time, suns, and brains.
+     */
     private void prepareActions() {
         // Window Closing Action
         addWindowListener(new WindowAdapter() {
@@ -106,6 +150,20 @@ public class PlayerVsPlayer extends JFrame {
         addTextFieldListeners(setBrainsField);
     }
 
+    /**
+     * Starts the game by collecting input values, validating them, and initializing the game instance.
+     * 
+     * This method performs the following steps:
+     * 1. Collects values from input fields for player names, match timer, sun amount, and brain amount.
+     * 2. Validates the collected values to ensure they are non-negative.
+     * 3. Retrieves the selected plants and zombies.
+     * 4. Creates an instance of POOBvsZombies with the collected and validated values.
+     * 5. Opens the GardenMenu and disposes of the current window.
+     * 
+     * If any input values are invalid (e.g., non-numeric or negative), a custom POOBvsZombiesException is thrown and handled.
+     * 
+     * @throws POOBvsZombiesException if any input values are invalid.
+     */
     private void actionStart() {
         try {
             // Recoger valores de los campos
@@ -150,6 +208,16 @@ public class PlayerVsPlayer extends JFrame {
 
 
     // Helper Methods
+    /**
+     * Creates a customized JTextField with the specified placeholder text, position, and size.
+     *
+     * @param placeholder the placeholder text to be displayed in the text field
+     * @param x the x-coordinate of the text field's position
+     * @param y the y-coordinate of the text field's position
+     * @param width the width of the text field
+     * @param height the height of the text field
+     * @return a customized JTextField with the specified properties
+     */
     private JTextField createTextField(String placeholder, int x, int y, int width, int height) {
         JTextField textField = new JTextField(placeholder);
         textField.setFont(new Font("Arial", Font.BOLD, 13));
@@ -160,6 +228,15 @@ public class PlayerVsPlayer extends JFrame {
         return textField;
     }
 
+    /**
+     * Adds focus listeners to a JTextField to handle placeholder text behavior.
+     * When the text field gains focus, the placeholder text is cleared if it matches
+     * the current text. When the text field loses focus, the placeholder text is
+     * restored if the field is empty. Additionally, it calls the checkFields method
+     * when the text field loses focus.
+     *
+     * @param textField the JTextField to which the focus listeners will be added
+     */
     private void addTextFieldListeners(JTextField textField) {
         String placeholder = textField.getText();
         textField.addFocusListener(new FocusAdapter() {
@@ -178,6 +255,14 @@ public class PlayerVsPlayer extends JFrame {
         });
     }
 
+    /**
+     * Adds labels to the specified JPanel. This includes:
+     * - A label prompting the user to select plants.
+     * - A label prompting the user to select zombies.
+     * - A label describing the game mode.
+     *
+     * @param panel the JPanel to which the labels will be added
+     */
     private void addLabels(JPanel panel) {
         // Label "Select your plants"
         JLabel selectPlantsLabel = new JLabel("Select your plants");
@@ -206,6 +291,16 @@ public class PlayerVsPlayer extends JFrame {
         panel.add(gameModeLabel);
     }
 
+    /**
+     * Adds plant panels to the specified parent panel.
+     *
+     * This method creates a new JPanel with a GridLayout to hold plant panels.
+     * It iterates through the list of plants from GardenMenu.PLANTS_VIEW, creates
+     * a PlantPanel for each plant using its image path, and adds the PlantPanel
+     * to the plantsPanel. Finally, it adds the plantsPanel to the specified parent panel.
+     *
+     * @param panel the parent JPanel to which the plant panels will be added
+     */
     private void addPlantPanels(JPanel panel) {
         JPanel plantsPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         plantsPanel.setBounds(65, 440, 100, 160);
@@ -220,6 +315,16 @@ public class PlayerVsPlayer extends JFrame {
         panel.add(plantsPanel);
     }
 
+    /**
+     * Adds zombie panels to the specified parent panel.
+     *
+     * This method creates a new JPanel with a GridLayout to hold zombie panels.
+     * It iterates over the list of zombies from GardenMenu.ZOMBIES_VIEW, creates
+     * a ZombiePanel for each zombie using its image path, and adds it to the
+     * zombiesPanel. Finally, the zombiesPanel is added to the specified parent panel.
+     *
+     * @param panel the parent JPanel to which the zombiesPanel will be added
+     */
     private void addZombiePanels(JPanel panel) {
         JPanel zombiesPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         zombiesPanel.setBounds(710, 440, 100, 160);
@@ -234,6 +339,13 @@ public class PlayerVsPlayer extends JFrame {
     }
     
 
+    /**
+     * Adds a button to the top-right corner of the specified panel.
+     * The button uses an image icon and is configured to be transparent and borderless.
+     * When clicked, the button will close the current window and open the main menu.
+     *
+     * @param panel the JPanel to which the button will be added
+     */
     private void addTopRightButtons(JPanel panel) {
         String buttonImagePath = "resources/images/buttons/return-icon.png";
         int x = 830;
@@ -260,6 +372,17 @@ public class PlayerVsPlayer extends JFrame {
         panel.add(button);
     }
 
+    /**
+     * Checks if all required fields are filled and at least one plant and one zombie are selected.
+     * Enables the start button if all conditions are met:
+     * - At least one plant is selected.
+     * - At least one zombie is selected.
+     * - Player one's name is filled and not the default text.
+     * - Player two's name is filled and not the default text.
+     * - Match time is filled and not the default text.
+     * - Suns field is filled and not the default text.
+     * - Brains field is filled and not the default text.
+     */
     private void checkFields() {
         boolean atLeastOnePlantSelected = false;
         for (PlantPanel plantPanel : plantPanelsList) {
@@ -332,6 +455,10 @@ public class PlayerVsPlayer extends JFrame {
     }
 
     // Custom Classes
+    /**
+     * BackgroundPanel is a custom JPanel that displays a background image.
+     * The image is loaded from the specified file path and scaled to fit the panel.
+     */
     private class BackgroundPanel extends JPanel {
         private Image backgroundImage;
 
@@ -347,11 +474,23 @@ public class PlayerVsPlayer extends JFrame {
         }
     }
 
+    /**
+     * The SelectablePanel class is an abstract class that extends JPanel and provides
+     * a panel with an image that can be selected or deselected by clicking on it.
+     * The panel visually indicates its selection state by overlaying a semi-transparent
+     * color (green for selected, red for not selected).
+     */
     abstract class SelectablePanel extends JPanel {
         private boolean selected = false;
         private Image itemImage;
         private String itemPath;
 
+        /**
+         * Constructs a SelectablePanel with the specified image path.
+         * The panel displays an image scaled to 50x50 pixels and toggles its selection state when clicked.
+         *
+         * @param imagePath the path to the image to be displayed in the panel
+         */
         public SelectablePanel(String imagePath) {
             this.itemPath = imagePath;
             this.itemImage = new ImageIcon(imagePath).getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -371,6 +510,11 @@ public class PlayerVsPlayer extends JFrame {
             return selected;
         }
 
+        /**
+         * Sets the selected state of this component and repaints it.
+         *
+         * @param selected true to select this component, false to deselect it
+         */
         public void setSelected(boolean selected) {
             this.selected = selected;
             repaint();

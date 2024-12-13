@@ -8,6 +8,15 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The MachineVSMachine class represents a graphical user interface (GUI) for the "Machine vs Machine" mode
+ * in the POOBvsZombies game. This mode allows both sides (plants and zombies) to be controlled by machines
+ * with intelligent strategies.
+ * 
+ * The class extends JFrame and includes various GUI components such as text fields, buttons, and panels
+ * for selecting plants and zombies. It also handles user interactions and game initialization.
+ * 
+ */
 public class MachineVSMachine extends JFrame {
 
     // Domain Layer
@@ -20,11 +29,21 @@ public class MachineVSMachine extends JFrame {
     private List<PlantPanel> plantPanelsList;
     private List<ZombiePanel> zombiePanelsList;
 
+    /**
+     * Constructor for the MachineVSMachine class.
+     * Initializes the elements and actions required for the machine vs machine functionality.
+     */
     public MachineVSMachine() {
         prepareElements();
         prepareActions();
     }
 
+    /**
+     * Prepares and initializes the elements of the Machine vs Machine window.
+     * This includes setting up the window properties, creating and adding
+     * various components such as text fields, buttons, and panels for plants
+     * and zombies. It also configures the layout and appearance of these components.
+     */
     private void prepareElements() {
         // Configuración de la ventana
         setTitle("Machine vs Machine");
@@ -73,6 +92,14 @@ public class MachineVSMachine extends JFrame {
         addTopRightButtons(backgroundPanel);
     }
 
+    /**
+     * Prepares the actions for the window and various components.
+     * 
+     * This method sets up the following actions:
+     * - Closes the window and exits the application when the window is closed.
+     * - Starts the action when the start button is pressed.
+     * - Adds focus listeners to the time, quantity, setSuns, and setBrains fields.
+     */
     private void prepareActions() {
         // Acción al cerrar la ventana
         addWindowListener(new WindowAdapter() {
@@ -98,6 +125,15 @@ public class MachineVSMachine extends JFrame {
     }
 
     // Método para manejar el inicio del juego
+    /**
+     * Initiates the start of the game by retrieving user inputs, validating them,
+     * and setting up the game configuration. It handles exceptions for invalid
+     * inputs and displays appropriate error messages.
+     * 
+     * @throws POOBvsZombiesException if the match time or horde number is less than 1,
+     *                                or if the sun amount or brain amount is negative.
+     * @throws NumberFormatException  if the input values are not valid integers.
+     */
     private void actionStart() {
         try {
             // Obtener valores ingresados
@@ -148,6 +184,16 @@ public class MachineVSMachine extends JFrame {
     }
 
     // Métodos auxiliares
+    /**
+     * Creates a customized JTextField with specified placeholder text and dimensions.
+     *
+     * @param placeholder the placeholder text to be displayed in the text field
+     * @param x the x-coordinate of the text field's position
+     * @param y the y-coordinate of the text field's position
+     * @param width the width of the text field
+     * @param height the height of the text field
+     * @return a customized JTextField with the specified properties
+     */
     private JTextField createTextField(String placeholder, int x, int y, int width, int height) {
         JTextField textField = new JTextField(placeholder);
         textField.setFont(new Font("Arial", Font.BOLD, 13));
@@ -158,6 +204,14 @@ public class MachineVSMachine extends JFrame {
         return textField;
     }
 
+    /**
+     * Adds focus listeners to a JTextField to handle placeholder text behavior.
+     * When the text field gains focus, if the current text is the placeholder, it clears the text.
+     * When the text field loses focus, if the current text is empty, it sets the text back to the placeholder.
+     * Additionally, it calls the checkFields() method when the text field loses focus.
+     *
+     * @param textField the JTextField to which the focus listeners will be added
+     */
     private void addTextFieldListeners(JTextField textField) {
         String placeholder = textField.getText();
         textField.addFocusListener(new FocusAdapter() {
@@ -176,6 +230,13 @@ public class MachineVSMachine extends JFrame {
         });
     }
 
+    /**
+     * Adds labels to the specified JPanel. This includes an informational label
+     * describing the mode, a label for selecting plants, and a label for selecting
+     * zombies. The labels are styled with specific fonts, colors, and positions.
+     *
+     * @param panel the JPanel to which the labels will be added
+     */
     private void addLabels(JPanel panel) {
         // Etiqueta de información
         JLabel infoLabel = new JLabel("<html>"
@@ -200,6 +261,19 @@ public class MachineVSMachine extends JFrame {
         panel.add(selectZombieLabel);
     }
 
+    /**
+     * Adds plant selection panels to the specified parent panel.
+     *
+     * @param panel the parent JPanel to which the plant selection panels will be added
+     *
+     * This method creates a plant selection panel with a grid layout and adds individual
+     * plant panels to it. Each plant panel displays an image and name of a plant.
+     * The plant selection panel is then added to the specified parent panel.
+     *
+     * The plant images and names are defined in the arrays `plantImages` and `plantNames`.
+     * The plant selection panel is positioned and sized using setBounds, and it is made
+     * transparent to allow the background to be visible.
+     */
     private void addPlantPanels(JPanel panel) {
         JPanel plantSelectionPanel = new JPanel();
         plantSelectionPanel.setBounds(130, 340, 120, 120); // Posición y tamaño ajustados
@@ -227,6 +301,15 @@ public class MachineVSMachine extends JFrame {
         panel.add(plantSelectionPanel);
     }
 
+    /**
+     * Adds a panel with zombie selection options to the specified parent panel.
+     *
+     * @param panel The parent JPanel to which the zombie selection panel will be added.
+     *
+     * This method creates a new JPanel for zombie selection, sets its layout and bounds,
+     * and populates it with ZombiePanel instances representing different types of zombies.
+     * The zombie selection panel is then added to the specified parent panel.
+     */
     private void addZombiePanels(JPanel panel) {
         JPanel zombieSelectionPanel = new JPanel();
         zombieSelectionPanel.setBounds(640, 340, 120, 120); // Posición y tamaño ajustados
@@ -254,6 +337,13 @@ public class MachineVSMachine extends JFrame {
         panel.add(zombieSelectionPanel);
     }
 
+    /**
+     * Adds a button to the top-right corner of the specified panel.
+     * The button uses an image icon and is configured to return to the main menu
+     * when clicked.
+     *
+     * @param panel the JPanel to which the button will be added
+     */
     private void addTopRightButtons(JPanel panel) {
         String buttonImagePath = "resources/images/buttons/return-icon.png"; // Botón Return
 
@@ -281,6 +371,19 @@ public class MachineVSMachine extends JFrame {
     }
 
     // Método para habilitar el botón START si todos los campos tienen valores
+    /**
+     * Checks if all required fields are filled and enables the start button if they are.
+     * 
+     * The method verifies the following conditions:
+     * - The time field is not empty and does not contain the default text "Time".
+     * - The quantity field is not empty and does not contain the default text "Number".
+     * - The suns field is not empty and does not contain the default text "Amount of suns".
+     * - The brains field is not empty and does not contain the default text "Amount of brains".
+     * - At least one plant is selected.
+     * - At least one zombie is selected.
+     * 
+     * If all conditions are met, the start button is enabled.
+     */
     private void checkFields() {
         boolean timeFilled = !timeField.getText().isEmpty() && !timeField.getText().equals("Time");
         boolean quantityFilled = !quantityField.getText().isEmpty() && !quantityField.getText().equals("Number");
@@ -295,6 +398,11 @@ public class MachineVSMachine extends JFrame {
                                atLeastOnePlantSelected && atLeastOneZombieSelected);
     }
 
+    /**
+     * Retrieves the names of the selected plants from the list of plant panels.
+     *
+     * @return an ArrayList containing the names of the selected plants.
+     */
     private ArrayList<String> getSelectedPlantNames() {
         ArrayList<String> selectedItems = new ArrayList<>();
         for (PlantPanel panel : plantPanelsList) {
@@ -305,6 +413,11 @@ public class MachineVSMachine extends JFrame {
         return selectedItems;
     }
 
+    /**
+     * Retrieves the names of the selected zombies from the list of zombie panels.
+     *
+     * @return An ArrayList of Strings containing the names of the selected zombies.
+     */
     private ArrayList<String> getSelectedZombieNames() {
         ArrayList<String> selectedItems = new ArrayList<>();
         for (ZombiePanel panel : zombiePanelsList) {
@@ -316,9 +429,18 @@ public class MachineVSMachine extends JFrame {
     }
 
     // Clases personalizadas
+    /**
+     * BackgroundPanel is a custom JPanel that displays a background image.
+     * The image is loaded from a specified file path and is drawn to fill the entire panel.
+     */
     private class BackgroundPanel extends JPanel {
         private Image backgroundImage;
 
+        /**
+         * Constructs a BackgroundPanel object.
+         * This constructor initializes the background image by loading it from the specified path
+         * and sets the layout of the panel to null.
+         */
         public BackgroundPanel() {
             // Cargar la imagen desde la ruta especificada
             backgroundImage = new ImageIcon("resources/images/menu/MachineVSMachineMenu.png").getImage();
@@ -336,12 +458,22 @@ public class MachineVSMachine extends JFrame {
     }
 
     // PlantPanel que representa cada panel de planta preseleccionada
+    /**
+     * The PlantPanel class represents a custom JPanel that displays a plant image
+     * and a green transparent overlay. The panel is always marked as selected.
+     */
     class PlantPanel extends JPanel {
         private boolean selected;
         private Image plantImage;
         private String plantPath;
         private String plantName;
 
+        /**
+         * Constructs a PlantPanel with the specified image path and plant name.
+         *
+         * @param imagePath the path to the image of the plant
+         * @param plantName the name of the plant
+         */
         public PlantPanel(String imagePath, String plantName) {
             this.plantPath = imagePath;
             this.plantName = plantName;
@@ -377,12 +509,22 @@ public class MachineVSMachine extends JFrame {
     }
 
     // ZombiePanel que representa cada panel de zombie preseleccionado
+    /**
+     * The ZombiePanel class represents a custom JPanel that displays a zombie image
+     * and a green transparent overlay. The panel is always selected.
+     */
     class ZombiePanel extends JPanel {
         private boolean selected;
         private Image zombieImage;
         private String zombiePath;
         private String zombieName;
 
+        /**
+         * Constructs a ZombiePanel with the specified image path and zombie name.
+         *
+         * @param imagePath the path to the image of the zombie
+         * @param zombieName the name of the zombie
+         */
         public ZombiePanel(String imagePath, String zombieName) {
             this.zombiePath = imagePath;
             this.zombieName = zombieName;
@@ -417,6 +559,12 @@ public class MachineVSMachine extends JFrame {
         }
     }
 
+    /**
+     * The main method that serves as the entry point of the application.
+     * It creates and displays the main window of the application.
+     *
+     * @param args Command line arguments passed to the application.
+     */
     public static void main(String[] args) {
         // Crear y mostrar la ventana
         SwingUtilities.invokeLater(() -> {
