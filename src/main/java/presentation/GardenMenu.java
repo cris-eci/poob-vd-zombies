@@ -1764,9 +1764,9 @@ public class GardenMenu extends JFrame {
             int matchTimer = 1;
             String namePlayerOne = "Player1";
             // ArrayList<String> plants = new ArrayList<>(Arrays.asList(selectedPlants));
-            int sunAmount = 50;
+            int sunAmount = 50000;
             String namePlayerTwo = "Player2";
-            int brainAmount = 100;
+            int brainAmount = 10000;
             // ArrayList<String> zombies = new ArrayList<>(Arrays.asList(selectedZombies));
             POOBvsZombies poobvszombies = new POOBvsZombies(matchTimer, namePlayerOne, selectedPlants, sunAmount,
                     namePlayerTwo, brainAmount, selectedZombies);

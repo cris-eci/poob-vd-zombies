@@ -11,14 +11,6 @@ import javax.swing.Timer;
 import presentation.GardenMenu;
 import presentation.POOBvsZombiesGUI;
 
-/**
- * The POOBvsZombies class represents the main game logic and state for the POOB vs Zombies game.
- * It manages game initialization, game modes, players, entities on the game board, and provides
- * methods for interacting with the game state.
- * @author: Andersson David Sánchez Méndez
- * @author: Cristian Santiago Pedraza Rodríguez
- * @version 2024
- */
 public class POOBvsZombies {
     private String modality;
     private String winner; 
@@ -30,25 +22,10 @@ public class POOBvsZombies {
     // Singleton instance
     private static POOBvsZombies instance;
 
-    // Map to manage individual timers for each entity
+    // Mapa para gestionar timers individuales por entidad
     private Map<Entity, Timer> entityTimers = new HashMap<>();
 
-    // Reference to GardenMenu
-    private GardenMenu gardenMenu;
-
     // Constructors
-
-    /**
-     * Constructs a new POOBvsZombies game in Player vs Player mode.
-     *
-     * @param matchTimeInSeconds Duration of the match in seconds.
-     * @param namePlayerOne Name of the first player.
-     * @param plants List of plant types available to the first player.
-     * @param sunAmount Initial amount of sun resources for the first player.
-     * @param namePlayerTwo Name of the second player.
-     * @param brainAmount Initial amount of brain resources for the second player.
-     * @param zombies List of zombie types available to the second player.
-     */
     public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
@@ -66,14 +43,6 @@ public class POOBvsZombies {
         instance = this;
     }
 
-    /**
-     * Constructs a new POOBvsZombies game in Player vs Machine mode.
-     *
-     * @param matchTimeInSeconds Duration of the match in seconds.
-     * @param hordersNumber Number of zombie hordes.
-     * @param namePlayerOne Name of the player.
-     * @param plants List of plant types available to the player.
-     */
     public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
@@ -92,17 +61,7 @@ public class POOBvsZombies {
 
         instance = this;
     }
-
     
-    
-    /**
-     * Constructs a new POOBvsZombies game instance Machine vs Machine mode.
-     *
-     * @param matchTimeInSeconds the duration of the match in seconds
-     * @param hordersNumber the number of zombie hordes
-     * @param suns the initial number of suns for the plants
-     * @param brains the initial number of brains for the zombies
-     */
     public POOBvsZombies(float matchTimeInSeconds, int hordersNumber, int suns, int brains) {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
@@ -124,22 +83,10 @@ public class POOBvsZombies {
         instance = this;
     }
 
-    /**
-     * Retrieves the singleton instance of POOBvsZombies.
-     *
-     * @return The singleton instance.
-     */
+    // Método para obtener la instancia Singleton
     public static POOBvsZombies getInstance() {
         return instance;
     }
-    
-    /**
-     * Creates a new Zombie instance based on the specified type.
-     *
-     * @param zombieType The type of zombie to create.
-     * @return A new Zombie instance.
-     * @throws IllegalArgumentException If the specified zombie type is invalid.
-     */
     public Zombie createZombieInstance(String zombieType) {
         switch (zombieType) {
             case "Basic":
@@ -157,12 +104,6 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Creates a new Plant instance based on the specified type.
-     *
-     * @param plantType The type of plant to create.
-     * @return A new Plant instance, or null if the type is invalid.
-     */
     public Plant createPlantInstance(String plantType) {
         switch (plantType) {
             case "Sunflower":
@@ -180,68 +121,44 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Spawns a zombie on the UI at the specified location.
-     *
-     * @param row The row index where the zombie will be placed.
-     * @param col The column index where the zombie will be placed.
-     * @param zombie The Zombie instance to spawn.
-     */
     public void spawnZombieUI(int row, int col, Zombie zombie) {
-        // Ensure gardenMenu is not null
+        // Asegurarnos que gardenMenu no sea nulo
         if (gardenMenu != null) {
             gardenMenu.spawnZombieAutomatically(row, col, zombie);
         }
     }
     
     /**
-     * Spawns a plant on the UI at the specified location.
+     * Método para visualizar una planta automáticamente en la interfaz gráfica.
      *
-     * @param row   The row index where the plant will be placed.
-     * @param col   The column index where the plant will be placed.
-     * @param plant The Plant instance to spawn.
+     * @param row   Fila donde se coloca la planta.
+     * @param col   Columna donde se coloca la planta.
+     * @param plant Instancia de la planta a visualizar.
      */
     public void spawnPlantUI(int row, int col, Plant plant) {
-        // Ensure gardenMenu is not null
+        // Asegurarse de que gardenMenu no sea nulo
         if (gardenMenu != null) {
             gardenMenu.spawnPlantAutomatically(row, col, plant);
         }
     }
 
-    /**
-     * Calculates the current progress of the game.
-     *
-     * @return An integer representing the progress.
-     */
     public int calculateProgress(){
         return 0;
     }
 
+    private Timer setRoundTime(int minutes) {
+        int milliseconds = minutes * 60 * 1000;
+        return new Timer(milliseconds, null);
+    }
 
-    /**
-     * Converts the given time in seconds to minutes.
-     *
-     * @param seconds the time in seconds to be converted
-     * @return the equivalent time in minutes
-     */
     private float setMatchTime(float seconds) {
         return seconds * 60;
     }
 
-    /**
-     * Gets the round time for the game.
-     *
-     * @return The round time in seconds.
-     */
     public float getRoundTime() {
         return roundTime;
     }
     
-    /**
-     * Gets the number of hordes in the game.
-     *
-     * @return The number of zombie hordes.
-     */
     public int getHordersNumber() {
         if (players.size() > 1 && players.get(1) instanceof ZombiesOriginal) {
             ZombiesOriginal zombiesOriginal = (ZombiesOriginal) players.get(1);
@@ -250,67 +167,39 @@ public class POOBvsZombies {
         return 0; 
     }
 
-    /**
-     * Gets the modality of the game.
-     *
-     * @return The game modality as a string.
-     */
     public String getModality() {
         return modality;
     }
 
-    /**
-     * Gets the total match time.
-     *
-     * @return The match time in seconds.
-     */
     public float getMatchTime() {
         return matchTime;
     }
 
-    /**
-     * Retrieves the first player (usually the plants player).
-     *
-     * @return The first Player instance.
-     */
     public Player getPlayerOne(){
         return players.get(0);
     }
 
-    /**
-     * Retrieves the second player (usually the zombies player).
-     *
-     * @return The second Player instance.
-     */
     public Player getPlayerTwo(){
         return players.get(1);
     }
 
-    /**
-     * Calculates the scores for both players based on current resources and entities.
-     */
     public void calculateScores() {
-        // Player 1 (Plants)
+        // Jugador 1 (Plantas)
         Player plantsPlayer = players.get(0);
-        int plantsResources = plantsPlayer.getTeam().getResourceCounterAmount(); // Current resources
-        int plantsValue = calculateEntitiesValue(entities, true); // Sum value of plants on the board
-        int plantsScore = (int) ((plantsResources + plantsValue) * 1.5); // Multiply by 1.5
+        int plantsResources = plantsPlayer.getTeam().getResourceCounterAmount(); // Recursos actuales
+        int plantsValue = calculateEntitiesValue(entities, true); // Sumar valor de las plantas en el tablero
+        int plantsScore = (int) ((plantsResources + plantsValue) * 1.5); // Multiplicar por 1.5
         plantsPlayer.setScore(plantsScore);
     
-        // Player 2 (Zombies)
+        // Jugador 2 (Zombies)
         Player zombiesPlayer = players.get(1);
-        int zombiesResources = zombiesPlayer.getTeam().getResourceCounterAmount(); // Current resources
-        int zombiesValue = calculateEntitiesValue(entities, false); // Sum value of zombies on the board
-        int zombiesScore = (zombiesResources + zombiesValue); // No multiplication
+        int zombiesResources = zombiesPlayer.getTeam().getResourceCounterAmount(); // Recursos actuales
+        int zombiesValue = calculateEntitiesValue(entities, false); // Sumar valor de los zombies en el tablero
+        int zombiesScore = (zombiesResources + zombiesValue); // Sin multiplicar por 1.5
         zombiesPlayer.setScore(zombiesScore);
     }
     
-
-    /**
-     * Determines the winner of the game based on the players' scores.
-     *
-     * @return A message indicating the winner and the scores.
-     */
+    
     public String determineWinner() {
         Player plantsPlayer = players.get(0);
         Player zombiesPlayer = players.get(1);
@@ -330,13 +219,10 @@ public class POOBvsZombies {
         }
     }
     
-    /**
-     * Ends the game and displays the winner message.
-     *
-     * @param winnerMessage The message to display indicating the winner.
-     */
+    
+
     public void endGame(String winnerMessage) {
-        calculateScores(); // Calculate final scores
+        calculateScores(); // Calcula los puntajes finales
         if (gardenMenu != null) {
             gardenMenu.showWinnerMessage(winnerMessage);
         }
@@ -344,30 +230,21 @@ public class POOBvsZombies {
         pooBvsZombiesGUI.setVisible(true);
     }
 
-    /**
-     * Calculates the total value of entities (plants or zombies) on the board.
-     *
-     * @param entities The game board matrix of entities.
-     * @param isPlant True to calculate the value of plants, false for zombies.
-     * @return The total value of the specified entities.
-     */
     private int calculateEntitiesValue(ArrayList<ArrayList<Object>> entities, boolean isPlant) {
         int totalValue = 0;
         for (ArrayList<Object> row : entities) {
             for (Object obj : row) {
                 if (obj instanceof Plant && isPlant) {
-                    totalValue += ((Plant) obj).getCost(); // Sum the cost of the plant
+                    totalValue += ((Plant) obj).getCost(); // Sumar costo de la planta
                 } else if (obj instanceof Zombie && !isPlant) {
-                    totalValue += ((Zombie) obj).getCost(); // Sum the cost of the zombie
+                    totalValue += ((Zombie) obj).getCost(); // Sumar costo del zombie
                 }
             }
         }
         return totalValue;
     }
     
-    /**
-     * Initializes the entities matrix representing the game board.
-     */
+    
     public void setUpEntities() {
         for (int i = 0; i < 5; i++) {
             ArrayList<Object> row = new ArrayList<Object>();
@@ -382,25 +259,11 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Adds an entity to the game board at the specified location.
-     *
-     * @param lane The row index where the entity will be placed.
-     * @param yPos The column index where the entity will be placed.
-     * @param entityType The type of entity to create and add.
-     */
     public void addEntity(int lane, int yPos, String entityType) {
         Entity entity = createEntity(entityType);
         addEntity(lane, yPos, entity);
     }
     
-    /**
-     * Creates a new Entity instance based on the specified type.
-     *
-     * @param entityType The type of entity to create.
-     * @return A new Entity instance.
-     * @throws IllegalArgumentException If the entity type is invalid.
-     */
     private Entity createEntity(String entityType) {
         switch (entityType) {
             case "Basic": return new Basic();
@@ -419,14 +282,6 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Adds an existing entity to the game board at the specified location.
-     *
-     * @param lane The row index where the entity will be placed.
-     * @param yPos The column index where the entity will be placed.
-     * @param entity The Entity instance to add.
-     * @throws IndexOutOfBoundsException If the specified location is invalid.
-     */
     public void addEntity(int lane, int yPos, Entity entity) {
         if (lane < 0 || lane >= 5 || yPos < 0 || yPos >= 10) {
             throw new IndexOutOfBoundsException("Invalid lane or yPos");
@@ -457,18 +312,10 @@ public class POOBvsZombies {
     }
     
 
-    /**
-     * Deletes an entity from the game board at the specified location.
-     *
-     * @param xPos The row index of the entity to delete.
-     * @param yPos The column index of the entity to delete.
-     * @throws IndexOutOfBoundsException If the specified location is invalid.
-     */
     public void deleteEntity(int xPos, int yPos) {
         if (xPos<0||xPos>=5||yPos<0||yPos>=10) throw new IndexOutOfBoundsException("Invalid xPos or yPos");
         if (yPos<9) {
             entities.get(xPos).set(yPos, null);
-            
         } else {
             // Si borramos aqui, significaría limpiar cola
             Queue<Zombie> q = getZombieQueue(xPos,9);
@@ -476,25 +323,11 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Retrieves the queue of zombies at the specified location.
-     *
-     * @param row The row index.
-     * @param col The column index.
-     * @return The queue of zombies at the specified location.
-     */
     @SuppressWarnings("unchecked")
     private Queue<Zombie> getZombieQueue(int row, int col) {
         return (Queue<Zombie>) entities.get(row).get(col);
     }
 
-    /**
-     * Gets the name of the entity at the specified location.
-     *
-     * @param xPos The row index.
-     * @param yPos The column index.
-     * @return The name of the entity, or null if none exists.
-     */
     public String getEntity(int xPos, int yPos) {
         if (xPos<0||xPos>=5||yPos<0||yPos>=10) return null;
         if (yPos<9) {
@@ -511,12 +344,6 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Returns the name of the given entity.
-     *
-     * @param entity The entity whose name is to be retrieved.
-     * @return The name of the entity, or null if the entity is null.
-     */
     private String entityName(Entity entity) {
         if (entity==null) return null;
         if (entity instanceof Basic) return "Basic";
@@ -534,10 +361,9 @@ public class POOBvsZombies {
     }
 
     /**
-     * Finds the column index of the first plant in the specified row, starting from the right.
-     *
-     * @param row The row index to search.
-     * @return The column index of the first plant, or -1 if none is found.
+     * Encuentra la planta más cercana hacia la última columna en la fila dada.
+     * Recorre de col=8 a col=0, si encuentra una planta retorna esa col.
+     * Si no encuentra, retorna -1
      */
     public int getFirstPlantInRow(int row) {
         for (int col = 8; col >= 0; col--) {
@@ -549,13 +375,6 @@ public class POOBvsZombies {
         return -1;
     }
 
-    /**
-     * Retrieves the Plant instance at the specified location.
-     *
-     * @param row The row index.
-     * @param col The column index.
-     * @return The Plant instance, or null if none exists.
-     */
     public Plant getPlantAt(int row, int col) {
         if (row<0||row>=5||col<0||col>=9) return null; // En la ultima col no hay plantas
         Object obj = entities.get(row).get(col);
@@ -565,35 +384,125 @@ public class POOBvsZombies {
         return null;
     }
     
-    /**
-     * Removes the entity at the specified location.
-     *
-     * @param row The row index.
-     * @param col The column index.
-     */
     public void removeEntity(int row, int col) {
         if (row<0||row>=5||col<0||col>=10) return;
         entities.get(row).set(col,null);
     }
 
-    /**
-     * Retrieves the matrix of entities representing the game board.
-     *
-     * @return The entities matrix.
-     */
+    // public void addEntity(int lane, int yPos, String entityType) {
+    //     Entity entity = null;
+    //     switch (entityType) {
+    //         case "Basic":
+    //             entity = new Basic();
+    //             break;
+    //         case "Brainstein":
+    //             entity = new Brainstein();
+    //             break;
+    //         case "BucketHead":
+    //             entity = new Buckethead();
+    //             break;
+    //         case "Conehead":
+    //             entity = new Conehead();
+    //             break;
+    //         case "ECIZombie":
+    //             entity = new ECIZombie();
+    //             break;
+    //         case "Sunflower":
+    //             entity = new Sunflower();
+    //             break;
+    //         case "Peashooter":
+    //             entity = new Peashooter();
+    //             break;
+    //         case "WallNut":
+    //             entity = new WallNut();
+    //             break;
+    //         case "PotatoMine":
+    //             entity = new PotatoMine();
+    //             break;
+    //         case "ECIPlant":
+    //             entity = new ECIPlant();    
+    //             break;
+    //         case "LownMover":
+    //             entity = new Lownmover();
+    //             break;
+    //         default:
+    //             throw new IllegalArgumentException("Invalid entity type: " + entityType);
+    //     }
+    //     addEntity(lane, yPos, entity);
+    // }
+
+    // private void addEntity(int lane, int yPos, Entity entity) {
+    //     if (lane >= 0 && lane < entities.size() && yPos >= 0 && yPos < entities.get(lane).size()) {
+    //         entities.get(lane).set(yPos, entity);
+    //         entity.setPosition(lane, yPos, entity.getName()); // Asignamos posición a la entidad
+    //     } else {
+    //         throw new IndexOutOfBoundsException("Invalid lane or yPos");
+    //     }
+    // }
+
+    // // Método combinado para remover entidad y detener Timer
+    // public void deleteEntity(int row, int col) {
+    //     Entity entity = getEntitiesMatrix().get(row).get(col);
+    //     if (entity != null) {
+    //         // Detener y remover el Timer asociado
+    //         Timer timer = entityTimers.get(entity);
+    //         if (timer != null) {
+    //             timer.stop();
+    //             entityTimers.remove(entity);
+    //             System.out.println("Timer detenido y removido para la entidad: " + entity.getName());
+    //         }
+
+    //         // Remover la entidad de la matriz
+    //         deleteEntity(row, col);
+    //         System.out.println("Entidad removida de la matriz en posición (" + row + ", " + col + ").");
+
+    //         // Remover visualmente en GardenMenu
+    //         spawnSpecificResource(row, col, null); // Ajusta este método para manejar null
+    //     } else {
+    //         System.out.println("No hay entidad en la posición (" + row + ", " + col + ") para remover.");
+    //     }
+    // }
+
+
+    // public String getEntity(int xPos, int yPos) {
+    //     try {
+    //         Entity entity = entities.get(xPos).get(yPos);
+    //         if (entity != null) {
+    //             if (entity instanceof Basic) {
+    //                 return "Basic";
+    //             } else if (entity instanceof Brainstein) {
+    //                 return "Brainstein";
+    //             } else if (entity instanceof Buckethead) {
+    //                 return "BucketHead";
+    //             } else if (entity instanceof Conehead) {
+    //                 return "Conehead";
+    //             } else if (entity instanceof ECIZombie) {
+    //                 return "ECIZombie";
+    //             } else if (entity instanceof Sunflower) {
+    //                 return "Sunflower";
+    //             } else if (entity instanceof Peashooter) {
+    //                 return "Peashooter";
+    //             } else if (entity instanceof WallNut) {
+    //                 return "WallNut";
+    //             } else if (entity instanceof PotatoMine) {
+    //                 return "PotatoMine";
+    //             } else if (entity instanceof ECIPlant) {
+    //                 return "ECIPlant";
+    //             } else if (entity instanceof Lownmover) {
+    //                 return "LownMover";
+    //             }
+    //         } 
+    //     } catch (IndexOutOfBoundsException e) {
+    //         // Position is out of bounds
+    //     }
+    //     return null;
+    // }
+
     public ArrayList<ArrayList<Object>> getEntitiesMatrix() {
         return entities;
     }
 
-    /**
-     * Adds extra resources for the ECIPlant when the player runs out of suns.
-     *
-     * @param row   The row index where the resources will be spawned.
-     * @param col   The column index where the resources will be spawned.
-     * @param count The number of resources to add.
-     * @param value The value of each resource.
-     * @param type  The type of resource ("Sun" or other).
-     */
+    // Método para añadir recursos extra para la ECIPlant cuando el jugador se queda sin soles
     public void addPendingExtraResources(int row, int col, int count, int value, String type) {
         for(int i =0; i < count; i++) {
             Resource resource = new Resource(type, value);
@@ -601,44 +510,24 @@ public class POOBvsZombies {
         }
     }
 
-    /**
-     * Spawns a specific resource at the specified location in the UI.
-     *
-     * @param row      The row index where the resource will be spawned.
-     * @param col      The column index where the resource will be spawned.
-     * @param resource The Resource instance to spawn.
-     */
+    // Método para colocar un recurso específico en la posición (row, col)
     public void spawnSpecificResource(int row, int col, Resource resource) {
         if (gardenMenu != null) {
             gardenMenu.spawnSpecificResource(row, col, resource);
         }
     }
-    
-    /**
-     * Sets the GardenMenu reference for UI interactions.
-     *
-     * @param gardenMenu The GardenMenu instance.
-     */
+
+    // Referencia a GardenMenu
+    private GardenMenu gardenMenu;
+
     public void setGardenMenu(GardenMenu gardenMenu) {
         this.gardenMenu = gardenMenu;
     }
 
-    /**
-     * Gets the GardenMenu reference.
-     *
-     * @return The GardenMenu instance.
-     */
     public GardenMenu getGardenMenu() {
         return gardenMenu;
     }
 
-    /**
-     * Checks for a lawnmower in the specified row and removes it if present.
-     *
-     * @param row The row index to check.
-     * @return True if a lawnmower was found and removed, false otherwise.
-     * @throws IndexOutOfBoundsException If the specified row index is invalid.
-     */
     public boolean getLawnmowerInRow(int row) {
         if (row < 0 || row >= entities.size()) {
             throw new IndexOutOfBoundsException("Invalid row index: " + row);
@@ -651,12 +540,6 @@ public class POOBvsZombies {
         return false;
     }
 
-    /**
-     * Removes all zombies in the specified row.
-     *
-     * @param row The row index where zombies will be removed.
-     * @throws IndexOutOfBoundsException If the specified row index is invalid.
-     */
     public void removeZombiesInRow(int row) {
         if (row < 0 || row >= 5) {
             throw new IndexOutOfBoundsException("Invalid row index: " + row);

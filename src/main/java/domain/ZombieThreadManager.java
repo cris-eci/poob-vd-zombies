@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import presentation.GardenMenu;
@@ -192,37 +191,40 @@ public class ZombieThreadManager {
     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
         try {
             while (!Thread.currentThread().isInterrupted()) {
+
                 if (!(zombie instanceof Brainstein)) {
-                    // Para cualquier zombie (incluyendo ECIZombie) excepto Brainstein:
-                    int plantCol = game.getFirstPlantInRow(row);
-                    if (plantCol == -1) {
-                        // No hay plantas
-                        int currentCol = getCurrentColumn(zombieLabel.getX());
-                        if (currentCol > 0) {
-                            // Mover hasta la col 0
-                            moveZombie(row, 0, zombieLabel);
-                        }
-                        if (game.getLawnmowerInRow(row)) {
-                            game.removeZombiesInRow(row);
-                            terminateZombiesInRow(row);
-                            garden.deleteLawnmover(row);
-                        }
-                        break; // Sin plantas, ya en la col 0 o muerto
-                    }
 
-                    // Hay planta, moverse a plantCol+1
-                    int targetCol = plantCol + 1;
-                    moveZombie(row, targetCol, zombieLabel);
-
-                    // Si NO es ECIZombie, ataca directamente
+                    // Solo los zombies que no son ECIZombie realizarán ataques directos aquí
                     if (!(zombie instanceof ECIZombie)) {
+                        // Buscar la planta más cercana
+                        int plantCol = game.getFirstPlantInRow(row);
+                        if (plantCol == -1) {
+                            // No hay más plantas, mover hasta el final (col=0) si no está ya allí
+                            int currentCol = getCurrentColumn(zombieLabel.getX());
+                            if (currentCol > 0) {
+                                moveZombie(row, 0, zombieLabel);
+                            }
+                            // Si hay una cortadora de césped en la fila, eliminar zombies y cortadora
+                            if (game.getLawnmowerInRow(row)) {
+                                game.removeZombiesInRow(row);
+                                terminateZombiesInRow(row);
+                                garden.deleteLawnmover(row);
+                            }
+                            // Ya está al final, detener el hilo
+                            break;
+                        }
+
+                        int targetCol = plantCol + 1;
+                        moveZombie(row, targetCol, zombieLabel);
+                        // Ahora el zombi está adyacente a la planta. Atacar.
                         attackPlant(row, plantCol, zombie, zombieLabel);
+                        // Si la planta murió, se remueve y el loop continúa para buscar la siguiente.
                     }
-                    // Si es ECIZombie, no atacamos directamente, el proyectil se encarga.
-                    // El ECIZombie seguirá disparando desde su hilo de proyectil.
+                    // Los ECIZombies manejan sus ataques con proyectiles en hilos separados
                 } else {
-                    // Brainstein genera recursos, no se mueve ni ataca
+                    // Brainstein no ataca, solo genera recursos
                     ((Brainstein) zombie).generateResource(row);
+                    // Esperar 2 segundos antes de generar otro recurso
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -232,6 +234,7 @@ public class ZombieThreadManager {
                 }
             }
         } finally {
+            // Limpieza al terminar el hilo del zombie
             cleanupZombieThread(row, zombieLabel);
         }
     }
@@ -345,7 +348,7 @@ public class ZombieThreadManager {
         }
 
         // Mientras la planta esté viva, atacarla cada 0.5s
-        while (!plant.isDead() && zombie.getHealth() > 0 && !Thread.currentThread().isInterrupted()) {
+        while (!plant.isDead()) {
             plant.takeDamage(zombie.getDamage());
             if (plant.isDead()) {
                 // Planta muerta, remover del dominio y de la interfaz
@@ -433,50 +436,42 @@ public class ZombieThreadManager {
      */
     private void attackPlantWithProjectile(int row, ECIZombie zombie, JLabel zombieLabel) {
         try {
-            JPanel mainPanel = garden.getMainPanel(); // Debes crear un getter en GardenMenu que retorne el panel principal
             while (!Thread.currentThread().isInterrupted() && zombie.getHealth() > 0) {
                 int plantCol = game.getFirstPlantInRow(row);
+                int cellWidth = 80;
+                int targetCol = plantCol + 1;
+                int endX = 40 + targetCol * cellWidth;
                 if (plantCol == -1) {
+                    // No hay plantas en la fila, esperar antes de intentar de nuevo
                     Thread.sleep(1000);
                     continue;
                 }
 
                 Plant targetPlant = game.getPlantAt(row, plantCol);
                 if (targetPlant == null || targetPlant.isDead()) {
+                    // La planta ya no existe, esperar antes de intentar de nuevo
                     Thread.sleep(1000);
                     continue;
                 }
 
-                // Obtener la etiqueta de la planta
-                JLabel plantLabel = garden.getPlantLabelAt(row, plantCol);
-                if (plantLabel == null) {
-                    Thread.sleep(1000);
-                    continue;
-                }
+                // Obtener la posición actual del ECIZombie
+                int startX = zombieLabel.getX();
+                int startY = zombieLabel.getY();
 
-                // Convertir posiciones al mismo sistema de coordenadas (el del panel principal)
-                // Posición absoluta del zombie en panel:
-                java.awt.Point zombiePos = SwingUtilities.convertPoint(zombieLabel.getParent(), 
-                                                                    zombieLabel.getLocation(), 
-                                                                    mainPanel);
+                // Obtener la posición de la planta
+                // int targetX = getPlantGraphicXPosition(row, plantCol);
+                // int targetY = getPlantGraphicYPosition(row, plantCol);
 
-                // Posición absoluta de la planta en panel:
-                java.awt.Point plantPos = SwingUtilities.convertPoint(plantLabel.getParent(), 
-                                                                    plantLabel.getLocation(), 
-                                                                    mainPanel);
+                int targetX = endX;
+                int targetY = plantCol * cellWidth;
 
-                int zombieCenterX = zombiePos.x + zombieLabel.getWidth()/2;
-                int zombieCenterY = zombiePos.y + zombieLabel.getHeight()/2;
-                int plantCenterX = plantPos.x + plantLabel.getWidth()/2;
-                int plantCenterY = plantPos.y + plantLabel.getHeight()/2;
-
-                // Crear y mostrar el proyectil en el mismo panel que zombie y planta
-                JLabel projectileLabel = createProjectileLabel(mainPanel, zombieCenterX - 15, zombieCenterY - 15);
+                // Crear y mostrar el proyectil
+                JLabel projectileLabel = createProjectileLabel(startX, startY);
 
                 // Mover el proyectil hacia la planta
-                boolean hit = moveProjectile(projectileLabel, zombieCenterX, plantCenterX, zombieCenterY, plantCenterY);
+                boolean hit = moveProjectile(projectileLabel, startX, targetX, startY, targetY);
 
-                // Eliminar el proyectil de la interfaz
+                // Eliminar el proyectil de la interfaz gráfica
                 SwingUtilities.invokeLater(() -> {
                     Container parent = projectileLabel.getParent();
                     if (parent != null) {
@@ -487,7 +482,9 @@ public class ZombieThreadManager {
                 });
 
                 if (hit) {
-                    targetPlant.takeDamage(ECIZombie.DAMAGE);
+                    // Aplicar daño al impactar
+                    targetPlant.takeDamage(zombie.getDamage());
+
                     if (targetPlant.isDead()) {
                         game.removeEntity(row, plantCol);
                         SwingUtilities.invokeLater(() -> {
@@ -496,7 +493,8 @@ public class ZombieThreadManager {
                     }
                 }
 
-                Thread.sleep(3000);
+                // Esperar antes de disparar el siguiente proyectil
+                Thread.sleep(1000); // Ajusta este valor según la velocidad de disparo deseada
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -515,22 +513,22 @@ public class ZombieThreadManager {
      * @param startY the starting Y coordinate of the projectile
      * @return the JLabel representing the projectile
      */
-    private JLabel createProjectileLabel(JPanel mainPanel, int startX, int startY) {
+    private JLabel createProjectileLabel(int startX, int startY) {
         ImageIcon icon = new ImageIcon("resources/images/blackPea.png");
         Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
-    
+
         JLabel projectileLabel = new JLabel(scaledIcon);
         projectileLabel.setSize(30, 30);
         projectileLabel.setLocation(startX, startY);
-    
+
         SwingUtilities.invokeLater(() -> {
-            mainPanel.add(projectileLabel);
-            mainPanel.setComponentZOrder(projectileLabel, 0);
-            mainPanel.revalidate();
-            mainPanel.repaint();
+            garden.getContentPane().add(projectileLabel);
+            garden.getContentPane().setComponentZOrder(projectileLabel, 0);
+            garden.getContentPane().revalidate();
+            garden.getContentPane().repaint();
         });
-    
+
         return projectileLabel;
     }
 
@@ -561,7 +559,7 @@ public class ZombieThreadManager {
         int deltaX = targetX - startX;
         int deltaY = targetY - startY;
         double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        double steps = distance / 5;
+        double steps = distance / 5; // Ajusta la velocidad del proyectil aquí
         double stepX = deltaX / steps;
         double stepY = deltaY / steps;
 
@@ -574,20 +572,22 @@ public class ZombieThreadManager {
             currentY += stepY;
             int finalX = (int) currentX;
             int finalY = (int) currentY;
+            // Puedes eliminar o comentar el siguiente System.err si no lo necesitas
+            // System.err.println("Proyectil: " + finalX + " " + finalY);  
 
             SwingUtilities.invokeLater(() -> {
                 projectileLabel.setLocation(finalX, finalY);
             });
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(10); // Ajusta la suavidad del movimiento aquí
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return false;
             }
         }
 
-        // Impacto con la planta
+        // El proyectil alcanzó la planta
         return true;
     }
     

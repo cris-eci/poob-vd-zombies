@@ -6,11 +6,6 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The Log class provides a method to record exceptions to a log file.
- * It uses a FileWriter and PrintWriter to write error messages and stack traces to "errors.log".
- * If an IOException occurs while writing to the log file, it logs the failure using a Logger.
- */
 public class Log {
     private static final Logger logger = Logger.getLogger(Log.class.getName());
 
