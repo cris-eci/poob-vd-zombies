@@ -17,8 +17,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator; // Add this import
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box; // Add this import
 import javax.swing.ImageIcon;
@@ -29,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
@@ -41,16 +44,22 @@ import domain.Buckethead;
 import domain.Conehead;
 import domain.ECIPlant;
 import domain.ECIZombie;
+import domain.Entity;
 import domain.POOBvsZombies;
+import domain.POOBvsZombiesException;
 import domain.Peashooter;
 import domain.Plant;
 import domain.Plants;
 import domain.Player;
 import domain.PotatoMine;
+import domain.ProjectTile;
+import domain.ProjectTileThreadManager;
 import domain.Resource;
+import domain.ResourceGenerator;
 import domain.Sunflower;
 import domain.WallNut;
 import domain.Zombie;
+import domain.ZombieThreadManager;
 
 public class GardenMenu extends JFrame {
     private ArrayList<String> selectedPlants;
@@ -60,11 +69,19 @@ public class GardenMenu extends JFrame {
     private Point originalShovelPosition;
     private JPanel[][] gridCells = new JPanel[5][10];
     private boolean shovelSelected = false;
-    private java.util.List<JLabel> movingZombies = new java.util.ArrayList<>();
+    private List<JLabel> movingZombies = new ArrayList<>();
     private POOBvsZombies poobvszombies;
     private JLabel playerOneNameLabel, playerTwoNameLabel;
     private JLabel playerOneSunsLabel, playerTwoBrainsLabel;
     private JLabel playerOneScoreLabel, playerTwoScoreLabel;
+    private Timer resourceGenerationTimer; // Timer cada 20 segundos
+    // Mapa para gestionar timers individuales por entidad
+    private Map<Entity, Timer> entityTimers = new HashMap<>();
+
+    // UPDATE
+    private ZombieThreadManager zombieThreadManager;
+    private ProjectTileThreadManager projectTileThreadManager;
+
 
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
             Arrays.asList(
@@ -120,10 +137,16 @@ public class GardenMenu extends JFrame {
                     "resources/images/cards/Plants/card_ECIPlant.png",
                     "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"));
     private List<TimerTask> timerTasks = new ArrayList<>();
+    
+    // Arreglo estatico de lawnmovers para poder acceder a ellos desde cualquier parte
+    private JLabel[] lawnmowersArrayJLabels = new JLabel[5];
 
     // Etiquetas para mostrar el mensaje y el tiempo
     private JLabel messageLabel;
     private JLabel timeLabel;
+    // Añade este mapa en la declaración de variables de la clase GardenMenu
+    private Map<Entity, Timer> imageChangeTimers = new HashMap<>();
+
 
     public GardenMenu(POOBvsZombies poobvszombies) {
         setTitle("Garden Menu");
@@ -132,6 +155,12 @@ public class GardenMenu extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        //Inicializar ZombieThreadManager
+        this.zombieThreadManager = new ZombieThreadManager(poobvszombies, this);
+
+        // Inicializar ProjectTileThreadManager
+        this.projectTileThreadManager = new ProjectTileThreadManager(poobvszombies, this, zombieThreadManager);
+        
         this.poobvszombies = poobvszombies;
         this.modality = poobvszombies.getModality();
         Player playerOne = poobvszombies.getPlayerOne();
@@ -192,9 +221,12 @@ public class GardenMenu extends JFrame {
         initializeTimers(poobvszombies);
         setupTimerLabels(panel);
         startSequentialTimers(0);
-
+        
         add(panel);
-        startZombieMovement();
+        //startZombieMovement();
+
+        
+        poobvszombies.setGardenMenu(this);
     }
 
     private void addPlantsCards(JPanel panel) {
@@ -206,7 +238,7 @@ public class GardenMenu extends JFrame {
                 // int plantIndex = getPlantIndex(selectedPlants[i]);
                 // if (plantIndex != -1) {
                 // Display the card
-                List<String> plant = null;
+                List<String> plant = PLANTS_VIEW.get(0);
 
                 // Buscar la planta en la lista de plantas y asignarla a la variable plant para
                 // tener todas sus posibles representaciones graficas
@@ -287,6 +319,23 @@ public class GardenMenu extends JFrame {
         panel.add(shovelLabel);
     }
 
+    // Method to delete a lawnmower from the interface and the domain, it is gonna be used in ZombieThreadManager
+    public void deleteLawnmover(int row) {
+        if (row >= 0 && row < lawnmowersArrayJLabels.length) {
+            JLabel lawnmowerLabel = lawnmowersArrayJLabels[row];
+            if (lawnmowerLabel != null) {
+                JPanel parentPanel = (JPanel) lawnmowerLabel.getParent();
+                if (parentPanel != null) {
+                    parentPanel.remove(lawnmowerLabel);
+                    parentPanel.revalidate();
+                    parentPanel.repaint();
+                }
+                poobvszombies.deleteEntity(row, 0);
+                lawnmowersArrayJLabels[row] = null;
+            }
+        }
+    }
+
     private void addGridLayout(JPanel panel) {
         // Create a panel with a 5x10 GridLayout
         JPanel gridPanel = new JPanel(new GridLayout(5, 10, 5, 5)); // 5 rows, 10 columns, 5px spacing
@@ -313,6 +362,9 @@ public class GardenMenu extends JFrame {
                     Image scaledMowerImage = mowerIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
                     JLabel mowerLabel = new JLabel(new ImageIcon(scaledMowerImage));
                     cellPanel.add(mowerLabel, BorderLayout.CENTER);
+
+                    // Add the lawnmower to the array
+                    lawnmowersArrayJLabels[row] = mowerLabel;
 
                     poobvszombies.addEntity(finalRow, finalCol, "LownMover");
                 } else if (col >= 1 && col <= 8) {
@@ -382,12 +434,11 @@ public class GardenMenu extends JFrame {
                             try {
                                 EntityData entityData = (EntityData) support.getTransferable()
                                         .getTransferData(EntityTransferable.ENTITY_FLAVOR);
-                                // poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-
-                                // Añadir a dominio
-                                poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                showEntityMatrix();
-
+                            
+                                 // Añadir a dominio
+                                 poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
+                                 updateScoreLabels();
+                                 
                                 Image image = entityData.getImage();
 
                                 JLabel label = new JLabel(new ImageIcon(image));
@@ -397,6 +448,14 @@ public class GardenMenu extends JFrame {
                                 targetPanel.revalidate();
                                 targetPanel.repaint();
 
+                               
+                                //showEntityMatrix();
+
+                                if (entityData.getName().equals("Peashooter")){
+                                    ProjectTile uselessProjectTile = new ProjectTile();
+                                    projectTileThreadManager.registerProjectTile(finalRow, finalCol, uselessProjectTile, targetPanel.getX(), targetPanel.getY());
+                                }
+
                                 // NUEVO: Deducir recursos
                                 String plantName = entityData.getName();
                                 Plant plant = createPlantInstance(plantName);
@@ -404,9 +463,61 @@ public class GardenMenu extends JFrame {
                                     Player playerOne = poobvszombies.getPlayerOne();
                                     // Deducir el costo de la planta
                                     playerOne.getTeam().deductResource(plant.getCost());
+                                    updateScoreLabels();
                                     // Actualizar la etiqueta de soles
                                     playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
                                 }
+
+                                // Iniciar Timer si la entidad es un generador de recursos
+                                if (plant instanceof ResourceGenerator) {
+                                    Timer plantTimer = createEntityTimer((ResourceGenerator) plant, finalRow, finalCol);
+                                    entityTimers.put(plant, plantTimer);
+                                    plantTimer.start();
+                                }
+                                if (plant instanceof PotatoMine) {
+                                    Timer imageChangeTimer = new Timer(14000, new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            System.out.println("Timer disparado para cambiar la imagen de PotatoMine.");
+                                            
+                                            // Crear el ImageIcon directamente con el GIF animado
+                                            ImageIcon newIcon = new ImageIcon("resources/images/plants/PotatoMine/potato-mineAnimated.gif");
+                                            
+                                            // Verificar que la imagen se haya cargado correctamente
+                                            if (newIcon.getIconWidth() == -1) {
+                                                System.err.println("No se pudo cargar la imagen: resources/images/plants/PotatoMine/potato-mineAnimated.gif");
+                                                return;
+                                            } else {
+                                                System.out.println("Imagen potato-mineAnimated.gif cargada correctamente.");
+                                            }
+                                
+                                            // Asignar el ImageIcon directamente sin escalar
+                                            label.setIcon(newIcon);
+                                            
+                                            // Ajustar el tamaño del JLabel si es necesario
+                                            label.setPreferredSize(new Dimension(newIcon.getIconWidth()-10, newIcon.getIconHeight()-10));
+                                            label.revalidate();
+                                            label.repaint();
+                                            System.out.println("Icono del JLabel actualizado con el GIF animado.");
+                                
+                                            // Traer el JLabel al frente
+                                            targetPanel.setComponentZOrder(label, 0);
+                                            targetPanel.revalidate();
+                                            targetPanel.repaint();
+                                            System.out.println("JLabel traído al frente.");
+                                
+                                            // Detener el Timer ya que es una acción única
+                                            ((Timer) e.getSource()).stop();
+                                            System.out.println("Timer de cambio de imagen detenido.");
+                                        }
+                                    });
+                                    imageChangeTimer.setRepeats(false); // Ejecutar solo una vez
+                                    imageChangeTimer.start();
+                                    imageChangeTimers.put(plant, imageChangeTimer);
+                                    System.out.println("Timer de cambio de imagen iniciado para PotatoMine.");
+                                }
+                                
+                                
                                 return true;
                             } catch (Exception ex) {
                                 ex.printStackTrace();
@@ -415,27 +526,49 @@ public class GardenMenu extends JFrame {
                         }
                     });
 
-                    // Añadir MouseListener a la celda
+                   // Dentro del MouseListener para usar la pala en la clase GardenMenu
                     cellPanel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             if (shovelSelected) {
                                 if (cellPanel.getComponentCount() > 0) {
-                                    // Remover la planta
+                                    // Obtener la entidad de dominio
+                                    Entity entity = (Entity) poobvszombies.getEntitiesMatrix().get(finalRow).get(finalCol);  
+                                    if (entity != null) {
+                                        // Detener y remover el Timer asociado (generación de recursos)
+                                        Timer resourceTimer = entityTimers.get(entity);
+                                        if (resourceTimer != null) {
+                                            resourceTimer.stop();
+                                            entityTimers.remove(entity);
+                                            System.out.println("Timer de recursos detenido y removido para la entidad: " + entity.getName());
+                                        }
+
+                                        // Detener y remover el Timer de cambio de imagen si es PotatoMine
+                                        if (entity instanceof PotatoMine) {
+                                            Timer imageChangeTimer = imageChangeTimers.get(entity);
+                                            if (imageChangeTimer != null) {
+                                                imageChangeTimer.stop();
+                                                imageChangeTimers.remove(entity);
+                                                System.out.println("Timer de cambio de imagen detenido y removido para PotatoMine.");
+                                            }
+                                        }
+                                    }
+
+                                    // Remover la planta visualmente
                                     cellPanel.removeAll();
                                     cellPanel.revalidate();
                                     cellPanel.repaint();
-
-                                    poobvszombies.deleteEntity(finalRow, finalCol);
-                                    
+                                    poobvszombies.deleteEntity(finalRow, finalCol); // Implementa este método en POOBvsZombies
                                     shovelSelected = false;
                                     setCursor(Cursor.getDefaultCursor()); // Restablecer el cursor
+                                    System.out.println("Planta eliminada en la celda (" + finalRow + ", " + finalCol + ").");
                                 } else {
                                     JOptionPane.showMessageDialog(null, "No hay planta en esta celda.");
                                 }
                             }
                         }
                     });
+
 
                 } else if (col == 9) {
                     if ("PlayerVsPlayer".equals(modality)) {
@@ -488,28 +621,50 @@ public class GardenMenu extends JFrame {
                                 try {
                                     EntityData entityData = (EntityData) support.getTransferable()
                                             .getTransferData(EntityTransferable.ENTITY_FLAVOR);
+                                    String zombieName = entityData.getName();
+                                    Zombie zombie = createZombieInstance(zombieName);
                                     // Añadir a dominio
                                     poobvszombies.addEntity(finalRow, finalCol, entityData.getName());
-                                    showEntityMatrix();
+                                    updateScoreLabels();
+                                    //showEntityMatrix();
+                                    // Image image = entityData.getImage();
+                                    // JLabel zombieLabel = new JLabel(new ImageIcon(image));
+                                    // zombieLabel.setHorizontalAlignment(JLabel.CENTER);
+                                    // // Get the cell's position relative to the main panel
+                                    // JPanel targetCell = (JPanel) support.getComponent();
+                                    // Point cellLocation = targetCell.getLocation();
+                                    // int x = gridPanel.getX() + cellLocation.x;
+                                    // int y = gridPanel.getY() + cellLocation.y;
+                                    // // Set the zombie's bounds
+                                    // zombieLabel.setBounds(x, y, targetCell.getWidth(), targetCell.getHeight());
+                                    // // Add the zombie to the main panel
+                                    // panel.add(zombieLabel);
+                                    // panel.setComponentZOrder(zombieLabel, 0); // Bring to front if necessary
+                                    // panel.revalidate();
+                                    // panel.repaint();
+
+                                    // Crear el JLabel del zombi
                                     Image image = entityData.getImage();
                                     JLabel zombieLabel = new JLabel(new ImageIcon(image));
                                     zombieLabel.setHorizontalAlignment(JLabel.CENTER);
-                                    // Get the cell's position relative to the main panel
+
                                     JPanel targetCell = (JPanel) support.getComponent();
                                     Point cellLocation = targetCell.getLocation();
                                     int x = gridPanel.getX() + cellLocation.x;
                                     int y = gridPanel.getY() + cellLocation.y;
-                                    // Set the zombie's bounds
                                     zombieLabel.setBounds(x, y, targetCell.getWidth(), targetCell.getHeight());
-                                    // Add the zombie to the main panel
+
                                     panel.add(zombieLabel);
-                                    panel.setComponentZOrder(zombieLabel, 0); // Bring to front if necessary
+                                    panel.setComponentZOrder(zombieLabel, 0);
                                     panel.revalidate();
                                     panel.repaint();
 
+                                    // Registrar el zombi en el ZombieThreadManager para moverlo
+                                    zombieThreadManager.registerZombie(finalRow, zombie, zombieLabel);
+
                                     // NUEVO: Deducir recursos
-                                    String zombieName = entityData.getName();
-                                    Zombie zombie = createZombieInstance(zombieName);
+                                    // String zombieName = entityData.getName();
+                                    // Zombie zombie = createZombieInstance(zombieName);
                                     if (zombie != null) {
                                         Player playerTwo = poobvszombies.getPlayerTwo();
                                         playerTwo.getTeam().deductResource(zombie.getCost());
@@ -518,6 +673,12 @@ public class GardenMenu extends JFrame {
                                     }
                                     // Add the zombie to the movingZombies list
                                     movingZombies.add(zombieLabel);
+                                    // Iniciar Timer si la entidad es un generador de recursos
+                                    if (zombie instanceof ResourceGenerator) {
+                                        Timer zombieTimer = createEntityTimer((ResourceGenerator) zombie, finalRow, finalCol);
+                                        entityTimers.put(zombie, zombieTimer);
+                                        zombieTimer.start();
+                                    }
                                     return true;
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
@@ -549,42 +710,58 @@ public class GardenMenu extends JFrame {
             inputPanel.add(Box.createHorizontalStrut(15)); // Space between fields
             inputPanel.add(new JLabel("Column (1-9):"));
             inputPanel.add(colField);
-
+    
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Enter Row and Column to Remove Plant",
                     JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     int row = Integer.parseInt(rowField.getText());
                     int col = Integer.parseInt(colField.getText());
-
+    
                     // Validate limits and conditions
                     if (row < 0 || row > 4 || col < 1 || col > 9) {
-                        JOptionPane.showMessageDialog(this, "Invalid row or column. Please enter valid numbers.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
+                        throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_COORDINATES);
                     } else if (col == 0) {
-                        JOptionPane.showMessageDialog(this, "Cannot remove lawnmower.", "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                        throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_LAWNMOWER);
                     } else {
                         JPanel targetPanel = gridCells[row][col];
                         if (targetPanel.getComponentCount() == 0) {
-                            JOptionPane.showMessageDialog(this, "No plant to remove in the selected cell.", "Error",
-                                    JOptionPane.ERROR_MESSAGE);
+                            throw new POOBvsZombiesException(POOBvsZombiesException.NO_PLANT_TO_REMOVE);
                         } else {
                             // Remove the plant
+                            // Obtener la entidad de dominio
+                            Entity entity = (Entity) poobvszombies.getEntitiesMatrix().get(row).get(col);    
+                            if (entity != null) {
+                                // Detener y remover el Timer asociado
+                                Timer timer = entityTimers.get(entity);
+                                if (timer != null) {
+                                    timer.stop();
+                                    entityTimers.remove(entity);
+                                }
+                            }
+    
+                            // Remover la planta visualmente
                             targetPanel.removeAll();
                             targetPanel.revalidate();
                             targetPanel.repaint();
+                            poobvszombies.deleteEntity(row, col); // Implementa este método en POOBvsZombies
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Please enter valid numeric values for row and column.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    try {
+                        throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+                    } catch (POOBvsZombiesException exc) {
+                        JOptionPane.showMessageDialog(this, exc.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (POOBvsZombiesException exc) {
+                    JOptionPane.showMessageDialog(this, exc.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-
+    
         panel.add(useShovelButton);
     }
+    
 
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
@@ -636,7 +813,7 @@ public class GardenMenu extends JFrame {
                         pvpMenu.setVisible(true);
                     } else {
                         MachineVSMachine mvsmMenu = new MachineVSMachine();
-                        //mvsmMenu.setVisible(true);
+                        mvsmMenu.setVisible(true);
                     }
                 });
             }
@@ -729,6 +906,70 @@ public class GardenMenu extends JFrame {
             }
         }
     }
+
+    public void updateScoreLabels() {
+        playerOneScoreLabel.setText("Score: " + poobvszombies.getPlayerOne().getScore());
+        playerTwoScoreLabel.setText("Score: " + poobvszombies.getPlayerTwo().getScore());
+
+        // Refrescar las etiquetas para asegurarse de que se actualicen visualmente
+        playerOneScoreLabel.revalidate();
+        playerOneScoreLabel.repaint();
+        playerTwoScoreLabel.revalidate();
+        playerTwoScoreLabel.repaint();
+    }
+    
+    public void showWinnerMessage(String winnerMessage) {
+        JOptionPane.showMessageDialog(this, winnerMessage, "Resultado Final", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    // Auxiliary class to handle the Transferable object of image type with type
+    // (plant or zombie)
+    // private static class EntityTransferable implements Transferable {
+    // public static final DataFlavor IMAGE_FLAVOR = new
+    // DataFlavor(EntityTransferable.class, "ImageTransferable");
+    // private Image image;
+    // private String type; // "plant" or "zombie"
+    // private String stringDefnitionName;
+
+    // public ImageTransferable(Image image, String type, String
+    // stringDefnitionName) {
+    // this.image = image;
+    // this.type = type;
+    // this.stringDefnitionName = stringDefnitionName;
+    // }
+
+    // public String getType() {
+    // return type;
+    // }
+
+    // public Image getImage() {
+    // return image;
+    // }
+
+    // public String getStringDefnitionName() {
+    // return stringDefnitionName;
+    // }
+
+    // @Override
+    // public DataFlavor[] getTransferDataFlavors() {
+    // return new DataFlavor[] { IMAGE_FLAVOR };
+    // }
+
+    // @Override
+    // public boolean isDataFlavorSupported(DataFlavor flavor) {
+    // return flavor.equals(IMAGE_FLAVOR);
+    // }
+
+    // @Override
+    // public Object getTransferData(DataFlavor flavor) throws
+    // UnsupportedFlavorException {
+    // if (flavor.equals(IMAGE_FLAVOR)) {
+    // return this;
+    // } else {
+    // throw new UnsupportedFlavorException(flavor);
+    // }
+    // }
+    // }
 
     private void addZombieCards(JPanel panel) {
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality) && selectedZombies != null) {
@@ -836,29 +1077,29 @@ public class GardenMenu extends JFrame {
         }
     }
 
-    private void startZombieMovement() {
-        Timer timer = new Timer(100, e -> {
-            Iterator<JLabel> iterator = movingZombies.iterator();
-            while (iterator.hasNext()) {
-                JLabel zombie = iterator.next();
-                Point location = zombie.getLocation();
-                if (location.x > 0) {
-                    // Move zombie to the left
-                    zombie.setLocation(location.x - 5, location.y);
-                } else {
-                    // Remove zombie safely
-                    Container parent = zombie.getParent();
-                    if (parent != null) {
-                        parent.remove(zombie);
-                        parent.revalidate();
-                        parent.repaint();
-                    }
-                    iterator.remove();
-                }
-            }
-        });
-        timer.start();
-    }
+    // private void startZombieMovement() {
+    //     Timer timer = new Timer(100, e -> {
+    //         Iterator<JLabel> iterator = movingZombies.iterator();
+    //         while (iterator.hasNext()) {
+    //             JLabel zombie = iterator.next();
+    //             Point location = zombie.getLocation();
+    //             if (location.x > 0) {
+    //                 // Move zombie to the left
+    //                 zombie.setLocation(location.x - 5, location.y);
+    //             } else {
+    //                 // Remove zombie safely
+    //                 Container parent = zombie.getParent();
+    //                 if (parent != null) {
+    //                     parent.remove(zombie);
+    //                     parent.revalidate();
+    //                     parent.repaint();
+    //                 }
+    //                 iterator.remove();
+    //             }
+    //         }
+    //     });
+    //     timer.start();
+    // }
 
     // Clase interna para representar cada temporizador
     private class TimerTask {
@@ -926,10 +1167,14 @@ public class GardenMenu extends JFrame {
                 // Sumar al equipo de plantas
                 playerOne.getTeam().addResource(resource);
                 playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+                updateScoreLabels(); // Reflejar el puntaje actualizado
+
             } else if (Resource.BRAIN.equals(resource.getType())) {
                 // Sumar al equipo de zombies
                 playerTwo.getTeam().addResource(resource);
                 playerTwoBrainsLabel.setText("" + playerTwo.getTeam().getResourceCounterAmount());
+                updateScoreLabels(); // Reflejar el puntaje actualizado
+
             }
 
             ((Timer) e.getSource()).stop();
@@ -968,11 +1213,14 @@ public class GardenMenu extends JFrame {
 
             // Validar que el tiempo total sea al menos 20 segundos y haya al menos una
             // horda
-            if (matchTimeInSeconds < 20 || hordersNumber <= 0) {
-                JOptionPane.showMessageDialog(this,
-                        "El tiempo total debe ser al menos 20 segundos y debe haber al menos una horda.",
-                        "Error de Configuración", JOptionPane.ERROR_MESSAGE);
-                System.exit(1);
+            if (matchTimeInSeconds < 1 || hordersNumber <= 0) {
+                try {
+                    throw new POOBvsZombiesException(POOBvsZombiesException.TIME_LIMIT);
+                } catch (POOBvsZombiesException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
             }
 
             // Calcular el tiempo restante después de la fase de plantación
@@ -1046,8 +1294,9 @@ public class GardenMenu extends JFrame {
         if (index >= timerTasks.size()) {
             // Todos los temporizadores han finalizado
             // Ocultar las etiquetas
-            messageLabel.setVisible(false);
-            timeLabel.setVisible(false);
+            poobvszombies.calculateScores();
+            String winnerMessage = poobvszombies.determineWinner();
+            poobvszombies.endGame(winnerMessage);
             return;
         }
 
@@ -1144,6 +1393,338 @@ public class GardenMenu extends JFrame {
         }
     }
 
+    // // Método para inicializar el timer de generación de recursos de las entidades
+    // private void startResourceGeneration() {
+    //     // Cada 20 segundos (20000 ms), se generan recursos de Sunflower, ECIPlant, Brainstein
+    //     resourceGenerationTimer = new Timer(20000, e -> {
+    //         ArrayList<ArrayList<Entity>> matrix = poobvszombies.getEntitiesMatrix();
+    //         for (int r = 0; r < 5; r++) {
+    //             for (int c = 0; c < 10; c++) {
+    //                 Entity ent = matrix.get(r).get(c);
+    //                 if (ent instanceof ResourceGenerator) {
+    //                     Resource res = ((ResourceGenerator) ent).generateResource(r);
+    //                     if (res != null) {
+    //                         // Colocar el recurso en la misma posición que la entidad
+    //                         spawnSpecificResource(r, c, res);
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // Aquí también se podría manejar la lógica de ECIPlant para los 3 soles extras, si se guardaron en POOBvsZombies.
+    //     });
+    //     resourceGenerationTimer.setRepeats(true);
+    //     resourceGenerationTimer.start();
+    // }
+
+    public void spawnSpecificResource(int row, int col, Resource resource) {
+        JPanel targetCell = gridCells[row][col];
+        // Determinar la ruta de la imagen basada en el tipo de recurso
+        String imagePath;
+        if (Resource.SOL.equals(resource.getType())) {
+            imagePath = "resources/images/sun.png"; // Imagen regular del sol
+        } else if (Resource.BIG_SOL.equals(resource.getType())) {
+            imagePath = "resources/images/big-sun.png"; // Imagen para Big Sun
+        } else if (Resource.BRAIN.equals(resource.getType())) {
+            imagePath = "resources/images/brain.png"; // Imagen del cerebro
+        } else if (Resource.THREE_BIG_SOL.equals(resource.getType())){
+            imagePath = "resources/images/three-big-sun.png"; // Imagen para THREE_BIG_SOL
+        }    
+        else {
+            imagePath = "resources/images/default.png"; // Imagen por defecto
+        }
+    
+        ImageIcon icon = new ImageIcon(imagePath);
+        // Verificar si la imagen existe
+        if (icon.getIconWidth() == -1) {
+            // Imagen no encontrada, usar una imagen de placeholder
+            System.err.println("Imagen no encontrada: " + imagePath);
+            imagePath = "resources/images/default.png"; // Ruta alternativa
+            icon = new ImageIcon(imagePath);
+        }
+    
+        Image scaledImage;
+    
+        if (Resource.THREE_BIG_SOL.equals(resource.getType())) {
+            scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH); // Reducir tamaño para THREE_BIG_SOL
+        } else {
+            scaledImage = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        }
+    
+        JLabel resourceLabel = new JLabel(new ImageIcon(scaledImage));
+        resourceLabel.setHorizontalAlignment(JLabel.CENTER);
+        targetCell.add(resourceLabel);
+        targetCell.revalidate();
+        targetCell.repaint();
+        targetCell.setComponentZOrder(resourceLabel, 0);
+    
+        if (Resource.THREE_BIG_SOL.equals(resource.getType())) {
+            // Directamente sumar 150 soles al contador del jugador sin esperar a la recolección
+            Player playerOne = poobvszombies.getPlayerOne();
+            playerOne.getTeam().addResource(new Resource(Resource.SOL, 150));
+            playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+            System.out.println("Se han sumado 150 soles al contador del jugador debido a THREE_BIG_SOL.");
+    
+            // Iniciar Timer para remover THREE_BIG_SOL después de 3 segundos
+            Timer collectTimer = new Timer(3000, (ActionEvent ev) -> {
+                targetCell.remove(resourceLabel);
+                targetCell.revalidate();
+                targetCell.repaint();
+                targetCell.setComponentZOrder(resourceLabel, 0);
+                resource.collect();
+    
+                ((Timer) ev.getSource()).stop();
+                System.out.println("THREE_BIG_SOL removido después de 3 segundos.");
+            });
+            collectTimer.setRepeats(false);
+            collectTimer.start();
+        } else {
+            // Iniciar Timer de recolección automática para SOL, BIG_SOL y BRAIN
+            Timer collectTimer = new Timer(3000, (ActionEvent ev) -> {
+                // Sumar el valor al jugador correspondiente
+                Player playerOne = poobvszombies.getPlayerOne();
+                Player playerTwo = poobvszombies.getPlayerTwo();
+                if (Resource.SOL.equals(resource.getType()) || Resource.BIG_SOL.equals(resource.getType())) {
+                    playerOne.getTeam().addResource(resource);
+                    playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+                } else if (Resource.BRAIN.equals(resource.getType())) {
+                    playerTwo.getTeam().addResource(resource);
+                    playerTwoBrainsLabel.setText("" + playerTwo.getTeam().getResourceCounterAmount());
+                }
+    
+                // Remover el recurso del tablero
+                targetCell.remove(resourceLabel);
+                targetCell.revalidate();
+                targetCell.repaint();
+                resource.collect();
+    
+                ((Timer) ev.getSource()).stop();
+                System.out.println("Recurso " + resource.getType() + " removido después de 3 segundos.");
+            });
+            collectTimer.setRepeats(false);
+            collectTimer.start();
+        }
+    }
+    
+    
+    
+    private Timer createEntityTimer(ResourceGenerator generator, int row, int col) {
+        return new Timer(20000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Resource res = generator.generateResource(row);
+                if (res != null) {
+                    spawnSpecificResource(row, col, res);
+                    System.out.println("Generando recurso: " + res.getType() + " en (" + row + ", " + col + ")");
+    
+                    // Manejar condiciones especiales para ECIPlant
+                    if (generator instanceof ECIPlant) {
+                        ECIPlant eciPlant = (ECIPlant) generator;
+                        Player playerOne = poobvszombies.getPlayerOne();
+                        System.out.println("Contador de soles antes de verificar: " + playerOne.getTeam().getResourceCounterAmount());
+    
+                        // Verificar si el contador es <= 0 y si aún no se han generado los soles extras
+                        if (playerOne.getTeam().getResourceCounterAmount() <= 0 && !eciPlant.hasGeneratedExtraSuns()) {
+                            eciPlant.setExtraSunsGenerated(true);
+                            System.out.println("ECIPlant detectó contador de soles <= 0. Generando THREE_BIG_SOL.");
+    
+                            // Generar THREE_BIG_SOL
+                            Resource threeBigSol = new Resource(Resource.THREE_BIG_SOL, Resource.THREE_BIG_VALUE);
+                            spawnSpecificResource(row, col, threeBigSol);
+    
+                            // Sumar 150 soles directamente al contador
+                            playerOne.getTeam().addResource(new Resource(Resource.SOL, 150));
+                            playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+                            System.out.println("ECIPlant ha sumado 150 soles al contador.");
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    
+    public void removePlantAt(int row, int col) {
+        JPanel cell = gridCells[row][col];
+        cell.removeAll();
+        cell.revalidate();
+        cell.repaint();
+    }
+
+    private int getZombieRow(JLabel zombieLabel) {
+        Point location = zombieLabel.getLocation();
+        int gridStartY = 80;
+        int cellHeight = (500 + 20) / 5;
+        int relativeY = location.y - gridStartY;
+        int row = relativeY / cellHeight;
+        return row;
+    }
+
+    // Añade este método dentro de la clase GardenMenu:
+    public void spawnZombieAutomatically(int row, int col, Zombie zombie) {
+        // Buscar la definición gráfica del zombie según su clase
+        // Usamos el método entityName() de POOBvsZombies o podemos mapear directamente.
+        String zombieName = null;
+        if (zombie instanceof Basic) zombieName = "Basic";
+        else if (zombie instanceof Brainstein) zombieName = "Brainstein";
+        else if (zombie instanceof Buckethead) zombieName = "BucketHead";
+        else if (zombie instanceof Conehead) zombieName = "Conehead";
+        else if (zombie instanceof ECIZombie) zombieName = "ECIZombie";
+
+        // Encontrar las imágenes del zombie en ZOMBIES_VIEW
+        List<String> zombieData = null;
+        for (List<String> zData : ZOMBIES_VIEW) {
+            if (zData.get(0).equals(zombieName)) {
+                zombieData = zData;
+                break;
+            }
+        }
+        if (zombieData == null) {
+            System.err.println("No se encontró representación gráfica para el zombie: " + zombieName);
+            return;
+        }
+
+        // zombieData: [0]: Nombre, [1]: imagen estatica, [2]: card, [3]: gif animado
+        String dragImagePath = zombieData.get(3);
+        ImageIcon icon = new ImageIcon(dragImagePath);
+
+        // Obtener la celda destino para determinar posición
+        JPanel targetCell = gridCells[row][col];
+        Point cellLocation = targetCell.getLocation();
+        // La posición absoluta en el panel principal
+        int x = 40 + col * 80; // Basado en el cálculo del grid (ya definido en zombieLogic)
+        int y = 80 + row * 100; // Ajustar acorde a las dimensiones reales de cada celda
+        // Notar: en el código original se tomaban offsets, aquí mantenemos consistencia con el grid definido.
+        // Del código original: gridPanel.setBounds(40,80,800,500); 
+        // Cada celda ~ 80x100, calculamos posición absoluta:
+        // fila: startY=80 + row* (500/5=100)
+        // col: startX=40 + col*(800/10=80)
+
+        JLabel zombieLabel = new JLabel(icon);
+        zombieLabel.setHorizontalAlignment(JLabel.CENTER);
+        zombieLabel.setBounds(x, y, 80, 100); 
+        // Añadir el zombieLabel al panel principal (el primero que agregamos en el constructor)
+        Container parentPanel = (Container) this.getContentPane().getComponent(0); // El panel principal
+        if (parentPanel instanceof JPanel) {
+            JPanel mainPanel = (JPanel) parentPanel;
+            mainPanel.add(zombieLabel);
+            mainPanel.setComponentZOrder(zombieLabel, 0);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        }
+
+        // Registrar el zombie en ZombieThreadManager para que se mueva y ataque
+        zombieThreadManager.registerZombie(row, zombie, zombieLabel);
+        
+        // Añadir el zombieLabel a la lista movingZombies si es necesario
+        movingZombies.add(zombieLabel);
+    }
+
+    /**
+     * Método nuevo para manejar la generación automática de plantas.
+     *
+     * @param row   Fila donde se coloca la planta.
+     * @param col   Columna donde se coloca la planta.
+     * @param plant Instancia de la planta a visualizar.
+     */
+    public void spawnPlantAutomatically(int row, int col, Plant plant) {
+        // Buscar la definición gráfica de la planta según su clase
+        String plantName = null;
+        if (plant instanceof Sunflower) plantName = "Sunflower";
+        else if (plant instanceof Peashooter) plantName = "Peashooter";
+        else if (plant instanceof WallNut) plantName = "WallNut";
+        // Agrega otros tipos de plantas si es necesario
+
+        // Encontrar las imágenes de la planta en PLANTS_VIEW
+        List<String> plantData = null;
+        for (List<String> pData : PLANTS_VIEW) {
+            if (pData.get(0).equals(plantName)) {
+                plantData = pData;
+                break;
+            }
+        }
+        if (plantData == null) {
+            System.err.println("No se encontró representación gráfica para la planta: " + plantName);
+            return;
+        }
+
+        // plantData: [0]: Nombre, [1]: imagen estática, [2]: card, [3]: gif animado
+        String plantImagePath = plantData.get(3); // Usar la imagen animada
+
+        ImageIcon icon = new ImageIcon(plantImagePath);
+
+        // Obtener la celda destino para determinar posición
+        JPanel targetCell = gridCells[row][col];
+        Point cellLocation = targetCell.getLocation();
+
+        // Calcular posición absoluta
+        int x = 40 + col * 80; // Basado en el cálculo del grid (ya definido en zombieLogic)
+        int y = 80 + row * 100; // Ajustar acorde a las dimensiones reales de cada celda
+
+        JLabel plantLabel = new JLabel(icon);
+        plantLabel.setHorizontalAlignment(JLabel.CENTER);
+        plantLabel.setBounds(x, y, 80, 100); // Ajustar tamaño según el grid
+
+        // Añadir el plantLabel al panel principal
+        Container parentPanel = (Container) this.getContentPane().getComponent(0); // El primer componente es el panel principal
+        if (parentPanel instanceof JPanel) {
+            JPanel mainPanel = (JPanel) parentPanel;
+            mainPanel.add(plantLabel);
+            mainPanel.setComponentZOrder(plantLabel, 0); // Traer al frente
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        }
+
+        // Si la planta es un generador de recursos, crear un temporizador para generar recursos
+        if (plant instanceof ResourceGenerator) {
+            Timer plantTimer = createEntityTimer((ResourceGenerator) plant, row, col);
+            entityTimers.put(plant, plantTimer);
+            plantTimer.start();
+        }
+    }
+
+    // /**
+    //  * Crea un temporizador para generar recursos a partir de una planta generadora de recursos.
+    //  *
+    //  * @param generator Generador de recursos.
+    //  * @param row       Fila de la planta.
+    //  * @param col       Columna de la planta.
+    //  * @return Instancia de Timer configurada.
+    //  */
+    // private Timer createPlantTimer(ResourceGenerator generator, int row, int col) {
+    //     return new Timer(20000, new ActionListener() { // Cada 20 segundos
+    //         @Override
+    //         public void actionPerformed(ActionEvent e) {
+    //             Resource res = generator.generateResource(row);
+    //             if (res != null) {
+    //                 spawnSpecificResource(row, col, res);
+    //                 System.out.println("Generando recurso: " + res.getType() + " en (" + row + ", " + col + ")");
+
+    //                 // Manejar condiciones especiales, e.g., ECIPlant
+    //                 if (generator instanceof ECIPlant) {
+    //                     ECIPlant eciPlant = (ECIPlant) generator;
+    //                     Player playerOne = poobvszombies.getPlayerOne();
+    //                     System.out.println("Contador de soles antes de verificar: " + playerOne.getTeam().getResourceCounterAmount());
+
+    //                     // Verificar si el contador es <= 0 y si aún no se han generado los soles extras
+    //                     if (playerOne.getTeam().getResourceCounterAmount() <= 0 && !eciPlant.hasGeneratedExtraSuns()) {
+    //                         eciPlant.setExtraSunsGenerated(true);
+    //                         System.out.println("ECIPlant detectó contador de soles <= 0. Generando THREE_BIG_SOL.");
+
+    //                         // Generar THREE_BIG_SOL
+    //                         Resource threeBigSol = new Resource(Resource.THREE_BIG_SOL, Resource.THREE_BIG_VALUE);
+    //                         spawnSpecificResource(row, col, threeBigSol);
+
+    //                         // Sumar 150 soles directamente al contador
+    //                         playerOne.getTeam().addResource(new Resource(Resource.SOL, 150));
+    //                         playerOneSunsLabel.setText("" + playerOne.getTeam().getResourceCounterAmount());
+    //                         System.out.println("ECIPlant ha sumado 150 soles al contador.");
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ArrayList<String> selectedPlants = new ArrayList<>(Arrays.asList(

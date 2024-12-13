@@ -12,7 +12,7 @@ public abstract class Zombie extends Character {
         return damage;
     }
 
-    public void takeDamage(int damage) {
-        this.health -= damage;
-    }
+    // public void takeDamage(int damage) {
+    //     this.health -= damage;
+    // }
 }

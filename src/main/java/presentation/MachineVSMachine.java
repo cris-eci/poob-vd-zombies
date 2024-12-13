@@ -15,7 +15,7 @@ public class MachineVSMachine extends JFrame {
 
     // GUI Components
     private JTextField timeField, quantityField, setSunsField, setBrainsField;
-    private JLabel sunsValueLabel, brainsValueLabel;
+    //private JLabel sunsValueLabel, brainsValueLabel;
     private JButton startButton;
     private List<PlantPanel> plantPanelsList;
     private List<ZombiePanel> zombiePanelsList;
@@ -106,6 +106,12 @@ public class MachineVSMachine extends JFrame {
             int sunAmount = Integer.parseInt(setSunsField.getText());
             int brainAmount = Integer.parseInt(setBrainsField.getText());
 
+            if(matchTime < 1 || hordeNumber < 1){
+                throw new POOBvsZombiesException(POOBvsZombiesException.TIME_LIMIT);
+            }
+            if(sunAmount < 0 || brainAmount < 0){
+                throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+            }
             // Plantas y Zombies seleccionados (preseleccionados)
             ArrayList<String> selectedPlants = getSelectedPlantNames();
             ArrayList<String> selectedZombies = getSelectedZombieNames();
@@ -129,8 +135,12 @@ public class MachineVSMachine extends JFrame {
             dispose();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid numeric value. Please check the inputs.", "Error",
-                    JOptionPane.WARNING_MESSAGE);
+            try{
+                throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);    
+            }
+            catch (POOBvsZombiesException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);

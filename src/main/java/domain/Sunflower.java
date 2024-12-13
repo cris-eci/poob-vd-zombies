@@ -1,7 +1,6 @@
-// Sunflower
 package domain;
+
 public class Sunflower extends Plant implements ResourceGenerator {
-    // Produce 25 soles cada 20 segundos
     private static final int COST = 50;
     private static final int HEALTH = 300;
 
@@ -10,7 +9,8 @@ public class Sunflower extends Plant implements ResourceGenerator {
     }
 
     @Override
-    public void generateResource(int lane) {
-        // Lógica para generar soles
+    public Resource generateResource(int lane) {
+        // Genera un sol de 25 en la posición actual
+        return new Resource(Resource.SOL, 25);
     }
 }

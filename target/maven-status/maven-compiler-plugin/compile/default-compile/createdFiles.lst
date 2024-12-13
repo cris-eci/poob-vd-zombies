@@ -1,3 +1,4 @@
+domain\ZombieThreadManager.class
 presentation\PlayerVSMachine$3.class
 domain\ZombiesStrategic.class
 presentation\GardenMenu$TimerTask.class
@@ -26,6 +27,7 @@ domain\Character.class
 domain\ECIPlant.class
 domain\Strategy.class
 domain\HumanPlayer.class
+presentation\GardenMenu$11.class
 presentation\MachineVSMachine$3.class
 presentation\GardenMenu$8.class
 presentation\PlayerVSMachine$4.class
@@ -54,12 +56,15 @@ presentation\PlayerVsPlayer$4.class
 domain\Shooter.class
 presentation\PlayerVsPlayer$SelectablePanel$1.class
 presentation\PlayerVSMachine$PlantPanel.class
+domain\ProjectTileThreadManager.class
 domain\Brainstein.class
 domain\Zombie.class
 domain\ZombiesOriginal.class
 presentation\GardenMenu$10.class
 presentation\GardenMenu$6.class
 domain\ResourceGenerator.class
+presentation\GardenMenu$5$1.class
+domain\Log.class
 domain\Peashooter.class
 domain\Plant.class
 presentation\POOBvsZombiesGUI.class
