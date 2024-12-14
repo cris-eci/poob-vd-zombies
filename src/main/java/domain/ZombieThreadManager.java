@@ -54,6 +54,9 @@ public class ZombieThreadManager {
         }
         if (threads != null) {
             for (Thread thread : threads) {
+                Zombie zombie = threadToZombieMap.get(thread);
+                // decimos que el zombie fue asesinado por la cortadora de cesped
+                zombie.setKilledByLoawnmower();
                 
                 thread.interrupt();
                 JLabel zombieLabel = threadToLabelMap.remove(thread);
@@ -69,7 +72,7 @@ public class ZombieThreadManager {
                     });
                 }
                 // Si el zombie es un ECIZombie, también terminamos su hilo de proyectil
-                Zombie zombie = threadToZombieMap.get(thread);
+                //Zombie zombie = threadToZombieMap.get(thread);
                 if (zombie instanceof ECIZombie) {
                     Thread projectileThread = zombieToProjectileThreadMap.remove(thread);
                     if (projectileThread != null) {
@@ -208,7 +211,7 @@ public class ZombieThreadManager {
                             terminateZombiesInRow(row);
                             garden.deleteLawnmover(row);
                         } else {
-                            if (game.getWinner().equals("")) {
+                            if (game.getWinner().equals("") && zombie.getKilledByLawnmower() == false) {
                                 game.setWinner("Zombies");
                                 SwingUtilities.invokeLater(() -> {
                                     JOptionPane.showMessageDialog(garden.getMainPanel(), "¡Los zombies han ganado!");
