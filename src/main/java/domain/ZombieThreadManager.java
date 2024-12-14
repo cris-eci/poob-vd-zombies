@@ -214,6 +214,7 @@ public class ZombieThreadManager {
                 if (!(zombie instanceof Brainstein)) {
                     // Para cualquier zombie (incluyendo ECIZombie) excepto Brainstein:
                     int plantCol = game.getFirstPlantInRow(row);
+                    
                     if (plantCol == -1) {
                         // No hay plantas
                         int currentCol = getCurrentColumn(zombieLabel.getX());
@@ -225,8 +226,12 @@ public class ZombieThreadManager {
                             game.removeZombiesInRow(row);
                             terminateZombiesInRow(row);
                             garden.deleteLawnmover(row);
+
+                            // Salimos inmediatamente del método para evitar que se ejecute la lógica de mostrar mensaje
+                            return;
+
                         } else {
-                            if (game.getWinner().equals("") && zombie.getKilledByLawnmower() == false) {
+                            if (game.getWinner().equals("") && !zombie.getKilledByLawnmower()) {
                                 game.setWinner("Zombies");
                                 SwingUtilities.invokeLater(() -> {
                                     JOptionPane.showMessageDialog(garden.getMainPanel(), "¡Los zombies han ganado!");
