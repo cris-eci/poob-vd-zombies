@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -206,9 +207,17 @@ public class ZombieThreadManager {
                             game.removeZombiesInRow(row);
                             terminateZombiesInRow(row);
                             garden.deleteLawnmover(row);
+                        } else {
+                            if (game.getWinner().equals("")) {
+                                game.setWinner("Zombies");
+                                SwingUtilities.invokeLater(() -> {
+                                    JOptionPane.showMessageDialog(garden.getMainPanel(), "¡Los zombies han ganado!");
+                                });
+                            }
+                            System.out.println("Zombies win!");
                         }
                         break; // Sin plantas, ya en la col 0 o muerto
-                    }
+                }
 
                     // Hay planta, moverse a plantCol+1
                     int targetCol = plantCol + 1;
