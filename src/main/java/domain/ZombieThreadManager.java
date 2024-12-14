@@ -213,6 +213,8 @@ public class ZombieThreadManager {
             while (!Thread.currentThread().isInterrupted()) {
                 if (!(zombie instanceof Brainstein)) {
                     // Para cualquier zombie (incluyendo ECIZombie) excepto Brainstein:
+                    
+                    // Recalcular siempre la primera planta en la fila
                     int plantCol = game.getFirstPlantInRow(row);
                     
                     if (plantCol == -1) {
@@ -226,36 +228,57 @@ public class ZombieThreadManager {
                             game.removeZombiesInRow(row);
                             terminateZombiesInRow(row);
                             garden.deleteLawnmover(row);
-
-                            // Salimos inmediatamente del método para evitar que se ejecute la lógica de mostrar mensaje
                             return;
-
                         } else {
                             if (game.getWinner().equals("") && !zombie.getKilledByLawnmower()) {
                                 game.setWinner("Zombies");
                                 SwingUtilities.invokeLater(() -> {
                                     JOptionPane.showMessageDialog(garden.getMainPanel(), "¡Los zombies han ganado!");
-
                                     garden.dispose(); // Close the current window
                                     POOBvsZombiesGUI menu = new POOBvsZombiesGUI();
                                     menu.setVisible(true);
                                 });
                             }
-                            // System.out.println("Zombies win!");
+                            break; 
                         }
-                        break; // Sin plantas, ya en la col 0 o muerto
                     }
-
-                    // Hay planta, moverse a plantCol+1
-                    int targetCol = plantCol + 1;
-                    moveZombie(row, targetCol, zombieLabel);
-
-                    // Si NO es ECIZombie, ataca directamente
-                    if (!(zombie instanceof ECIZombie)) {
-                        attackPlant(row, plantCol, zombie, zombieLabel);
+    
+                    // Hay planta, el zombie debe moverse hacia ella y atacarla
+                    // Pero la planta más cercana podría cambiar mientras el zombie se mueve.
+                    // Por lo tanto, realizaremos un bucle que:
+                    // 1. Calcula la planta más cercana
+                    // 2. Mueve el zombie hasta plantCol+1
+                    // 3. Al llegar, recalcula la planta más cercana.
+                    // Si la planta cercana cambió a una más cercana (col más grande), repetir el movimiento.
+                    
+                    while (true) {
+                        int currentPlantCol = game.getFirstPlantInRow(row);
+                        if (currentPlantCol == -1) {
+                            // Ya no hay planta (posiblemente fue destruida por otro zombie)
+                            break;
+                        }
+                        
+                        int targetCol = currentPlantCol + 1;
+                        
+                        // Mover zombie a la columna targetCol
+                        moveZombie(row, targetCol, zombieLabel);
+                        
+                        // Después del movimiento, verificar si la planta más cercana cambió
+                        int newPlantCol = game.getFirstPlantInRow(row);
+                        if (newPlantCol != currentPlantCol && newPlantCol != -1) {
+                            // Hay una nueva planta más cercana o cambió la posición, repetir el ciclo para recalcular
+                            continue;
+                        }
+                        
+                        // Si llegamos aquí, la planta cercana sigue siendo la misma (currentPlantCol)
+                        // Ahora atacar la planta
+                        if (!(zombie instanceof ECIZombie)) {
+                            attackPlant(row, currentPlantCol, zombie, zombieLabel);
+                        }
+                        // Si es un ECIZombie, no atacamos directamente. El ECIZombie ya ataca con proyectiles.
+                        break; // Salir del while interno, volver al while externo
                     }
-                    // Si es ECIZombie, no atacamos directamente, el proyectil se encarga.
-                    // El ECIZombie seguirá disparando desde su hilo de proyectil.
+    
                 } else {
                     // Brainstein genera recursos, no se mueve ni ataca
                     ((Brainstein) zombie).generateResource(row);
@@ -271,6 +294,7 @@ public class ZombieThreadManager {
             cleanupZombieThread(row, zombieLabel);
         }
     }
+    
 
     /**
      * Limpia los datos y hilos asociados a un zombie al terminar su ejecución.
