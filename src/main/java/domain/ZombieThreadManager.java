@@ -14,13 +14,17 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import presentation.GardenMenu;
+import presentation.POOBvsZombiesGUI;
 
 /**
  * Manages zombie threads and their interactions within the game.
  * <p>
- * This class handles the creation, management, and termination of zombie threads,
- * as well as their interactions with plants and other game elements. It also manages
- * the graphical representation of zombies and their movements within the user interface.
+ * This class handles the creation, management, and termination of zombie
+ * threads,
+ * as well as their interactions with plants and other game elements. It also
+ * manages
+ * the graphical representation of zombies and their movements within the user
+ * interface.
  * </p>
  */
 public class ZombieThreadManager {
@@ -42,8 +46,10 @@ public class ZombieThreadManager {
 
     /**
      * Terminates all zombie threads in the specified row, stops their movement,
-     * removes their graphical representation from the user interface, and interrupts
-     * any associated projectile threads if the zombies are instances of {@code ECIZombie}.
+     * removes their graphical representation from the user interface, and
+     * interrupts
+     * any associated projectile threads if the zombies are instances of
+     * {@code ECIZombie}.
      *
      * @param row the row number whose zombie threads are to be terminated
      */
@@ -57,7 +63,7 @@ public class ZombieThreadManager {
                 Zombie zombie = threadToZombieMap.get(thread);
                 // decimos que el zombie fue asesinado por la cortadora de cesped
                 zombie.setKilledByLoawnmower();
-                
+
                 thread.interrupt();
                 JLabel zombieLabel = threadToLabelMap.remove(thread);
                 // Eliminar el zombieLabel de la interfaz gráfica
@@ -72,19 +78,20 @@ public class ZombieThreadManager {
                     });
                 }
                 // Si el zombie es un ECIZombie, también terminamos su hilo de proyectil
-                //Zombie zombie = threadToZombieMap.get(thread);
+                // Zombie zombie = threadToZombieMap.get(thread);
                 if (zombie instanceof ECIZombie) {
                     Thread projectileThread = zombieToProjectileThreadMap.remove(thread);
                     if (projectileThread != null) {
                         projectileThread.interrupt();
                     }
-                }                
+                }
             }
         }
     }
 
     /**
-     * Constructs a new ZombieThreadManager associated with the given game and garden menu.
+     * Constructs a new ZombieThreadManager associated with the given game and
+     * garden menu.
      *
      * @param game   the POOBvsZombies game instance
      * @param garden the GardenMenu associated with the game
@@ -98,8 +105,10 @@ public class ZombieThreadManager {
      * Registers a zombie to be managed by the thread manager.
      * <p>
      * This method creates a new thread to handle the zombie's movement and logic.
-     * It stores the thread, zombie instance, and associated JLabel for future reference.
-     * If the zombie is an instance of {@code ECIZombie}, it also creates and starts a separate
+     * It stores the thread, zombie instance, and associated JLabel for future
+     * reference.
+     * If the zombie is an instance of {@code ECIZombie}, it also creates and starts
+     * a separate
      * thread to manage its projectile attacks.
      *
      * @param row         the row where the zombie is located
@@ -111,7 +120,7 @@ public class ZombieThreadManager {
 
         // almacenamos el hilo recien creado.
         synchronized (zombieThreadsByRow) {
-        zombieThreadsByRow.computeIfAbsent(row, k -> new ArrayList<>()).add(zombieThread);
+            zombieThreadsByRow.computeIfAbsent(row, k -> new ArrayList<>()).add(zombieThread);
         }
 
         // almacenamos el JLabel del zombie para poder moverlo o quitarlo
@@ -139,15 +148,17 @@ public class ZombieThreadManager {
     /**
      * Retrieves the first zombie in the specified row.
      *
-     * This method returns an {@code ArrayList<Object>} containing the following elements:
+     * This method returns an {@code ArrayList<Object>} containing the following
+     * elements:
      * <ul>
-     *   <li>The {@code Thread} associated with the first zombie.</li>
-     *   <li>The {@code JLabel} representing the zombie's visual component.</li>
-     *   <li>The {@code Zombie} object representing the zombie's data.</li>
+     * <li>The {@code Thread} associated with the first zombie.</li>
+     * <li>The {@code JLabel} representing the zombie's visual component.</li>
+     * <li>The {@code Zombie} object representing the zombie's data.</li>
      * </ul>
      *
      * @param row the row number to search for the first zombie.
-     * @return an {@code ArrayList<Object>} containing the first zombie's thread, label, and object;
+     * @return an {@code ArrayList<Object>} containing the first zombie's thread,
+     *         label, and object;
      *         or an empty list if there are no zombies in the specified row.
      */
     public ArrayList<Object> getFirstZombieInRow(int row) {
@@ -170,23 +181,27 @@ public class ZombieThreadManager {
             zombieTarget.add(zombieLabel);
             zombieTarget.add(zombie);
 
-         
         }
         return zombieTarget;
     }
 
     /**
      * Lógica principal del zombie.
-     * Solo maneja el movimiento y ataques directos para zombies que no son ECIZombie.
+     * Solo maneja el movimiento y ataques directos para zombies que no son
+     * ECIZombie.
      */
     /**
      * Executes the main logic for a zombie's behavior within the game.
      * <p>
      * This method handles the movement and actions of a zombie based on its type.
-     * Regular zombies move towards the nearest plant in their row, attack it when adjacent,
-     * and handle interactions with lawnmowers. Special zombies like {@code Brainstein} and
-     * {@code ECIZombie} have unique behaviors: {@code Brainstein} generates resources,
-     * while {@code ECIZombie} attacks using projectiles managed in separate threads.
+     * Regular zombies move towards the nearest plant in their row, attack it when
+     * adjacent,
+     * and handle interactions with lawnmowers. Special zombies like
+     * {@code Brainstein} and
+     * {@code ECIZombie} have unique behaviors: {@code Brainstein} generates
+     * resources,
+     * while {@code ECIZombie} attacks using projectiles managed in separate
+     * threads.
      * </p>
      *
      * @param row         the row number where the zombie is located
@@ -215,12 +230,16 @@ public class ZombieThreadManager {
                                 game.setWinner("Zombies");
                                 SwingUtilities.invokeLater(() -> {
                                     JOptionPane.showMessageDialog(garden.getMainPanel(), "¡Los zombies han ganado!");
+
+                                    garden.dispose(); // Close the current window
+                                    POOBvsZombiesGUI menu = new POOBvsZombiesGUI();
+                                    menu.setVisible(true);
                                 });
                             }
-                            System.out.println("Zombies win!");
+                            // System.out.println("Zombies win!");
                         }
                         break; // Sin plantas, ya en la col 0 o muerto
-                }
+                    }
 
                     // Hay planta, moverse a plantCol+1
                     int targetCol = plantCol + 1;
@@ -252,9 +271,12 @@ public class ZombieThreadManager {
      * Limpia los datos y hilos asociados a un zombie al terminar su ejecución.
      */
     /**
-     * Cleans up resources associated with a zombie thread after it has finished its execution.
-     * This includes removing the thread from tracking collections, interrupting any associated
-     * projectile threads (for ECIZombie types), and removing the zombie's label from the GUI.
+     * Cleans up resources associated with a zombie thread after it has finished its
+     * execution.
+     * This includes removing the thread from tracking collections, interrupting any
+     * associated
+     * projectile threads (for ECIZombie types), and removing the zombie's label
+     * from the GUI.
      *
      * @param row         the row index where the zombie was located
      * @param zombieLabel the JLabel representing the zombie in the GUI
@@ -310,8 +332,8 @@ public class ZombieThreadManager {
     /**
      * Moves a zombie JLabel from its current position to a target column.
      *
-     * @param row The row in which the zombie is located.
-     * @param targetCol The target column to which the zombie should move.
+     * @param row         The row in which the zombie is located.
+     * @param targetCol   The target column to which the zombie should move.
      * @param zombieLabel The JLabel representing the zombie to be moved.
      */
     private void moveZombie(int row, int targetCol, JLabel zombieLabel) {
@@ -343,9 +365,9 @@ public class ZombieThreadManager {
     /**
      * Attacks a plant at the specified position with the given zombie.
      * 
-     * @param row The row position of the plant.
-     * @param plantCol The column position of the plant.
-     * @param zombie The zombie that will attack the plant.
+     * @param row         The row position of the plant.
+     * @param plantCol    The column position of the plant.
+     * @param zombie      The zombie that will attack the plant.
      * @param zombieLabel The label representing the zombie in the UI.
      */
     private void attackPlant(int row, int plantCol, Zombie zombie, JLabel zombieLabel) {
@@ -384,9 +406,11 @@ public class ZombieThreadManager {
     /**
      * Retrieves the X position of the zombie associated with the given thread.
      *
-     * @param zombieThread the thread associated with the zombie whose X position is to be retrieved
+     * @param zombieThread the thread associated with the zombie whose X position is
+     *                     to be retrieved
      * @return the X position of the zombie
-     * @throws IllegalArgumentException if the zombie thread is not found or has no associated JLabel
+     * @throws IllegalArgumentException if the zombie thread is not found or has no
+     *                                  associated JLabel
      */
     public int getZombieXPosition(Thread zombieThread) {
         JLabel zombieLabel;
@@ -409,11 +433,12 @@ public class ZombieThreadManager {
         thread.interrupt();
     }
 
-
     /**
      * Notifies the game that a zombie has reached the house in the specified row.
-     * If there is a lawnmower in the row, it removes all zombies in that row and deletes the lawnmower.
-     * Otherwise, it calculates the final scores and ends the game with a message indicating that the zombies have won.
+     * If there is a lawnmower in the row, it removes all zombies in that row and
+     * deletes the lawnmower.
+     * Otherwise, it calculates the final scores and ends the game with a message
+     * indicating that the zombies have won.
      *
      * @param row the row in which a zombie has reached the house
      */
@@ -428,24 +453,28 @@ public class ZombieThreadManager {
             game.endGame(winnerMessage); // Finaliza el juego
         }
     }
-    
-     /**
+
+    /**
      * Método que maneja el ataque con proyectiles de un ECIZombie.
      * Este método corre en un hilo separado y asegura que solo haya un proyectil
      * activo por ECIZombie.
      */
     /**
-     * Attacks the first plant in the specified row with a projectile from the given zombie.
-     * The method continuously checks for the presence of plants in the row and fires projectiles
+     * Attacks the first plant in the specified row with a projectile from the given
+     * zombie.
+     * The method continuously checks for the presence of plants in the row and
+     * fires projectiles
      * at them until the zombie is interrupted or its health drops to zero.
      *
-     * @param row The row in which to attack the plant.
-     * @param zombie The zombie that is attacking the plant.
-     * @param zombieLabel The JLabel representing the zombie in the graphical interface.
+     * @param row         The row in which to attack the plant.
+     * @param zombie      The zombie that is attacking the plant.
+     * @param zombieLabel The JLabel representing the zombie in the graphical
+     *                    interface.
      */
     private void attackPlantWithProjectile(int row, ECIZombie zombie, JLabel zombieLabel) {
         try {
-            JPanel mainPanel = garden.getMainPanel(); // Debes crear un getter en GardenMenu que retorne el panel principal
+            JPanel mainPanel = garden.getMainPanel(); // Debes crear un getter en GardenMenu que retorne el panel
+                                                      // principal
             while (!Thread.currentThread().isInterrupted() && zombie.getHealth() > 0) {
                 int plantCol = game.getFirstPlantInRow(row);
                 if (plantCol == -1) {
@@ -468,19 +497,19 @@ public class ZombieThreadManager {
 
                 // Convertir posiciones al mismo sistema de coordenadas (el del panel principal)
                 // Posición absoluta del zombie en panel:
-                java.awt.Point zombiePos = SwingUtilities.convertPoint(zombieLabel.getParent(), 
-                                                                    zombieLabel.getLocation(), 
-                                                                    mainPanel);
+                java.awt.Point zombiePos = SwingUtilities.convertPoint(zombieLabel.getParent(),
+                        zombieLabel.getLocation(),
+                        mainPanel);
 
                 // Posición absoluta de la planta en panel:
-                java.awt.Point plantPos = SwingUtilities.convertPoint(plantLabel.getParent(), 
-                                                                    plantLabel.getLocation(), 
-                                                                    mainPanel);
+                java.awt.Point plantPos = SwingUtilities.convertPoint(plantLabel.getParent(),
+                        plantLabel.getLocation(),
+                        mainPanel);
 
-                int zombieCenterX = zombiePos.x + zombieLabel.getWidth()/2;
-                int zombieCenterY = zombiePos.y + zombieLabel.getHeight()/2;
-                int plantCenterX = plantPos.x + plantLabel.getWidth()/2;
-                int plantCenterY = plantPos.y + plantLabel.getHeight()/2;
+                int zombieCenterX = zombiePos.x + zombieLabel.getWidth() / 2;
+                int zombieCenterY = zombiePos.y + zombieLabel.getHeight() / 2;
+                int plantCenterX = plantPos.x + plantLabel.getWidth() / 2;
+                int plantCenterY = plantPos.y + plantLabel.getHeight() / 2;
 
                 // Crear y mostrar el proyectil en el mismo panel que zombie y planta
                 JLabel projectileLabel = createProjectileLabel(mainPanel, zombieCenterX - 15, zombieCenterY - 15);
@@ -519,8 +548,10 @@ public class ZombieThreadManager {
      * Crea un JLabel para el proyectil y lo agrega a la interfaz gráfica.
      */
     /**
-     * Creates a JLabel representing a projectile with a specified starting position.
-     * The projectile is represented by an image icon which is scaled to a specific size.
+     * Creates a JLabel representing a projectile with a specified starting
+     * position.
+     * The projectile is represented by an image icon which is scaled to a specific
+     * size.
      * The JLabel is then added to the garden's content pane and its Z-order is set.
      *
      * @param startX the starting X coordinate of the projectile
@@ -531,18 +562,18 @@ public class ZombieThreadManager {
         ImageIcon icon = new ImageIcon("resources/images/blackPea.png");
         Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
-    
+
         JLabel projectileLabel = new JLabel(scaledIcon);
         projectileLabel.setSize(30, 30);
         projectileLabel.setLocation(startX, startY);
-    
+
         SwingUtilities.invokeLater(() -> {
             mainPanel.add(projectileLabel);
             mainPanel.setComponentZOrder(projectileLabel, 0);
             mainPanel.revalidate();
             mainPanel.repaint();
         });
-    
+
         return projectileLabel;
     }
 
@@ -554,19 +585,19 @@ public class ZombieThreadManager {
      * Moves a projectile from a starting position to a target position.
      *
      * @param projectileLabel the JLabel representing the projectile
-     * @param startX the starting X coordinate of the projectile
-     * @param targetX the target X coordinate of the projectile
-     * @param startY the starting Y coordinate of the projectile
-     * @param targetY the target Y coordinate of the projectile
-     * @return true if the projectile reached the target position, false if the thread was interrupted
+     * @param startX          the starting X coordinate of the projectile
+     * @param targetX         the target X coordinate of the projectile
+     * @param startY          the starting Y coordinate of the projectile
+     * @param targetY         the target Y coordinate of the projectile
+     * @return true if the projectile reached the target position, false if the
+     *         thread was interrupted
      */
     private boolean moveProjectile(
-        JLabel projectileLabel,
-        int startX,
-        int targetX,
-        int startY,
-        int targetY
-    ) {
+            JLabel projectileLabel,
+            int startX,
+            int targetX,
+            int startY,
+            int targetY) {
         int currentX = startX;
         int currentY = startY;
 
@@ -602,7 +633,5 @@ public class ZombieThreadManager {
         // Impacto con la planta
         return true;
     }
-    
-
 
 }
