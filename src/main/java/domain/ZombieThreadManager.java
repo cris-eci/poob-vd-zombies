@@ -190,27 +190,7 @@ public class ZombieThreadManager {
      * Solo maneja el movimiento y ataques directos para zombies que no son
      * ECIZombie.
      */
-    /**
-     * Executes the main logic for a zombie's behavior within the game.
-     * <p>
-     * This method handles the movement and actions of a zombie based on its type.
-     * Regular zombies move towards the nearest plant in their row, attack it when
-     * adjacent,
-     * and handle interactions with lawnmowers. Special zombies like
-     * {@code Brainstein} and
-     * {@code ECIZombie} have unique behaviors: {@code Brainstein} generates
-     * resources,
-     * while {@code ECIZombie} attacks using projectiles managed in separate
-     * threads.
-     * </p>
-     *
-     * @param row         the row number where the zombie is located
-     * @param zombie      the zombie instance performing actions
-     * @param zombieLabel the JLabel representing the zombie in the user interface
-     */
-
-
-     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
+    private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 if (zombie instanceof Brainstein) {
@@ -225,25 +205,29 @@ public class ZombieThreadManager {
                     continue;
                 }
     
-                // Para cualquier zombie que no sea Brainstein:
+                // Recalcular siempre la planta más cercana
                 int plantCol = game.getFirstPlantInRow(row);
     
                 if (plantCol == -1) {
                     // No hay plantas
-                    int currentCol = getCurrentColumn(zombieLabel.getX());
-                    if (currentCol > 0) {
-                        // Mover hasta la col 0
-                        // Nota: no hay necesidad de recalcular aquí, porque no hay plantas
-                        moveZombie(row, 0, zombieLabel, false);
+                    // El objetivo es llegar a la columna 0, pero si aparece una planta durante el camino,
+                    // debemos abortar y perseguir la planta.
+                    boolean reached = moveZombie(row, 0, zombieLabel, true);
+                    if (!reached) {
+                        // Significa que durante el movimiento aparecieron plantas
+                        // Volver al inicio del while para recalcular
+                        continue;
                     }
     
-                    if (game.getLawnmowerInRow(row)) {
+                    // Llegamos a la col 0
+                    boolean hadLawnmower = game.getLawnmowerInRow(row);
+                    if (hadLawnmower) {
                         game.removeZombiesInRow(row);
                         terminateZombiesInRow(row);
                         garden.deleteLawnmover(row);
-                        return; 
+                        return;
                     } else {
-                        // Llega a la casa sin podadora
+                        // Sin podadora
                         if (game.getWinner().equals("") && !zombie.getKilledByLawnmower()) {
                             game.setWinner("Zombies");
                             SwingUtilities.invokeLater(() -> {
@@ -255,41 +239,36 @@ public class ZombieThreadManager {
                         }
                         break; 
                     }
-                }
-    
-                // Hay planta
-                // El objetivo es llegar a plantCol+1
-                // Pero durante el movimiento podrían aparecer plantas más a la derecha (mayor col)
-                // Por ello, haremos el movimiento paso a paso y recalcularemos después de cada paso.
-    
-                int targetCol = plantCol + 1;
-                boolean reached = moveZombie(row, targetCol, zombieLabel, true);
-                if (!reached) {
-                    // Si no alcanzamos el targetCol es porque se interrumpió el movimiento
-                    // debido a que apareció una nueva planta más cercana
-                    // Volver al inicio del while para recalcular objetivo
-                    continue;
-                }
-    
-                // Si llegamos aquí, significa que llegamos exitosamente a targetCol
-                // Volvemos a recalcular la planta por si cambió justo al llegar
-                int newPlantCol = game.getFirstPlantInRow(row);
-                if (newPlantCol == plantCol) {
-                    // La planta sigue siendo la misma, atacar (si no es ECIZombie)
-                    if (!(zombie instanceof ECIZombie)) {
-                        attackPlant(row, plantCol, zombie, zombieLabel);
-                    }
-                    // Después de atacar la planta, el bucle se repite, se recalcula planta y se sigue
                 } else {
-                    // La planta cambió mientras llegábamos, volver al inicio del while para perseguir la nueva
-                    continue;
+                    // Hay planta
+                    // Movernos hacia plantCol+1, con verificación constante.
+                    int targetCol = plantCol + 1;
+                    boolean reached = moveZombie(row, targetCol, zombieLabel, true);
+                    if (!reached) {
+                        // Apareció otra planta más a la derecha o cambió la situación,
+                        // volver a recalcular planta en la siguiente iteración
+                        continue;
+                    }
+    
+                    // Si llegamos aquí, logramos llegar a targetCol
+                    // Recalcular planta por si cambió justo al llegar
+                    int newPlantCol = game.getFirstPlantInRow(row);
+                    if (newPlantCol == plantCol) {
+                        // La planta sigue siendo la misma, si no es ECIZombie, atacamos
+                        if (!(zombie instanceof ECIZombie)) {
+                            attackPlant(row, plantCol, zombie, zombieLabel);
+                        }
+                        // Después de atacar, el while se repite y recalcula todo
+                    } else {
+                        // Cambió la planta, volver al inicio del while a recalcular
+                        continue;
+                    }
                 }
             }
         } finally {
             cleanupZombieThread(row, zombieLabel);
         }
     }
-    
 
     /**
      * Limpia los datos y hilos asociados a un zombie al terminar su ejecución.
@@ -353,12 +332,14 @@ public class ZombieThreadManager {
         return Math.max(0, (xPosition - gridStartX) / cellWidth);
     }
 
- /**
- * Modificamos moveZombie para que después de cada paso revisemos si la planta más cercana ha cambiado.
- * Si detectamos un cambio de planta más cercana (por ejemplo, la nueva planta más cercana tiene
- * un índice de columna diferente al que estábamos usando), abortamos el movimiento y retornamos false.
+ 
+/**
+ * moveZombie revisa en cada paso si la situación cambió.
+ * Si initialPlantCol era -1 (sin plantas) y ahora hay una planta (plantCol != -1),
+ * se interrumpe el movimiento y se retorna false.
+ * Si había una planta objetivo y ahora apareció una más a la derecha, igual se interrumpe.
  *
- * @param checkForNewPlants Si es true, después de cada paso checamos si la planta más cercana cambió.
+ * @param checkForNewPlants siempre true, para verificar continuamente
  */
 private boolean moveZombie(int row, int targetCol, JLabel zombieLabel, boolean checkForNewPlants) {
     int cellWidth = 80;
@@ -366,11 +347,11 @@ private boolean moveZombie(int row, int targetCol, JLabel zombieLabel, boolean c
     int startY = zombieLabel.getY();
     int endX = 40 + targetCol * cellWidth;
 
+    // Al iniciar el movimiento registramos cuál es la planta más cercana actual
+    int initialPlantCol = game.getFirstPlantInRow(row);
+
     int currentX = startX;
     int currentY = startY;
-
-    // Guardamos el plantCol inicial antes de mover
-    int initialPlantCol = game.getFirstPlantInRow(row);
 
     while (currentX > endX) {
         currentX -= 5;
@@ -388,18 +369,18 @@ private boolean moveZombie(int row, int targetCol, JLabel zombieLabel, boolean c
 
         if (checkForNewPlants) {
             int currentPlantCol = game.getFirstPlantInRow(row);
-            // Si la planta más cercana cambió y es distinta a la que usábamos como referencia
-            // significa que apareció una planta más a la derecha (más grande currentPlantCol)
-            // o simplemente cambió la situación, debemos redirigir el zombie
+            // Caso 1: No había plantas, initialPlantCol = -1, pero ahora currentPlantCol != -1
+            // Significa que aparecieron plantas. Interrumpimos el movimiento.
+            // Caso 2: Había una planta y ahora apareció otra más a la derecha o la situación cambió,
+            //          currentPlantCol != initialPlantCol. También interrumpimos.
             if (currentPlantCol != initialPlantCol) {
-                // Abortar este movimiento para recalcular objetivo
+                // Interrumpimos y devolvemos false para que zombieLogic recalcule.
                 return false;
             }
         }
     }
-    return true; // Alcanzamos el targetCol sin interrupciones
-}
-    /**
+    return true; // Alcanzamos el targetCol sin encontrar cambios que requieran abortar
+}   /**
      * Attacks a plant at the specified position with the given zombie.
      * 
      * @param row         The row position of the plant.
