@@ -1,5 +1,11 @@
 package domain;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -685,4 +691,184 @@ public class POOBvsZombies {
     public String getWinner() {
         return winner;
     }
+
+    public void saveGame(File file, int currentIndex, int currentRemaining, boolean isPaused) throws IOException {
+    try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
+        pw.println("modality=" + getModality());
+        pw.println("matchTime=" + getMatchTime());
+        pw.println("roundTime=" + getRoundTime());
+
+        Player p1 = getPlayerOne();
+        pw.println("playerOneName=" + p1.getName());
+        pw.println("playerOneScore=" + p1.getScore());
+        pw.println("playerOneSuns=" + p1.getTeam().getResourceCounterAmount());
+
+        Player p2 = getPlayerTwo();
+        pw.println("playerTwoName=" + p2.getName());
+        pw.println("playerTwoScore=" + p2.getScore());
+        pw.println("playerTwoBrains=" + p2.getTeam().getResourceCounterAmount());
+
+        pw.println("currentTimerTaskIndex=" + currentIndex);
+        pw.println("currentTimerTaskRemainingTime=" + currentRemaining);
+        pw.println("isPaused=" + isPaused);
+
+        // Guardar la matriz de entidades
+        for (int i = 0; i < 5; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < 10; j++) {
+                Object obj = entities.get(i).get(j);
+                if (j > 0) sb.append(" ");
+                if (j < 9) {
+                    // entidad o null
+                    if (obj == null) sb.append("-");
+                    else sb.append(entityName((Entity)obj));
+                } else {
+                    // Ultima col = cola de zombies
+                    @SuppressWarnings("unchecked")
+                    Queue<Zombie> q = (Queue<Zombie>) obj;
+                    if (q.isEmpty()) sb.append("-");
+                    else {
+                        Zombie z = q.peek();
+                        sb.append(entityName(z));
+                    }
+                }
+            }
+            pw.println(sb.toString());
+        }
+    }
+}
+
+public static POOBvsZombies loadGame(File file) throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader(file));
+
+    String modality="";
+    float matchTime=0f, roundTime=0f;
+    String playerOneName="", playerTwoName="";
+    int playerOneScore=0, playerOneSuns=0;
+    int playerTwoScore=0, playerTwoBrains=0;
+    int currentTaskIndex=0, currentTaskRemaining=0;
+    boolean isPaused=false;
+
+    // Leer encabezado hasta isPaused
+    String line;
+    ArrayList<String> headerLines = new ArrayList<>();
+    while((line=br.readLine())!=null) {
+        headerLines.add(line);
+        if (line.startsWith("isPaused=")) break;
+    }
+
+    for (String l: headerLines) {
+        if (l.startsWith("modality=")) modality = l.split("=")[1];
+        else if (l.startsWith("matchTime=")) matchTime = Float.parseFloat(l.split("=")[1]);
+        else if (l.startsWith("roundTime=")) roundTime = Float.parseFloat(l.split("=")[1]);
+        else if (l.startsWith("playerOneName=")) playerOneName = l.split("=")[1];
+        else if (l.startsWith("playerOneScore=")) playerOneScore = Integer.parseInt(l.split("=")[1]);
+        else if (l.startsWith("playerOneSuns=")) playerOneSuns = Integer.parseInt(l.split("=")[1]);
+        else if (l.startsWith("playerTwoName=")) playerTwoName = l.split("=")[1];
+        else if (l.startsWith("playerTwoScore=")) playerTwoScore = Integer.parseInt(l.split("=")[1]);
+        else if (l.startsWith("playerTwoBrains=")) playerTwoBrains = Integer.parseInt(l.split("=")[1]);
+        else if (l.startsWith("currentTimerTaskIndex=")) currentTaskIndex = Integer.parseInt(l.split("=")[1]);
+        else if (l.startsWith("currentTimerTaskRemainingTime=")) currentTaskRemaining = Integer.parseInt(l.split("=")[1]);
+        else if (l.startsWith("isPaused=")) isPaused = Boolean.parseBoolean(l.split("=")[1]);
+    }
+
+    // Leer la matriz
+    ArrayList<ArrayList<Object>> newMatrix = new ArrayList<>();
+    for (int i=0; i<5; i++) {
+        String matLine = br.readLine();
+        if (matLine == null) {
+            br.close();
+            throw new IOException("Archivo incompleto: faltan líneas de matriz");
+        }
+        String[] parts = matLine.split(" ");
+        if (parts.length<10) {
+            br.close();
+            throw new IOException("Línea de matriz inválida");
+        }
+        ArrayList<Object> row = new ArrayList<>();
+        for (int j=0;j<10;j++) {
+            String entName = parts[j];
+            if (entName.equals("-")) {
+                if (j<9) row.add(null);
+                else {
+                    row.add(new LinkedList<Zombie>());
+                }
+            } else {
+                if (j<9) {
+                    Entity e = createEntityStatic(entName);
+                    row.add(e);
+                } else {
+                    Queue<Zombie> q = new LinkedList<>();
+                    Zombie z = (Zombie)createEntityStatic(entName);
+                    q.offer(z);
+                    row.add(q);
+                }
+            }
+        }
+        newMatrix.add(row);
+    }
+    br.close();
+
+    // Crear instancia POOBvsZombies según modalidad
+    POOBvsZombies loadedGame;
+    ArrayList<String> emptyList = new ArrayList<>();
+    if (modality.equals("PlayerVsPlayer")) {
+        loadedGame = new POOBvsZombies(1, // matchTimeInSeconds dummy
+                "tempP1", emptyList, 50, "tempP2", 50, emptyList);
+    } else if (modality.equals("PlayerVsMachine")) {
+        loadedGame = new POOBvsZombies(1,1,"tempP1",emptyList);
+    } else if (modality.equals("MachineVsMachine")) {
+        loadedGame = new POOBvsZombies(1,1,50,50);
+    } else {
+        loadedGame = new POOBvsZombies(1,"tempP1",emptyList,50,"tempP2",50,emptyList);
+    }
+
+    loadedGame.modality = modality;
+    loadedGame.matchTime = matchTime;
+    loadedGame.roundTime = roundTime;
+
+    // Ajustar jugadores
+    loadedGame.getPlayerOne().setName(playerOneName);
+    loadedGame.getPlayerOne().setScore(playerOneScore);
+    loadedGame.getPlayerOne().getTeam().setResourceCounter(playerOneSuns);
+
+    loadedGame.getPlayerTwo().setName(playerTwoName);
+    loadedGame.getPlayerTwo().setScore(playerTwoScore);
+    loadedGame.getPlayerTwo().getTeam().setResourceCounter(playerTwoBrains);
+
+    loadedGame.entities = newMatrix;
+
+    // Guardar info adicional para restaurar en GardenMenu
+    loadedGame.restoredIndex = currentTaskIndex;
+    loadedGame.restoredRemaining = currentTaskRemaining;
+    loadedGame.restoredPaused = isPaused;
+
+    return loadedGame;
+}
+
+private static Entity createEntityStatic(String name) {
+    switch (name) {
+        case "Basic": return new Basic();
+        case "Brainstein": return new Brainstein();
+        case "BucketHead": return new Buckethead();
+        case "Conehead": return new Conehead();
+        case "ECIZombie": return new ECIZombie();
+        case "Sunflower": return new Sunflower();
+        case "Peashooter": return new Peashooter();
+        case "WallNut": return new WallNut();
+        case "PotatoMine": return new PotatoMine();
+        case "ECIPlant": return new ECIPlant();
+        case "LownMover": return new Lownmover();
+        default: return null;
+    }
+}
+
+// Campos para restaurar estado
+private int restoredIndex=0;
+private int restoredRemaining=0;
+private boolean restoredPaused=false;
+public int getRestoredIndex(){return restoredIndex;}
+public int getRestoredRemaining(){return restoredRemaining;}
+public boolean getRestoredPaused(){return restoredPaused;}
+
 }

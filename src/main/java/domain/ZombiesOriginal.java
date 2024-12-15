@@ -20,7 +20,7 @@ public class ZombiesOriginal extends MachinePlayer{
     private GardenMenu gardenMenu;
     private ArrayList<String> zombieTypes;  // Tipos de zombies posibles
     private POOBvsZombies game; // Referencia al juego para acceder a métodos necesarios
-
+    private String name;
         
     private JLabel zombieLabel;
         
@@ -70,7 +70,11 @@ public class ZombiesOriginal extends MachinePlayer{
         public int getHordersNumber() {
             return hordersNumber;
         }
-    
+        
+        public void setName(String name) {
+            this.name = name;
+        }   
+        
         public float getHorderTime(float matchTime) {
             return horderTime;
         }

@@ -15,12 +15,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator; // Add this import
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import javax.swing.Box; // Add this import
 import javax.swing.ImageIcon;
@@ -157,6 +160,11 @@ public class GardenMenu extends JFrame {
     private Timer phaseTimer; // Timer que maneja la cuenta regresiva de cada fase (startSequentialTimers)
     private Timer resourceTimerMvM; // Timer para MachineVsMachine
     private Timer collectTimer; 
+
+    // Agregar un método para almacenar el estado restaurado
+    private int currentTimerTaskIndex = 0;
+    private int currentTimerTaskRemainingTime = 0;
+    
 
 
     public GardenMenu(POOBvsZombies poobvszombies) {
@@ -777,13 +785,32 @@ public class GardenMenu extends JFrame {
                 });
             }
 
+            // En addTopRightButtons:
             if (imagePath.contains("save-icon")) {
                 button.addActionListener(e -> {
-                    // Implementar funcionalidad para guardar el estado del juego
-                    JOptionPane.showMessageDialog(this, "Funcionalidad de guardar aún no implementada.", "Guardar",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    pauseGame();
+                    javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+                    int returnVal = fc.showSaveDialog(this);
+                    if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) {
+                        File file = fc.getSelectedFile();
+                        try {
+                            // currentTimerTaskIndex y currentTimerTaskRemainingTime deben ser guardados
+                            // Cuando incrementas la fase o decrece el tiempo, actualiza estas variables.
+                            // Aquí asumimos que currentTimerTaskIndex y currentTimerTaskRemainingTime
+                            // se mantienen al día en startSequentialTimers.
+                            int currentIndex = currentTimerTaskIndex;
+                            int currentRemaining = currentTimerTaskRemainingTime;
+                            poobvszombies.saveGame(file, currentIndex, currentRemaining, isPaused);
+                            JOptionPane.showMessageDialog(this, "Partida guardada con éxito.", "Guardar",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + ex.getMessage(), "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
                 });
             }
+
 
             // Add action events to buttons
             if (imagePath.contains("return-icon")) {
@@ -815,6 +842,205 @@ public class GardenMenu extends JFrame {
             x += 60; // Adjust X position for the next button
         }
     }
+
+    // Método para recargar entidades en la UI después de cargar partida
+    public void reloadEntitiesUI() {
+        ArrayList<ArrayList<Object>> matrix = poobvszombies.getEntitiesMatrix();
+        for (int i=0; i<5; i++){
+            for (int j=0; j<10; j++){
+                Object obj = matrix.get(i).get(j);
+                if (j<9) {
+                    if (obj instanceof Plant) {
+                        spawnPlantAutomatically(i,j,(Plant)obj);
+                    } else if (obj instanceof Zombie) {
+                        spawnZombieAutomatically(i,j,(Zombie)obj);
+                    }
+                } else {
+                    @SuppressWarnings("unchecked")
+                    Queue<Zombie> q = (Queue<Zombie>)obj;
+                    if (!q.isEmpty()) {
+                        Zombie z = q.peek();
+                        spawnZombieAutomatically(i,j,z);
+                    }
+                }
+            }
+        }
+        updateScoreLabels();
+    }
+
+    // Método para restaurar estado tras cargar partida
+    public void restoreGameState(int currentIndex, int currentRemaining, boolean wasPaused) {
+        // Limpiar timers actuales
+        if (phaseTimer != null && phaseTimer.isRunning()) phaseTimer.stop();
+        if (resourceTimerForPlayerVsPlayer != null) resourceTimerForPlayerVsPlayer.stop();
+        if (resourceTimerForPvMOrMvM != null) resourceTimerForPvMOrMvM.stop();
+        if (resourceTimerMvM != null) resourceTimerMvM.stop();
+
+        // Re-crear timerTasks según modalidad y matchTime/hordas
+        timerTasks.clear();
+        if ("PlayerVsPlayer".equals(modality)) {
+            timerTasks.add(new TimerTask("Planting time 1", Plants.PLANTING_TIME));
+            timerTasks.add(new TimerTask("Round time", (int) poobvszombies.getRoundTime()));
+            timerTasks.add(new TimerTask("Planting time 2", Plants.PLANTING_TIME));
+            timerTasks.add(new TimerTask("Last round", (int) poobvszombies.getRoundTime()));
+
+            resourceTimerForPlayerVsPlayer = new Timer(10000, e->{
+                if(isPaused)return;
+                String currentPhase=messageLabel.getText();
+                if (currentPhase.contains("Planting time")) {
+                    spawnResource(new Resource(Resource.SOL));
+                } else if(currentPhase.contains("Round")||currentPhase.contains("Last round")){
+                    spawnResource(new Resource(Resource.BRAIN));
+                }
+            });
+            resourceTimerForPlayerVsPlayer.start();
+
+        } else if ("PlayerVsMachine".equals(modality)) {
+            timerTasks.add(new TimerTask("Planting time",20));
+            int hordersNumber=poobvszombies.getHordersNumber();
+            int totalTime=(int)poobvszombies.getMatchTime();
+            int remainingTime=totalTime;
+            remainingTime-=20;
+            int hordeDuration=remainingTime/hordersNumber;
+            int extra=remainingTime%hordersNumber;
+            for(int i=1;i<=hordersNumber;i++){
+                int dur=hordeDuration;
+                if(i<=extra)dur+=1;
+                timerTasks.add(new TimerTask("Horda "+i,dur));
+            }
+
+            resourceTimerForPvMOrMvM = new Timer(10000,e->{
+                if(isPaused)return;
+                spawnResource(new Resource(Resource.SOL));
+            });
+            resourceTimerForPvMOrMvM.start();
+
+        } else if ("MachineVsMachine".equals(modality)) {
+            timerTasks.add(new TimerTask("Planting time",20));
+            int hordersNumber=poobvszombies.getHordersNumber();
+            int totalTime=(int)poobvszombies.getMatchTime();
+            int rem=totalTime-20;
+            int hordeDuration=rem/hordersNumber;
+            int extra=rem%hordersNumber;
+            for(int i=1;i<=hordersNumber;i++){
+                int dur=hordeDuration;
+                if(i<=extra)dur+=1;
+                timerTasks.add(new TimerTask("Horda "+i,dur));
+            }
+
+            resourceTimerMvM = new Timer(10000,e->{
+                if(isPaused)return;
+                String currentPhase=messageLabel.getText();
+                if(currentPhase.contains("Planting time")){
+                    spawnResource(new Resource(Resource.SOL));
+                } else if (currentPhase.contains("Horda")){
+                    spawnResource(new Resource(Resource.SOL));
+                    spawnResource(new Resource(Resource.BRAIN));
+                }
+            });
+            resourceTimerMvM.start();
+        }
+
+        // Actualizar índices
+        this.currentTimerTaskIndex = currentIndex;
+        this.currentTimerTaskRemainingTime = currentRemaining;
+
+        // Iniciar desde ese punto
+        startSequentialTimers(currentIndex, currentRemaining);
+        
+        reloadCards(); // Recargar cartas de plantas y zombies
+        if (wasPaused) {
+            pauseGame();
+        }
+    }
+
+    public void reloadCards() {
+        // Actualizar las listas selectedPlants y selectedZombies a partir de lo que tengan los jugadores.
+        Player playerOne = poobvszombies.getPlayerOne();
+        Player playerTwo = poobvszombies.getPlayerTwo();
+
+        this.selectedPlants = playerOne.getTeam().getCharacters();
+        // Dependiendo de la modalidad, puede que PlayerTwo tenga equipo de zombies
+        // En PlayerVsPlayer y MachineVsMachine el PlayerTwo es zombies, en PlayerVsMachine el PlayerTwo es zombies también.
+        // En PlayerVsMachine, PlayerTwo (la máquina) pone zombies automáticamente, igual su team tiene su lista
+        this.selectedZombies = playerTwo.getTeam().getCharacters();
+
+        // Antes de volver a añadir las cartas, podemos asegurarnos de no duplicar.
+        // Si las cartas ya estaban, al cargar estado quizá queremos removerlas primero.
+        // Sin embargo, en el código original las cartas se añadían en el constructor.
+        // Podríamos, por seguridad, remover las cartas antiguas si las hubo.
+        // Asumiremos que las cartas estaban en la parte superior del panel (en posiciones fijas).
+
+        // Opcional: Limpiar el área donde estaban las cartas
+        // Suponiendo que las cartas se añadieron en posiciones fijas (x,y),
+        // podemos no hacer nada y volver a mostrarlas superpuestas, o mejor, reabrir la ventana.
+        // Por simplicidad, asumimos que las cartas no se duplican. Si es necesario, crear un método para limpiar.
+
+        // Volver a añadir las cartas de plantas y zombies
+        Container parentPanel = (Container) getContentPane().getComponent(0);
+        if (parentPanel instanceof JPanel) {
+            JPanel panel = (JPanel) parentPanel;
+            addPlantsCards(panel);
+            if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
+                addPlantsCards(panel);
+                addZombieCards(panel);
+                panel.revalidate();
+                panel.repaint();
+                
+            } else if ("PlayerVsMachine".equals(modality)) {
+                // En PlayerVsMachine la lista de zombies del playerTwo se usa internamente
+                // Dependiendo de si se necesita mostrar sus cartas (si se permitía arrastrar zombies o no)
+                // Originalmente, PlayerVsMachine no mostraba zombies para arrastrar el jugador humano, 
+                // ya que el segundo jugador es la máquina. Así que en PlayerVsMachine no mostramos zombies.
+                // Sólo en PlayerVsPlayer o MachineVsMachine mostramos las cartas de zombies.
+            }
+            panel.revalidate();
+            panel.repaint();
+        }
+    }
+    // Sobrecarga startSequentialTimers para aceptar remainingTime
+    
+    public void startSequentialTimers(int index, int remainingTime) {
+        if (index >= timerTasks.size()) {
+            poobvszombies.calculateScores();
+            String winnerMessage=poobvszombies.determineWinner();
+            poobvszombies.endGame(winnerMessage);
+            return;
+        }
+
+        TimerTask currentTask = timerTasks.get(index);
+        int duration = currentTask.getDurationInSeconds();
+        int timeToUse = (remainingTime>0 && remainingTime<duration)?remainingTime:duration;
+        messageLabel.setText(currentTask.getMessage());
+        timeLabel.setText(formatTime(timeToUse));
+        messageLabel.setVisible(true);
+        timeLabel.setVisible(true);
+
+        if (phaseTimer!=null && phaseTimer.isRunning()) phaseTimer.stop();
+        phaseTimer = new Timer(1000,null);
+        phaseTimer.addActionListener(new ActionListener(){
+            int remain=timeToUse;
+            @Override
+            public void actionPerformed(ActionEvent e){
+                if(isPaused)return;
+                if(remain>0){
+                    remain--;
+                    currentTimerTaskRemainingTime=remain;
+                    timeLabel.setText(formatTime(remain));
+                } else {
+                    phaseTimer.stop();
+                    messageLabel.setVisible(false);
+                    timeLabel.setVisible(false);
+                    currentTimerTaskIndex=index+1;
+                    currentTimerTaskRemainingTime=0;
+                    startSequentialTimers(index+1,0);
+                }
+            }
+        });
+        phaseTimer.setInitialDelay(0);
+        phaseTimer.start();
+    }
+
 
     private void togglePause() {
         if (!isPaused) {

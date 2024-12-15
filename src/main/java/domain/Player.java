@@ -83,4 +83,13 @@ public abstract class Player {
     public void setScore(int score) {
         this.score = score;
     }
+
+    /**
+     * Sets the team of the player.
+     *
+     * @param team the team of the player
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 }

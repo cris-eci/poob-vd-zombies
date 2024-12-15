@@ -7,6 +7,7 @@ domain\PotatoMine.class
 presentation\GardenMenu.class
 domain\Basic.class
 presentation\EntityData.class
+presentation\GardenMenu$12.class
 domain\ZombieThreadManager$2.class
 presentation\MachineVSMachine$BackgroundPanel.class
 presentation\PlayerVsPlayer$2.class
