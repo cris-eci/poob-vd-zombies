@@ -993,6 +993,8 @@ public class GardenMenu extends JFrame {
                 // Originalmente, PlayerVsMachine no mostraba zombies para arrastrar el jugador humano, 
                 // ya que el segundo jugador es la máquina. Así que en PlayerVsMachine no mostramos zombies.
                 // Sólo en PlayerVsPlayer o MachineVsMachine mostramos las cartas de zombies.
+
+                addPlantsCards(panel);
             }
             panel.revalidate();
             panel.repaint();
@@ -1774,7 +1776,6 @@ public class GardenMenu extends JFrame {
         else if (zombie instanceof Brainstein) zombieName = "Brainstein";
         else if (zombie instanceof Buckethead) zombieName = "BucketHead";
         else if (zombie instanceof Conehead) zombieName = "Conehead";
-        else if (zombie instanceof ECIZombie) zombieName = "ECIZombie";
 
         // Encontrar las imágenes del zombie en ZOMBIES_VIEW
         List<String> zombieData = null;
@@ -1862,29 +1863,41 @@ public class GardenMenu extends JFrame {
         JPanel targetCell = gridCells[row][col];
         Point cellLocation = targetCell.getLocation();
 
-        // Calcular posición absoluta
-        int x = 40 + col * 80; // Basado en el cálculo del grid (ya definido en zombieLogic)
-        int y = 80 + row * 100; // Ajustar acorde a las dimensiones reales de cada celda
+        // // Calcular posición absoluta
+        // int x = 40 + col * 80; // Basado en el cálculo del grid (ya definido en zombieLogic)
+        // int y = 80 + row * 100; // Ajustar acorde a las dimensiones reales de cada celda
 
         JLabel plantLabel = new JLabel(icon);
         plantLabel.setHorizontalAlignment(JLabel.CENTER);
-        plantLabel.setBounds(x, y, 80, 100); // Ajustar tamaño según el grid
+        //plantLabel.setBounds(x, y, 80, 100); // Ajustar tamaño según el grid
 
         // Añadir el plantLabel al panel principal
-        Container parentPanel = (Container) this.getContentPane().getComponent(0); // El primer componente es el panel principal
-        if (parentPanel instanceof JPanel) {
-            JPanel mainPanel = (JPanel) parentPanel;
-            mainPanel.add(plantLabel);
-            mainPanel.setComponentZOrder(plantLabel, 0); // Traer al frente
-            mainPanel.revalidate();
-            mainPanel.repaint();
-        }
-
+        // Container parentPanel = (Container) this.getContentPane().getComponent(0); // El primer componente es el panel principal
+        // if (parentPanel instanceof JPanel) {
+        //     JPanel mainPanel = (JPanel) parentPanel;
+        //     mainPanel.add(plantLabel);
+        //     mainPanel.setComponentZOrder(plantLabel, 0); // Traer al frente
+        //     mainPanel.revalidate();
+        //     mainPanel.repaint();
+        // }
+        targetCell.add(plantLabel);
+        targetCell.revalidate();
+        targetCell.repaint();
         // Si la planta es un generador de recursos, crear un temporizador para generar recursos
         if (plant instanceof ResourceGenerator) {
             Timer plantTimer = createEntityTimer((ResourceGenerator) plant, row, col);
             entityTimers.put(plant, plantTimer);
             plantTimer.start();
+        }
+
+        // Si la planta es un Peashooter, registrar su proyectil
+        if (plant instanceof Peashooter) {
+            ProjectTile projectile = new ProjectTile();
+            // Usamos la posición relativa de la celda, aunque en este caso el projectTileThreadManager
+            // podría necesitar cálculos adicionales. Ajustar según sea necesario.
+            int x = targetCell.getX();
+            int y = targetCell.getY();
+            projectTileThreadManager.registerProjectTile(row, col, projectile, x, y);
         }
     }
 
