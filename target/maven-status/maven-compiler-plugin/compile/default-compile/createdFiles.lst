@@ -7,6 +7,8 @@ domain\PotatoMine.class
 presentation\GardenMenu.class
 domain\Basic.class
 presentation\EntityData.class
+presentation\GardenMenu$12.class
+domain\ZombieThreadManager$2.class
 presentation\MachineVSMachine$BackgroundPanel.class
 presentation\PlayerVsPlayer$2.class
 presentation\MachineVSMachine$2.class
@@ -63,7 +65,6 @@ domain\ZombiesOriginal.class
 presentation\GardenMenu$10.class
 presentation\GardenMenu$6.class
 domain\ResourceGenerator.class
-presentation\GardenMenu$5$1.class
 domain\Log.class
 domain\Peashooter.class
 domain\Plant.class
@@ -77,4 +78,5 @@ presentation\GardenMenu$3.class
 presentation\GardenMenu$9.class
 domain\MachinePlayer.class
 presentation\MachineVSMachine$1.class
+domain\ZombieThreadManager$1.class
 presentation\MachineVSMachine$PlantPanel.class

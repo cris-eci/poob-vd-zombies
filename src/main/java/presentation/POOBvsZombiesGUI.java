@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -20,6 +21,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import domain.POOBvsZombies;
+import domain.POOBvsZombiesException;
 
 /**
  * POOBvsZombiesGUI is the main graphical user interface for the POOBvsZombies game.
@@ -167,11 +171,29 @@ public class POOBvsZombiesGUI extends JFrame {
             }
 
             if (imagePath.contains("open-icon")) {
-                button.addActionListener(e -> {
-                    // Implementar funcionalidad para guardar el estado del juego
-                    JOptionPane.showMessageDialog(this, "Funcionalidad de abrir aún no implementada.", "Abrir", JOptionPane.INFORMATION_MESSAGE);
-                });
-            }
+            button.addActionListener(e -> {
+                javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+                int returnVal = fc.showOpenDialog(this);
+                if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    try {
+                        POOBvsZombies loadedGame = POOBvsZombies.loadGame(file);
+                        GardenMenu loadedMenu = new GardenMenu(loadedGame);
+                        loadedMenu.reloadEntitiesUI();
+                        loadedMenu.restoreGameState(loadedGame.getRestoredIndex(), loadedGame.getRestoredRemaining(), loadedGame.getRestoredPaused());
+                        this.dispose();
+                        loadedMenu.setVisible(true);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "Error al cargar la partida: " + ex.getMessage(),
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    } catch (POOBvsZombiesException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                }
+            });
+        }
+
             
 
             panel.add(button);

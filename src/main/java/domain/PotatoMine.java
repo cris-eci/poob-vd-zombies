@@ -21,6 +21,7 @@ public class PotatoMine extends Plant {
      */
     public static final int ACTIVATION_TIME = 14;
 
+    private boolean hasExploded = false;
     /**
      * Indicates whether the PotatoMine is activated.
      */
@@ -40,6 +41,7 @@ public class PotatoMine extends Plant {
         activated = true;
     }
 
+    
     /**
      * Checks if the PotatoMine is activated.
      *
@@ -59,5 +61,18 @@ public class PotatoMine extends Plant {
             System.out.println("PotatoMine ha explotado.");
             // Implementa la lógica de daño a los zombies adyacentes
         }
+    }
+
+    /**
+     * Sets the activation status of the PotatoMine.
+     *
+     * @param activated a boolean indicating whether the PotatoMine is activated (true) or not (false)
+     */
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+    public boolean hasExploded() {
+        return hasExploded;
     }
 }

@@ -6,6 +6,13 @@ package domain;
  */
 public abstract class Zombie extends Character {
     /**
+     * Indicates whether the zombie has been killed by a lawnmower.
+     * This flag is set to true if the zombie is killed by a lawnmower, otherwise it remains false.
+     */
+    private boolean  killedByLawnmower = false;
+
+
+    /**
      * The amount of damage this zombie can inflict.
      */
     protected int damage;
@@ -29,6 +36,22 @@ public abstract class Zombie extends Character {
      */
     public int getDamage() {
         return damage;
+    }
+
+    /**
+     * Sets the flag indicating that the zombie was killed by a lawnmower.
+     */
+    public void setKilledByLoawnmower(){
+        killedByLawnmower = true;
+    }
+
+    /**
+     * Checks if the zombie was killed by a lawnmower.
+     *
+     * @return true if the zombie was killed by a lawnmower, false otherwise.
+     */
+    public boolean getKilledByLawnmower(){
+        return killedByLawnmower;
     }
 }
 
