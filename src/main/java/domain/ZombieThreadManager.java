@@ -2,17 +2,23 @@ package domain;
 
 import java.awt.Container;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.Timer; // Importa javax.swing.Timer
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import presentation.GardenMenu;
+import presentation.POOBvsZombiesGUI;
 
 /**
  * Manages zombie threads and their interactions within the game.
@@ -39,6 +45,12 @@ public class ZombieThreadManager {
     // Nueva estructura para rastrear los hilos de proyectiles por ECIZombie
     private Map<Thread, Thread> zombieToProjectileThreadMap = new HashMap<>();
 
+    // Map para almacenar el Timer de activación de PotatoMine por posición
+    private Map<String, Timer> potatoMineTimers = new HashMap<>();
+
+    private volatile boolean isPaused = false; // Variable para controlar la pausa
+    private final Object pauseLock = new Object(); // Objeto para sincronización
+
     /**
      * Terminates all zombie threads in the specified row, stops their movement,
      * removes their graphical representation from the user interface, and interrupts
@@ -53,7 +65,9 @@ public class ZombieThreadManager {
         }
         if (threads != null) {
             for (Thread thread : threads) {
-                
+                Zombie zombie = threadToZombieMap.get(thread);
+                // decimos que el zombie fue asesinado por la cortadora de cesped
+                zombie.setKilledByLoawnmower();
                 thread.interrupt();
                 JLabel zombieLabel = threadToLabelMap.remove(thread);
                 // Eliminar el zombieLabel de la interfaz gráfica
@@ -68,7 +82,7 @@ public class ZombieThreadManager {
                     });
                 }
                 // Si el zombie es un ECIZombie, también terminamos su hilo de proyectil
-                Zombie zombie = threadToZombieMap.get(thread);
+                //Zombie zombie = threadToZombieMap.get(thread);
                 if (zombie instanceof ECIZombie) {
                     Thread projectileThread = zombieToProjectileThreadMap.remove(thread);
                     if (projectileThread != null) {
@@ -119,6 +133,16 @@ public class ZombieThreadManager {
         // hilo
         synchronized (threadToZombieMap) {
             threadToZombieMap.put(zombieThread, zombie);
+        }
+
+        synchronized (potatoMineTimers) {
+            String key = row + "," + 0; // La PotatoMine siempre está en la col 0
+            Timer activationTimer = potatoMineTimers.get(key);
+            if (activationTimer != null) {
+                activationTimer.stop();
+                potatoMineTimers.remove(key);
+                System.out.println("Timer de activación detenido para PotatoMine en (" + row + ", 0).");
+            }
         }
         zombieThread.start();
 
@@ -192,36 +216,19 @@ public class ZombieThreadManager {
     private void zombieLogic(int row, Zombie zombie, JLabel zombieLabel) {
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                if (!(zombie instanceof Brainstein)) {
-                    // Para cualquier zombie (incluyendo ECIZombie) excepto Brainstein:
-                    int plantCol = game.getFirstPlantInRow(row);
-                    if (plantCol == -1) {
-                        // No hay plantas
-                        int currentCol = getCurrentColumn(zombieLabel.getX());
-                        if (currentCol > 0) {
-                            // Mover hasta la col 0
-                            moveZombie(row, 0, zombieLabel);
+                // Verificar si el juego está pausado
+                synchronized (pauseLock) {
+                    while (isPaused) {
+                        try {
+                            pauseLock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
                         }
-                        if (game.getLawnmowerInRow(row)) {
-                            game.removeZombiesInRow(row);
-                            terminateZombiesInRow(row);
-                            garden.deleteLawnmover(row);
-                        }
-                        break; // Sin plantas, ya en la col 0 o muerto
                     }
-
-                    // Hay planta, moverse a plantCol+1
-                    int targetCol = plantCol + 1;
-                    moveZombie(row, targetCol, zombieLabel);
-
-                    // Si NO es ECIZombie, ataca directamente
-                    if (!(zombie instanceof ECIZombie)) {
-                        attackPlant(row, plantCol, zombie, zombieLabel);
-                    }
-                    // Si es ECIZombie, no atacamos directamente, el proyectil se encarga.
-                    // El ECIZombie seguirá disparando desde su hilo de proyectil.
-                } else {
-                    // Brainstein genera recursos, no se mueve ni ataca
+                }
+                if (zombie instanceof Brainstein) {
+                    // Solo genera recursos
                     ((Brainstein) zombie).generateResource(row);
                     try {
                         Thread.sleep(2000);
@@ -229,6 +236,67 @@ public class ZombieThreadManager {
                         Thread.currentThread().interrupt();
                         return;
                     }
+                    continue;
+                }
+    
+                // Para cualquier zombie que no sea Brainstein:
+                int plantCol = game.getFirstPlantInRow(row);
+    
+                if (plantCol == -1) {
+                    // No hay plantas
+                    int currentCol = getCurrentColumn(zombieLabel.getX());
+                    if (currentCol > 0) {
+                        // Mover hasta la col 0
+                        // Nota: no hay necesidad de recalcular aquí, porque no hay plantas
+                        moveZombie(row, 0, zombieLabel, false);
+                    }
+    
+                    if (game.getLawnmowerInRow(row)) {
+                        game.removeZombiesInRow(row);
+                        terminateZombiesInRow(row);
+                        garden.deleteLawnmover(row);
+                        return; 
+                    } else {
+                        // Llega a la casa sin podadora
+                        if (game.getWinner().equals("") && !zombie.getKilledByLawnmower()) {
+                            game.setWinner("Zombies");
+                            SwingUtilities.invokeLater(() -> {
+                                JOptionPane.showMessageDialog(garden.getMainPanel(), "¡Los zombies han ganado!");
+                                garden.dispose(); 
+                                POOBvsZombiesGUI menu = new POOBvsZombiesGUI();
+                                menu.setVisible(true);
+                            });
+                        }
+                        break; 
+                    }
+                }
+    
+                // Hay planta
+                // El objetivo es llegar a plantCol+1
+                // Pero durante el movimiento podrían aparecer plantas más a la derecha (mayor col)
+                // Por ello, haremos el movimiento paso a paso y recalcularemos después de cada paso.
+    
+                int targetCol = plantCol + 1;
+                boolean reached = moveZombie(row, targetCol, zombieLabel, true);
+                if (!reached) {
+                    // Si no alcanzamos el targetCol es porque se interrumpió el movimiento
+                    // debido a que apareció una nueva planta más cercana
+                    // Volver al inicio del while para recalcular objetivo
+                    continue;
+                }
+    
+                // Si llegamos aquí, significa que llegamos exitosamente a targetCol
+                // Volvemos a recalcular la planta por si cambió justo al llegar
+                int newPlantCol = game.getFirstPlantInRow(row);
+                if (newPlantCol == plantCol) {
+                    // La planta sigue siendo la misma, atacar (si no es ECIZombie)
+                    if (!(zombie instanceof ECIZombie)) {
+                        attackPlant(row, plantCol, zombie, zombieLabel);
+                    }
+                    // Después de atacar la planta, el bucle se repite, se recalcula planta y se sigue
+                } else {
+                    // La planta cambió mientras llegábamos, volver al inicio del while para perseguir la nueva
+                    continue;
                 }
             }
         } finally {
@@ -302,7 +370,7 @@ public class ZombieThreadManager {
      * @param targetCol The target column to which the zombie should move.
      * @param zombieLabel The JLabel representing the zombie to be moved.
      */
-    private void moveZombie(int row, int targetCol, JLabel zombieLabel) {
+    private boolean moveZombie(int row, int targetCol, JLabel zombieLabel,boolean checkForNewPlants) {
         int cellWidth = 80;
         int startX = zombieLabel.getX(); // Posición actual X
         int startY = zombieLabel.getY();
@@ -311,7 +379,21 @@ public class ZombieThreadManager {
         int currentX = startX;
         int currentY = startY;
 
+        // Guardamos el plantCol inicial antes de mover
+        int initialPlantCol = game.getFirstPlantInRow(row);
+
         while (currentX > endX) {
+            // Verificar si el juego está pausado
+            synchronized (pauseLock) {
+                while (isPaused) {
+                    try {
+                        pauseLock.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return false;
+                    }
+                }
+            }
             currentX -= 5;
             int finalX = currentX;
             int finalY = currentY;
@@ -320,12 +402,24 @@ public class ZombieThreadManager {
             });
             try {
                 // Espera de 150ms para controlar la velocidad de movimiento
-                Thread.sleep(150);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                return;
+                return false;
+            }
+
+            if (checkForNewPlants) {
+                int currentPlantCol = game.getFirstPlantInRow(row);
+                // Si la planta más cercana cambió y es distinta a la que usábamos como referencia
+                // significa que apareció una planta más a la derecha (más grande currentPlantCol)
+                // o simplemente cambió la situación, debemos redirigir el zombie
+                if (currentPlantCol != initialPlantCol) {
+                    // Abortar este movimiento para recalcular objetivo
+                    return false;
+                }
             }
         }
+        return true;
     }
 
     /**
@@ -336,37 +430,210 @@ public class ZombieThreadManager {
      * @param zombie The zombie that will attack the plant.
      * @param zombieLabel The label representing the zombie in the UI.
      */
+    
+    
     private void attackPlant(int row, int plantCol, Zombie zombie, JLabel zombieLabel) {
         // Obtener la planta desde el dominio
         Plant plant = game.getPlantAt(row, plantCol);
         if (plant == null) {
-            // Ya no hay planta (otro zombi la mató?), volver
+            // Ya no hay planta (otro zombie la mató?), volver
             return;
         }
 
-        // Mientras la planta esté viva, atacarla cada 0.5s
-        while (!plant.isDead() && zombie.getHealth() > 0 && !Thread.currentThread().isInterrupted()) {
-            plant.takeDamage(zombie.getDamage());
-            if (plant.isDead()) {
-                // Planta muerta, remover del dominio y de la interfaz
-                Player plantsPlayer = game.getPlayerOne();
-                plantsPlayer.setScore(plantsPlayer.getScore() - plant.getCost());
-                game.removeEntity(row, plantCol);
-                SwingUtilities.invokeLater(() -> {
-                    garden.removePlantAt(row, plantCol);
-                });
-                break;
-            }
+        System.out.println("Zombie intentando atacar planta en (" + row + ", " + plantCol + ").");
 
-            // Esperar 0.5 segundos antes del próximo ataque
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
+        // Si la planta es una PotatoMine y está activada
+        if (plant instanceof PotatoMine) {
+            PotatoMine pm = (PotatoMine) plant;
+            synchronized (pm) { // Sincronizar para evitar múltiples explosiones
+                if (pm.isActivated() && !pm.hasExploded()) {
+                    pm.explode(); // Marca la PotatoMine como explotada
+                    System.out.println("PotatoMine activada detectada. Explosión iniciada.");
+
+                    // Cambiar la imagen a explosión
+                    JLabel plantLabel = garden.getPlantLabelAt(row, plantCol);
+                    if (plantLabel != null) {
+                        List<String> plantInfo = GardenMenu.PLANTS_VIEW.get(3); // Índice 3 para PotatoMine
+                        String explodedImagePath = plantInfo.get(5); // Sexta posición para explosión
+
+                        ImageIcon explodedIcon = new ImageIcon(explodedImagePath);
+                        if (explodedIcon.getIconWidth() == -1) {
+                            System.err.println("No se pudo cargar la imagen de explosión: " + explodedImagePath);
+                        } else {
+                            SwingUtilities.invokeLater(() -> {
+                                plantLabel.setIcon(explodedIcon);
+                                plantLabel.revalidate();
+                                plantLabel.repaint();
+                                System.out.println("Imagen de explosión asignada al JLabel.");
+                            });
+                        }
+
+                        // Crear y mostrar "BOOM!!!" en la pantalla
+                        JLabel boomLabel = new JLabel("<html><div style='text-align: center; color: red; font-size: 48pt; font-weight: bold;'>BOOM!!!</div></html>", SwingConstants.CENTER);
+                        // Posicionar el "BOOM!!!" sobre la planta
+                        boomLabel.setBounds(plantLabel.getX(), plantLabel.getY(), 200, 100); // Ajusta según tu interfaz
+                        boomLabel.setOpaque(false);
+
+                        SwingUtilities.invokeLater(() -> {
+                            garden.getMainPanel().add(boomLabel);
+                            garden.getMainPanel().setComponentZOrder(boomLabel, 0); // Traer al frente
+                            garden.getMainPanel().revalidate();
+                            garden.getMainPanel().repaint();
+                            System.out.println("BOOM!!! mostrado en pantalla para PotatoMine en (" + row + ", " + plantCol + ").");
+                        });
+
+                        // Programar la eliminación de la imagen de explosión y "BOOM!!!" después de 2 segundos
+                        Timer removalTimer = new Timer(2000, new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                SwingUtilities.invokeLater(() -> {
+                                    // Eliminar el "BOOM!!!" de la interfaz
+                                    garden.getMainPanel().remove(boomLabel);
+
+                                    // Remover la imagen de explosión de la PotatoMine
+                                    plantLabel.setIcon(null); // Opcional: Puedes establecer una imagen vacía o una imagen por defecto
+                                    plantLabel.revalidate();
+                                    plantLabel.repaint();
+
+                                    // Remover la planta de la interfaz gráfica
+                                    garden.removePlantAt(row, plantCol); // Método para eliminar el JLabel de la planta
+
+                                    // Actualizar la interfaz
+                                    garden.getMainPanel().revalidate();
+                                    garden.getMainPanel().repaint();
+
+                                    System.out.println("Explosión y BOOM!!! eliminados de la interfaz.");
+
+                                    // Remover la PotatoMine del dominio después de la explosión
+                                    game.removeEntity(row, plantCol);
+                                    game.deleteEntity(row, plantCol);
+                                    System.out.println("PotatoMine removida del dominio en (" + row + ", " + plantCol + ").");
+                                });
+                            }
+                        });
+                        removalTimer.setRepeats(false); // Ejecutar una sola vez
+                        removalTimer.start();
+                    }
+
+                    // Terminar el hilo del zombie que atacó la PotatoMine
+                    Thread zombieThread = findThreadByLabel(zombieLabel);
+                    if (zombieThread != null) {
+                        terminateZombie(zombieThread);
+                        System.out.println("Zombie que atacó la PotatoMine ha sido terminado.");
+                    }
+
+                    return; // Salir del método ya que la PotatoMine explotó
+                }
             }
         }
+
+
+        
+            // Si no es una PotatoMine activada, proceder con el ataque normal
+            // Mientras la planta esté viva, atacarla cada 0.5s
+            while (!plant.isDead() && zombie.getHealth() > 0 && !Thread.currentThread().isInterrupted()) {
+                plant.takeDamage(zombie.getDamage());
+                if (plant.isDead()) {
+                    // Planta muerta, remover del dominio y de la interfaz
+                    Player plantsPlayer = game.getPlayerOne();
+                    plantsPlayer.setScore(plantsPlayer.getScore() - plant.getCost());
+                    game.removeEntity(row, plantCol);
+                    SwingUtilities.invokeLater(() -> {
+                        garden.removePlantAt(row, plantCol);
+                        System.out.println("Planta removida del dominio y de la interfaz.");
+                    });
+                    break;
+                }
+        
+                // Esperar 0.5 segundos antes del próximo ataque
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+        }
+    
+    /**
+     * Registra una PotatoMine y configura su activación después de 14 segundos.
+     *
+     * @param row Fila de la PotatoMine.
+     * @param col Columna de la PotatoMine.
+     */
+    public void registerPotatoMine(int row, int col) {
+        String key = row + "," + col;
+        Timer activationTimer = new Timer(14000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                activatePotatoMine(row, col);
+            }
+        });
+        activationTimer.setRepeats(false);
+        activationTimer.start();
+        potatoMineTimers.put(key, activationTimer);
+        System.out.println("Timer de activación iniciado para PotatoMine en (" + row + ", " + col + ").");
     }
+
+
+    /**
+     * Activa la PotatoMine después de 14 segundos.
+     *
+     * @param row Fila de la PotatoMine.
+     * @param col Columna de la PotatoMine.
+     */
+    public void activatePotatoMine(int row, int col) {
+        // Obtener el JLabel de la planta
+        JLabel plantLabel = garden.getPlantLabelAt(row, col);
+        if (plantLabel == null) {
+            System.err.println("No se encontró la JLabel para la PotatoMine en (" + row + ", " + col + ").");
+            return;
+        }
+
+        // Cambiar a la imagen activada
+        List<String> plantInfo = GardenMenu.PLANTS_VIEW.get(3); // Índice 3 para PotatoMine
+        String activatedGifPath = plantInfo.get(4); // Quinta posición para activación
+
+        ImageIcon activatedIcon = new ImageIcon(activatedGifPath);
+        if (activatedIcon.getIconWidth() == -1) {
+            System.err.println("No se pudo cargar la imagen activada: " + activatedGifPath);
+            return;
+        }
+        
+        SwingUtilities.invokeLater(() -> {
+            plantLabel.setIcon(activatedIcon);
+            plantLabel.revalidate();
+            plantLabel.repaint();
+        });
+
+        // Actualizar el estado de la planta en el dominio del juego
+        Plant plant = game.getPlantAt(row, col);
+        if (plant instanceof PotatoMine) {
+            ((PotatoMine) plant).activate();
+            System.out.println("PotatoMine activada en (" + row + ", " + col + ").");
+        }
+    }
+
+
+
+     /**
+     * Encuentra el Thread asociado a un JLabel de zombie.
+     *
+     * @param zombieLabel JLabel del zombie.
+     * @return Thread correspondiente o null si no se encuentra.
+     */
+    private Thread findThreadByLabel(JLabel zombieLabel) {
+        synchronized (threadToLabelMap) {
+            for (Map.Entry<Thread, JLabel> entry : threadToLabelMap.entrySet()) {
+                if (entry.getValue().equals(zombieLabel)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+
 
     // método para obtener la posición X de un zombie, dado su hilo.
     /**
@@ -387,6 +654,8 @@ public class ZombieThreadManager {
             throw new IllegalArgumentException("Zombie thread not found or has no associated JLabel.");
         }
     }
+
+
 
     /**
      * Terminates the specified zombie thread by interrupting it.
@@ -435,6 +704,17 @@ public class ZombieThreadManager {
         try {
             JPanel mainPanel = garden.getMainPanel(); // Debes crear un getter en GardenMenu que retorne el panel principal
             while (!Thread.currentThread().isInterrupted() && zombie.getHealth() > 0) {
+                // Verificar si el juego está pausado
+                synchronized (pauseLock) {
+                    while (isPaused) {
+                        try {
+                            pauseLock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
+                        }
+                    }
+                }
                 int plantCol = game.getFirstPlantInRow(row);
                 if (plantCol == -1) {
                     Thread.sleep(1000);
@@ -591,6 +871,35 @@ public class ZombieThreadManager {
         return true;
     }
     
+    /**
+     * Pausa todos los hilos de zombies.
+     */
+    public void pauseZombies() {
+        synchronized (pauseLock) {
+            isPaused = true;
+            System.out.println("ZombieThreadManager: Juego en pausa.");
+        }
+    }
 
+    /**
+     * Reanuda todos los hilos de zombies.
+     */
+    public void resumeZombies() {
+        synchronized (pauseLock) {
+            isPaused = false;
+            pauseLock.notifyAll();
+            System.out.println("ZombieThreadManager: Juego reanudado.");
+        }
+    }
+
+    /**
+     * Pausa un ECIZombie al detener su hilo de proyectiles.
+     */
+    private void pauseECIZombie(Thread zombieThread) {
+        Thread projectileThread = zombieToProjectileThreadMap.get(zombieThread);
+        if (projectileThread != null) {
+            projectileThread.interrupt();
+        }
+    }
 
 }

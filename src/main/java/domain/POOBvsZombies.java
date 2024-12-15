@@ -340,8 +340,9 @@ public class POOBvsZombies {
         if (gardenMenu != null) {
             gardenMenu.showWinnerMessage(winnerMessage);
         }
-        POOBvsZombiesGUI pooBvsZombiesGUI = new POOBvsZombiesGUI();
-        pooBvsZombiesGUI.setVisible(true);
+        // POOBvsZombiesGUI pooBvsZombiesGUI = new POOBvsZombiesGUI();
+        // pooBvsZombiesGUI.setVisible(true);
+        System.exit(0);
     }
 
     /**
@@ -665,5 +666,23 @@ public class POOBvsZombies {
         while (!queue.isEmpty()) {
             queue.poll();
         }
+    }
+
+    /**
+     * Sets the winner of the game.
+     *
+     * @param winner the name of the winner to be set
+     */
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    /**
+     * Retrieves the winner of the game.
+     *
+     * @return A string representing the winner.
+     */
+    public String getWinner() {
+        return winner;
     }
 }

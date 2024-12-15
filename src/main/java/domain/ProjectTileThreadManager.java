@@ -22,6 +22,9 @@ public class ProjectTileThreadManager {
     private ZombieThreadManager zombieThreadManager;
     private JLabel projectTileLabel;
 
+    private volatile boolean isPaused = false; // Variable para controlar la pausa
+    private final Object pauseLock = new Object(); // Objeto para sincronización
+
     /**
      * Manages the threads for projectiles in the POOB vs Zombies game.
      *
@@ -62,6 +65,17 @@ public class ProjectTileThreadManager {
      */
     private void projectTileLogic(int row, int yPos, ProjectTile projectTile, int graphicXPosition, int graficYPosition) {
         while (true) {
+            // Verificar si el juego está pausado
+                synchronized (pauseLock) {
+                    while (isPaused) {
+                        try {
+                            pauseLock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
+                        }
+                    }
+                }
             ArrayList<Object> firstZombie = zombieThreadManager.getFirstZombieInRow(row);
 
             if (firstZombie.isEmpty()) {
@@ -162,6 +176,17 @@ public class ProjectTileThreadManager {
         int currentX = originXpos;
     
         while (currentX < targetXpos - 30) { // Subtract projectile width to stop before overlapping
+            // Verificar si el juego está pausado
+            synchronized (pauseLock) {
+                while (isPaused) {
+                    try {
+                        pauseLock.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+            }
             currentX += 5; // Move speed
             int finalX = currentX;
     
@@ -193,6 +218,27 @@ public class ProjectTileThreadManager {
         // Check if zombie is dead
         if (targetZombie.getHealth() <= 0) {
             zombieThreadManager.terminateZombie(targetZombieThread);
+        }
+    }
+
+    /**
+     * Pausa todos los hilos de proyectiles.
+     */
+    public void pauseProjectiles() {
+        synchronized (pauseLock) {
+            isPaused = true;
+            System.out.println("ProjectTileThreadManager: Juego en pausa.");
+        }
+    }
+
+    /**
+     * Reanuda todos los hilos de proyectiles.
+     */
+    public void resumeProjectiles() {
+        synchronized (pauseLock) {
+            isPaused = false;
+            pauseLock.notifyAll();
+            System.out.println("ProjectTileThreadManager: Juego reanudado.");
         }
     }
 }
