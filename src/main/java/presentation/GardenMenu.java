@@ -1569,7 +1569,7 @@ public class GardenMenu extends JFrame {
         else if (zombie instanceof Brainstein) zombieName = "Brainstein";
         else if (zombie instanceof Buckethead) zombieName = "BucketHead";
         else if (zombie instanceof Conehead) zombieName = "Conehead";
-        else if (zombie instanceof ECIZombie) zombieName = "ECIZombie";
+        //else if (zombie instanceof ECIZombie) zombieName = "ECIZombie";
 
         // Encontrar las imágenes del zombie en ZOMBIES_VIEW
         List<String> zombieData = null;

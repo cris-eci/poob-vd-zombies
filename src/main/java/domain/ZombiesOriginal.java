@@ -2,9 +2,7 @@ package domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import presentation.GardenMenu;
@@ -39,7 +37,7 @@ public class ZombiesOriginal extends MachinePlayer{
             this.team = zombiesHordersTeam;
             this.hordersNumber = hordersNumber;
             this.horderTime = matchTime / hordersNumber;
-            this.zombieTypes = new ArrayList<>(Arrays.asList("Basic", "BucketHead", "Conehead", "ECIZombie"));  // ejemplo de tipos de zombies
+            this.zombieTypes = new ArrayList<>(Arrays.asList("Basic", "BucketHead", "Conehead")/*, "ECIZombie") */);  // ejemplo de tipos de zombies
         }
     
         public ZombiesOriginal(int hordersNumber, float matchTime, ArrayList<String> zombiesMachine, int brains) {
