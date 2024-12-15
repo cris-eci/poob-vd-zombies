@@ -54,8 +54,13 @@ public class POOBvsZombies {
      * @param namePlayerTwo Name of the second player.
      * @param brainAmount Initial amount of brain resources for the second player.
      * @param zombies List of zombie types available to the second player.
+     * @throws POOBvsZombiesException If the inputs are invalid.
      */
-    public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) {
+    public POOBvsZombies(float matchTimeInSeconds, String namePlayerOne, ArrayList<String> plants, int sunAmount, String namePlayerTwo, int brainAmount, ArrayList<String> zombies) throws POOBvsZombiesException {
+        
+        if(matchTimeInSeconds <= 0 || namePlayerOne == null || plants == null || sunAmount <= 0 || namePlayerTwo == null || zombies == null || brainAmount <= 0){ 
+            throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+        }
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
 
@@ -79,8 +84,12 @@ public class POOBvsZombies {
      * @param hordersNumber Number of zombie hordes.
      * @param namePlayerOne Name of the player.
      * @param plants List of plant types available to the player.
+     * @throws POOBvsZombiesException If the inputs are invalid.
      */
-    public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants) {
+    public POOBvsZombies(float matchTimeInSeconds,int hordersNumber, String namePlayerOne, ArrayList<String> plants)throws POOBvsZombiesException {
+        if(matchTimeInSeconds <= 0 || hordersNumber <= 0 || namePlayerOne == null || plants == null){ 
+            throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+        }
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
 
@@ -108,8 +117,14 @@ public class POOBvsZombies {
      * @param hordersNumber the number of zombie hordes
      * @param suns the initial number of suns for the plants
      * @param brains the initial number of brains for the zombies
+     * @throws POOBvsZombiesException if the inputs are invalid
      */
-    public POOBvsZombies(float matchTimeInSeconds, int hordersNumber, int suns, int brains) {
+    public POOBvsZombies(float matchTimeInSeconds, int hordersNumber, int suns, int brains) throws POOBvsZombiesException{
+
+        if(matchTimeInSeconds <= 0 || hordersNumber <= 0 || suns <= 0 || brains <= 0){ 
+            throw new POOBvsZombiesException(POOBvsZombiesException.INVALID_INPUTS);
+        }
+
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
 
@@ -738,7 +753,7 @@ public class POOBvsZombies {
     }
 }
 
-public static POOBvsZombies loadGame(File file) throws IOException {
+public static POOBvsZombies loadGame(File file) throws IOException, POOBvsZombiesException {
     BufferedReader br = new BufferedReader(new FileReader(file));
 
     String modality="";

@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import domain.POOBvsZombies;
+import domain.POOBvsZombiesException;
 
 /**
  * POOBvsZombiesGUI is the main graphical user interface for the POOBvsZombies game.
@@ -185,6 +186,9 @@ public class POOBvsZombiesGUI extends JFrame {
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(this, "Error al cargar la partida: " + ex.getMessage(),
                                 "Error", JOptionPane.ERROR_MESSAGE);
+                    } catch (POOBvsZombiesException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
                     }
                 }
             });

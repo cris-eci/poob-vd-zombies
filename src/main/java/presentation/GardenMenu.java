@@ -1943,10 +1943,18 @@ public class GardenMenu extends JFrame {
             String namePlayerTwo = "Player2";
             int brainAmount = 100;
             // ArrayList<String> zombies = new ArrayList<>(Arrays.asList(selectedZombies));
-            POOBvsZombies poobvszombies = new POOBvsZombies(matchTimer, namePlayerOne, selectedPlants, sunAmount,
-                    namePlayerTwo, brainAmount, selectedZombies);
-            GardenMenu frame = new GardenMenu(poobvszombies);
-            frame.setVisible(true);
+            POOBvsZombies poobvszombies;
+            try {
+                poobvszombies = new POOBvsZombies(matchTimer, namePlayerOne, selectedPlants, sunAmount,
+                        namePlayerTwo, brainAmount, selectedZombies);
+
+                        GardenMenu frame = new GardenMenu(poobvszombies);
+                        frame.setVisible(true);
+            } catch (POOBvsZombiesException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
         });
     }
 }

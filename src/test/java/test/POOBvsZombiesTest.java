@@ -22,7 +22,12 @@ public class POOBvsZombiesTest {
         zombies.add("Basic");
         zombies.add("Conehead");
 
-        game = new POOBvsZombies(300, "PlayerOne", plants, 100, "PlayerTwo", 100, zombies);
+        try {
+            game = new POOBvsZombies(300, "PlayerOne", plants, 100, "PlayerTwo", 100, zombies);
+        } catch (POOBvsZombiesException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -150,7 +155,7 @@ public class POOBvsZombiesTest {
     }
 
     @Test
-    public void accordingPSShouldSaveAndLoadGameCorrectly() throws IOException {
+    public void accordingPSShouldSaveAndLoadGameCorrectly() throws IOException, POOBvsZombiesException {
         File file = new File("test_game_save.txt");
         game.saveGame(file, 0, 60, false);
 
@@ -214,7 +219,7 @@ public class POOBvsZombiesTest {
 
 
     @Test
-    public void accordingPSShouldSaveAndLoadGameWithEntitiesCorrectly() throws IOException {
+    public void accordingPSShouldSaveAndLoadGameWithEntitiesCorrectly() throws IOException, POOBvsZombiesException {
         game.addEntity(2, 2, "Sunflower");
         File file = new File("save_test.txt");
         game.saveGame(file, 0, 30, false);
@@ -260,7 +265,7 @@ public class POOBvsZombiesTest {
 
 
     @Test
-    public void accordingPSShouldRestoreGameStateWithResources() throws IOException {
+    public void accordingPSShouldRestoreGameStateWithResources() throws IOException, POOBvsZombiesException {
         game.addPendingExtraResources(0, 0, 5, 25, "Sun");
         File file = new File("restore_test.txt");
         game.saveGame(file, 1, 20, true);
