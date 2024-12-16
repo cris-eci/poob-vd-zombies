@@ -402,7 +402,7 @@ public class ZombieThreadManager {
             });
             try {
                 // Espera de 150ms para controlar la velocidad de movimiento
-                Thread.sleep(100);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return false;

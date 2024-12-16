@@ -139,7 +139,7 @@ public class ZombiesOriginal extends MachinePlayer{
             // Cada zombie aparecerá de forma aleatoria en una de las 5 filas (0 a 4)
             // y será de un tipo aleatorio de la lista zombieTypes.
             // Además, cada zombie aparece cada 3 segundos.
-            int zombiesInHorde = 10;  // Cada horda tendrá 10 zombies (ejemplo dado)
+            int zombiesInHorde = 15;  // Cada horda tendrá 10 zombies (ejemplo dado)
             for (int i = 0; i < zombiesInHorde; i++) {
                 try {
                     int row = (int) (Math.random() * 5); 
@@ -159,7 +159,7 @@ public class ZombiesOriginal extends MachinePlayer{
                     // Este método lo crearemos en POOBvsZombies
                     game.spawnZombieUI(row, 9, zombie);
         
-                    Thread.sleep(3000);  // Esperar 3 segundos antes del siguiente zombie
+                    Thread.sleep(7000);  // Esperar 3 segundos antes del siguiente zombie
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
@@ -222,7 +222,7 @@ public class ZombiesOriginal extends MachinePlayer{
                                     game.getGardenMenu().updateScoreLabels();
                                 }
 
-                                // Esperar 3 segundos antes de generar el siguiente zombie
+                                // Esperar 5 segundos antes de generar el siguiente zombie
                                 Thread.sleep(3000);
                             } else {
                                 // No hay suficientes cerebros, esperar hasta que se acumulen más recursos
