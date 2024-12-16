@@ -93,7 +93,7 @@ public class POOBvsZombies {
         this.players = new ArrayList<Player>();
         this.entities = new ArrayList<ArrayList<Object>>();
 
-        this.players.add(new PlantsStrategic(namePlayerOne, 50, plants));
+        this.players.add(new PlantsStrategic(namePlayerOne, 2615, plants));
         this.players.add(new ZombiesOriginal(hordersNumber, matchTimeInSeconds));
 
         this.modality = "PlayerVsMachine";
