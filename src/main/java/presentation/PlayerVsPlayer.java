@@ -347,7 +347,7 @@ public class PlayerVsPlayer extends JFrame {
      * @param panel the JPanel to which the button will be added
      */
     private void addTopRightButtons(JPanel panel) {
-        String buttonImagePath = "resources/images/buttons/return-icon.png";
+        String buttonImagePath = "/images/buttons/return-icon.png";
         int x = 830;
         int y = 5;
         int buttonSize = 40;

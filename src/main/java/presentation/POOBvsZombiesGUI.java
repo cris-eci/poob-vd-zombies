@@ -146,8 +146,8 @@ public class POOBvsZombiesGUI extends JFrame {
      */
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
-                "resources/images/buttons/import-icon.png", // Import
-                "resources/images/buttons/open-icon.png" // Open
+                "/images/buttons/import-icon.png", // Import
+                "/images/buttons/open-icon.png" // Open
         };
 
         int x = 40;
@@ -155,7 +155,7 @@ public class POOBvsZombiesGUI extends JFrame {
         int buttonSize = 40;
 
         for (String imagePath : buttonImagePaths) {
-            ImageIcon icon = new ImageIcon(imagePath);
+            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
             JButton button = new JButton(
                     new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
             button.setBounds(x, y, buttonSize, buttonSize);
