@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="test.POOBvsZombiesTest" time="0.077" tests="31" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\Usuario\desktop\POOB\finalProject\target\test-classes;C:\Users\Usuario\desktop\POOB\finalProject\target\classes;C:\Users\Usuario\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.7.0\junit-jupiter-engine-5.7.0.jar;C:\Users\Usuario\.m2\repository\org\apiguardian\apiguardian-api\1.1.0\apiguardian-api-1.1.0.jar;C:\Users\Usuario\.m2\repository\org\junit\platform\junit-platform-engine\1.7.0\junit-platform-engine-1.7.0.jar;C:\Users\Usuario\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Usuario\.m2\repository\org\junit\platform\junit-platform-commons\1.7.0\junit-platform-commons-1.7.0.jar;C:\Users\Usuario\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.7.0\junit-jupiter-api-5.7.0.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="America/Bogota"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21\bin"/>
+    <property name="sun.java.command" value="C:\Users\Usuario\AppData\Local\Temp\surefire502824484271814487\surefirebooter12569586568914745256.jar C:\Users\Usuario\AppData\Local\Temp\surefire502824484271814487 2024-12-18T10-09-01_638-jvmRun1 surefire11169408938692976596tmp surefire_05991183451188910261tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\Usuario\desktop\POOB\finalProject\target\test-classes;C:\Users\Usuario\desktop\POOB\finalProject\target\classes;C:\Users\Usuario\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.7.0\junit-jupiter-engine-5.7.0.jar;C:\Users\Usuario\.m2\repository\org\apiguardian\apiguardian-api\1.1.0\apiguardian-api-1.1.0.jar;C:\Users\Usuario\.m2\repository\org\junit\platform\junit-platform-engine\1.7.0\junit-platform-engine-1.7.0.jar;C:\Users\Usuario\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Usuario\.m2\repository\org\junit\platform\junit-platform-commons\1.7.0\junit-platform-commons-1.7.0.jar;C:\Users\Usuario\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.7.0\junit-jupiter-api-5.7.0.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\Usuario"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2024-07-16"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-21"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\Usuario\desktop\POOB\finalProject"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\Usuario\AppData\Local\Temp\surefire502824484271814487\surefirebooter12569586568914745256.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.4+8-LTS-274"/>
+    <property name="user.name" value="Usuario"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="C:\Users\Usuario\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\Usuario\AppData\Local\Temp\"/>
+    <property name="java.version" value="21.0.4"/>
+    <property name="user.dir" value="C:\Users\Usuario\desktop\POOB\finalProject"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-21\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Users\Usuario\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Usuario\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn;C:\Program Files\dotnet;C:\Program Files\Git\cmd;C:\Program Files\Java\jdk-21\bin;C:\workspace\apache-maven-3.9.9-bin\apache-maven-3.9.9\bin;C:\Users\Usuario\AppData\Local\Programs\Python\Python312\Scripts;C:\Users\Usuario\AppData\Local\Programs\Python\Python312;C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps;C:\Users\Usuario\.dotnet\tools;C:\Users\Usuario\AppData\Local\Programs\oh-my-posh\bin;C:\Users\Usuario\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="21.0.4+8-LTS-274"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="accordingPSShouldAddPendingExtraResourcesCorrectly" classname="test.POOBvsZombiesTest" time="0.031"/>
+  <testcase name="accordingPSShouldBeSingletonInstance" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldReturnNullWhenNoPlantAtPosition" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldCreatePlantInstances" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldSpawnPlantAndZombieCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldCreateZombieInstances" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldSetAndGetWinnerCorrectly" classname="test.POOBvsZombiesTest" time="0.003"/>
+  <testcase name="accordingPSShouldNotFindLawnmowerWhenNotPresent" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldReturnCorrectModality" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldRetrievePlantAtCorrectPosition" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldCalculateScoresCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldNotAddInvalidEntitiesAndHandleExceptions" classname="test.POOBvsZombiesTest" time="0.002"/>
+  <testcase name="accordingPSShouldThrowExceptionForInvalidZombieType" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldCalculateProgressCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldAddEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldFindFirstPlantInRowCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldReturnNullForInvalidPlantType" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldRetrievePlayerTwoCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldRetrievePlayerOneCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldUpdateScoresAfterRemovingEntities" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldRemoveEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldRestoreGameStateWithResources" classname="test.POOBvsZombiesTest" time="0.003"/>
+  <testcase name="accordingPSShouldSaveAndLoadGameWithEntitiesCorrectly" classname="test.POOBvsZombiesTest" time="0.003"/>
+  <testcase name="accordingPSShouldReturnCorrectRoundTime" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldAddAndDeleteEntityCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldDetermineWinnerCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldSaveAndLoadGameCorrectly" classname="test.POOBvsZombiesTest" time="0.002"/>
+  <testcase name="accordingPSShouldDetermineWinnerAfterScoreUpdate" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldDeleteEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldReturnCorrectMatchTime" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldCalculateScoresAfterAddingEntities" classname="test.POOBvsZombiesTest" time="0"/>
+</testsuite>
