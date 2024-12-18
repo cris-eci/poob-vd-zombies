@@ -89,58 +89,58 @@ public class GardenMenu extends JFrame {
     public static final List<List<String>> ZOMBIES_VIEW = Arrays.asList(
             Arrays.asList(
                     "Basic",
-                    "resources/images/zombies/Basic/Basic.jpg",
-                    "resources/images/cards/Zombies/card_basic_zombie.png",
-                    "resources/images/zombies/Basic/BasicDinamic.gif"),
+                    "/images/zombies/Basic/Basic.jpg",
+                    "/images/cards/Zombies/card_basic_zombie.png",
+                    "/images/zombies/Basic/BasicDinamic.gif"),
             Arrays.asList(
                     "Brainstein",
-                    "resources/images/zombies/Brainstein/brainsteinGarden.jpeg",
-                    "resources/images/cards/Zombies/card_brainstein.png",
-                    "resources/images/zombies/Brainstein/brainsteinAnimated.gif"),
+                    "/images/zombies/Brainstein/brainsteinGarden.jpeg",
+                    "/images/cards/Zombies/card_brainstein.png",
+                    "/images/zombies/Brainstein/brainsteinAnimated.gif"),
             Arrays.asList(
                     "BucketHead",
-                    "resources/images/zombies/BucketHead/Buckethead.jpg",
-                    "resources/images/cards/Zombies/card_buckethead_zombie.png",
-                    "resources/images/zombies/BucketHead/BucketheadAnimated.gif"),
+                    "/images/zombies/BucketHead/Buckethead.jpg",
+                    "/images/cards/Zombies/card_buckethead_zombie.png",
+                    "/images/zombies/BucketHead/BucketheadAnimated.gif"),
             Arrays.asList(
                     "Conehead",
-                    "resources/images/zombies/Conehead/Conehead.jpg",
-                    "resources/images/cards/Zombies/card_conehead_zombie.png",
-                    "resources/images/zombies/Conehead/ConeheadAnimated.gif"),
+                    "/images/zombies/Conehead/Conehead.jpg",
+                    "/images/cards/Zombies/card_conehead_zombie.png",
+                    "/images/zombies/Conehead/ConeheadAnimated.gif"),
             Arrays.asList(
                     "ECIZombie",
-                    "resources/images/zombies/ECIZombie/ECIZombie.png",
-                    "resources/images/cards/Zombies/card_ECIZombie.png",
-                    "resources/images/zombies/ECIZombie/ECIZombieAnimated.gif"));
+                    "/images/zombies/ECIZombie/ECIZombie.png",
+                    "/images/cards/Zombies/card_ECIZombie.png",
+                    "/images/zombies/ECIZombie/ECIZombieAnimated.gif"));
 
     public static final List<List<String>> PLANTS_VIEW = Arrays.asList(
             Arrays.asList(
                     "Sunflower",
-                    "resources/images/plants/Sunflower/Sunflower.jpg",
-                    "resources/images/cards/Plants/card_sunflower.png",
-                    "resources/images/plants/Sunflower/sunflowerAnimated.gif"),
+                    "/images/plants/Sunflower/Sunflower.jpg",
+                    "/images/cards/Plants/card_sunflower.png",
+                    "/images/plants/Sunflower/sunflowerAnimated.gif"),
             Arrays.asList(
                     "Peashooter",
-                    "resources/images/plants/Peashooter/Peashooter.jpg",
-                    "resources/images/cards/Plants/card_peashooter.png",
-                    "resources/images/plants/Peashooter/peashooterAnimated.gif"),
+                    "/images/plants/Peashooter/Peashooter.jpg",
+                    "/images/cards/Plants/card_peashooter.png",
+                    "/images/plants/Peashooter/peashooterAnimated.gif"),
             Arrays.asList(
                     "WallNut",
-                    "resources/images/plants/WallNut/Wall-nutGrass.jpg",
-                    "resources/images/cards/Plants/card_wallnut.png",
-                    "resources/images/plants/WallNut/wall-nutAnimated.gif"),
+                    "/images/plants/WallNut/Wall-nutGrass.jpg",
+                    "/images/cards/Plants/card_wallnut.png",
+                    "/images/plants/WallNut/wall-nutAnimated.gif"),
             Arrays.asList(
                     "PotatoMine",
-                    "resources/images/plants/PotatoMine/Potato_MineGrass.jpg",
-                    "resources/images/cards/Plants/card_potatomine.png",
-                    "resources/images/plants/PotatoMine/before-potato-mineAnimated.gif",
-                    "resources/images/plants/PotatoMine/potato-mineAnimated.gif",   // Nueva ruta para activación
-                    "resources/images/plants/PotatoMine/PotatoMineExplode_0.png"),    // Nueva ruta para explosión),
+                    "/images/plants/PotatoMine/Potato_MineGrass.jpg",
+                    "/images/cards/Plants/card_potatomine.png",
+                    "/images/plants/PotatoMine/before-potato-mineAnimated.gif",
+                    "/images/plants/PotatoMine/potato-mineAnimated.gif",   // Nueva ruta para activación
+                    "/images/plants/PotatoMine/PotatoMineExplode_0.png"),    // Nueva ruta para explosión),
             Arrays.asList(
                     "ECIPlant",
-                    "resources/images/plants/ECIPlant/ECIPlant.png",
-                    "resources/images/cards/Plants/card_ECIPlant.png",
-                    "resources/images/plants/ECIPlant/ECIPlantAnimated.gif"));
+                    "/images/plants/ECIPlant/ECIPlant.png",
+                    "/images/cards/Plants/card_ECIPlant.png",
+                    "/images/plants/ECIPlant/ECIPlantAnimated.gif"));
     private List<TimerTask> timerTasks = new ArrayList<>();
     
     // Arreglo estatico de lawnmovers para poder acceder a ellos desde cualquier parte
@@ -189,7 +189,7 @@ public class GardenMenu extends JFrame {
 
         // Panel with custom background
         JPanel panel = new JPanel() {
-            Image backgroundImage = new ImageIcon("resources/images/gardenPvsP.png").getImage();
+            Image backgroundImage = new ImageIcon(getClass().getResource("/images/gardenPvsP.png")).getImage();
 
             @Override
             protected void paintComponent(Graphics g) {
@@ -282,7 +282,7 @@ public class GardenMenu extends JFrame {
                 if (plant == null)
                     continue;
 
-                ImageIcon icon = new ImageIcon(plant.get(2));
+                ImageIcon icon = new ImageIcon(getClass().getResource(plant.get(2)));                
                 JLabel cardLabel = new JLabel(
                         new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                 cardLabel.setBounds(x, y, 100, 150);
@@ -294,7 +294,7 @@ public class GardenMenu extends JFrame {
                 cardLabel.setTransferHandler(new TransferHandler("icon") {
                     @Override
                     protected Transferable createTransferable(JComponent c) {
-                        ImageIcon dragIcon = new ImageIcon(dragImagePath);
+                        ImageIcon dragIcon = new ImageIcon(getClass().getResource(dragImagePath));  
                         EntityData entityData = new EntityData("plant", plantName, dragIcon.getImage());
                         return new EntityTransferable(entityData);
                     }
@@ -324,10 +324,10 @@ public class GardenMenu extends JFrame {
 
     private void addShovel(JPanel panel) {
         // Path of the shovel
-        String shovelImagePath = "resources/images/shovel.png";
+        String shovelImagePath = "/images/shovel.png";
 
         // Load and scale the shovel
-        ImageIcon shovelIcon = new ImageIcon(shovelImagePath);
+        ImageIcon shovelIcon = new ImageIcon(getClass().getResource(shovelImagePath));
         Image scaledShovelImage = shovelIcon.getImage().getScaledInstance(65, 65, Image.SCALE_SMOOTH);
 
         // Create a JLabel to display the shovel
@@ -373,7 +373,7 @@ public class GardenMenu extends JFrame {
         gridPanel.setOpaque(false); // Transparent to make the background visible
 
         // Path of the lawn mower
-        String lawnMowerImagePath = "resources/images/Lawnmower.jpg";
+        String lawnMowerImagePath = "/images/Lawnmower.jpg";
 
         // Add cells to the grid with specific restrictions for plants and zombies
         for (int row = 0; row < 5; row++) {
@@ -388,7 +388,7 @@ public class GardenMenu extends JFrame {
 
                 if (col == 0) {
                     // Add the lawn mower to the first column of each row
-                    ImageIcon mowerIcon = new ImageIcon(lawnMowerImagePath);
+                    ImageIcon mowerIcon = new ImageIcon(getClass().getResource(lawnMowerImagePath));
                     Image scaledMowerImage = mowerIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
                     JLabel mowerLabel = new JLabel(new ImageIcon(scaledMowerImage));
                     cellPanel.add(mowerLabel, BorderLayout.CENTER);
@@ -749,11 +749,11 @@ public class GardenMenu extends JFrame {
 
     private void addTopRightButtons(JPanel panel) {
         String[] buttonImagePaths = {
-                "resources/images/buttons/pause-icon.png", // Pause
-                "resources/images/buttons/export-icon.png", // Export
-                "resources/images/buttons/save-icon.png", // Save
-                "resources/images/buttons/return-icon.png", // Return
-                "resources/images/buttons/home-icon.png" // Back to main menu
+                "/images/buttons/pause-icon.png", // Pause
+                "/images/buttons/export-icon.png", // Export
+                "/images/buttons/save-icon.png", // Save
+                "/images/buttons/return-icon.png", // Return
+                "/images/buttons/home-icon.png" // Back to main menu
         };
 
         int x = 600;
@@ -761,7 +761,7 @@ public class GardenMenu extends JFrame {
         int buttonSize = 40;
 
         for (String imagePath : buttonImagePaths) {
-            ImageIcon icon = new ImageIcon(imagePath);
+            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
             JButton button = new JButton(
                     new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
             button.setBounds(x, y, buttonSize, buttonSize);
@@ -1244,7 +1244,7 @@ public class GardenMenu extends JFrame {
 
                     // Add drag functionality
                     String dragImagePath = zombie.get(3);
-                    ImageIcon icon = new ImageIcon(zombie.get(2));
+                    ImageIcon icon = new ImageIcon(getClass().getResource(zombie.get(2)));
                     JLabel cardLabel = new JLabel(
                             new ImageIcon(icon.getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
                     cardLabel.setBounds(x, y - 85, 100, 150);
@@ -1252,7 +1252,7 @@ public class GardenMenu extends JFrame {
                     cardLabel.setTransferHandler(new TransferHandler("icon") {
                         @Override
                         protected Transferable createTransferable(JComponent c) {
-                            ImageIcon dragIcon = new ImageIcon(dragImagePath);
+                            ImageIcon dragIcon = new ImageIcon(getClass().getResource(dragImagePath));
                             EntityData entityData = new EntityData("zombie", zombieName, dragIcon.getImage());
                             return new EntityTransferable(entityData);
                         }
@@ -1284,10 +1284,10 @@ public class GardenMenu extends JFrame {
     private void addZombieTable(JPanel panel) {
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
             // Path of the zombie table image
-            String zombieTableImagePath = "resources/images/zombie-table.png";
+            String zombieTableImagePath = "/images/zombie-table.png";
 
             // Load and scale the image
-            ImageIcon zombieTableIcon = new ImageIcon(zombieTableImagePath);
+            ImageIcon zombieTableIcon = new ImageIcon(getClass().getResource(zombieTableImagePath));
             Image scaledZombieTableImage = zombieTableIcon.getImage().getScaledInstance(460, 80, Image.SCALE_SMOOTH);
 
             // Create a JLabel to display the zombie table

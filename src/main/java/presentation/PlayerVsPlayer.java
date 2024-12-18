@@ -352,7 +352,7 @@ public class PlayerVsPlayer extends JFrame {
         int y = 5;
         int buttonSize = 40;
 
-        ImageIcon icon = new ImageIcon(buttonImagePath);
+        ImageIcon icon = new ImageIcon(getClass().getResource(buttonImagePath));
         JButton button = new JButton(
                 new ImageIcon(icon.getImage().getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH)));
         button.setBounds(x, y, buttonSize, buttonSize);
@@ -463,7 +463,8 @@ public class PlayerVsPlayer extends JFrame {
         private Image backgroundImage;
 
         public BackgroundPanel() {
-            backgroundImage = new ImageIcon("resources/images/menu/PlayerVsPlayerMenu.png").getImage();
+            backgroundImage = new ImageIcon(getClass().getResource("/images/menu/PlayerVSPlayerMenu.png")).getImage();
+            
         }
 
         protected void paintComponent(Graphics g) {
@@ -493,7 +494,7 @@ public class PlayerVsPlayer extends JFrame {
          */
         public SelectablePanel(String imagePath) {
             this.itemPath = imagePath;
-            this.itemImage = new ImageIcon(imagePath).getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+            this.itemImage = new ImageIcon(getClass().getResource(imagePath)).getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             setPreferredSize(new Dimension(50, 50));
             setOpaque(false);
 
