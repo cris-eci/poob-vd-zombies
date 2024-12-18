@@ -49,7 +49,8 @@ public class POOBvsZombiesGUI extends JFrame {
 
         // Custom panel with background image
         JPanel panel = new JPanel() {
-            Image backgroundImage = new ImageIcon("resources/images/menu/modalityMenu.png").getImage();
+        //Image backgroundImage = new ImageIcon("/src/main/resources/images/menu/modalityMenu.png").getImage();
+        Image backgroundImage = new ImageIcon(getClass().getResource("/images/menu/modalityMenu.png")).getImage();
 
             @Override
             protected void paintComponent(Graphics g) {
