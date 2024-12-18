@@ -134,7 +134,7 @@ public class ProjectTileThreadManager {
      * @return The JLabel representing the projectile tile.
      */
     private JLabel createAndRegisterProjectTile(int row, int yPos, JLabel zombieLabel) {
-        ImageIcon icon = new ImageIcon("resources/images/pea.png");
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/pea.png"));
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE) {
             System.err.println("Failed to load image: /resources/images/pea.png");
         }

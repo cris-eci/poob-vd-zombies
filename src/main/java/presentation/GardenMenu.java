@@ -1358,7 +1358,7 @@ public class GardenMenu extends JFrame {
         }
 
         // Crear JLabel con la imagen del recurso
-        String imagePath = (resource.getType().equals(Resource.SOL)) ? "resources/images/sun.png"
+        String imagePath = (resource.getType().equals(Resource.SOL)) ? "/images/sun.png"
                 : "/images/brain.png";
         ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
         Image scaledImage = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
