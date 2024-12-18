@@ -7,8 +7,10 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -212,14 +214,15 @@ public class POOBvsZombiesGUI extends JFrame {
     private void playMusic(String filePath) {
         if (clip == null) {
             try {
-                File musicFile = new File(filePath);
-                if (musicFile.exists()) {
-                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+                InputStream audioSrc = getClass().getResourceAsStream(filePath);
+                if (audioSrc != null) {
+                    InputStream bufferedIn = new BufferedInputStream(audioSrc);
+                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn);
                     clip = AudioSystem.getClip();
                     clip.open(audioStream);
                     clip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music continuously
                 } else {
-                    System.out.println("The specified music file does not exist: " + filePath);
+                    System.out.println("The specified music file was not found: " + filePath);
                 }
             } catch (UnsupportedAudioFileException | LineUnavailableException | java.io.IOException e) {
                 e.printStackTrace();
