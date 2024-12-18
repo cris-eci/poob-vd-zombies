@@ -1301,10 +1301,10 @@ public class GardenMenu extends JFrame {
     private void addBrainIcon(JPanel panel) {
         if ("PlayerVsPlayer".equals(modality) || "MachineVsMachine".equals(modality)) {
             // Path of the brain image
-            String brainImagePath = "resources/images/brain.png";
+            String brainImagePath = "/images/brain.png";
 
             // Load and scale the image
-            ImageIcon brainIcon = new ImageIcon(brainImagePath);
+            ImageIcon brainIcon = new ImageIcon(getClass().getResource(brainImagePath));
             Image scaledBrainImage = brainIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
 
             // Create a JLabel to display the brain
@@ -1359,8 +1359,8 @@ public class GardenMenu extends JFrame {
 
         // Crear JLabel con la imagen del recurso
         String imagePath = (resource.getType().equals(Resource.SOL)) ? "resources/images/sun.png"
-                : "resources/images/brain.png";
-        ImageIcon icon = new ImageIcon(imagePath);
+                : "/images/brain.png";
+        ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
         Image scaledImage = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         JLabel resourceLabel = new JLabel(new ImageIcon(scaledImage));
         resourceLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -1626,25 +1626,25 @@ public class GardenMenu extends JFrame {
         // Determinar la ruta de la imagen basada en el tipo de recurso
         String imagePath;
         if (Resource.SOL.equals(resource.getType())) {
-            imagePath = "resources/images/sun.png"; // Imagen regular del sol
+            imagePath = "/images/sun.png"; // Imagen regular del sol
         } else if (Resource.BIG_SOL.equals(resource.getType())) {
-            imagePath = "resources/images/big-sun.png"; // Imagen para Big Sun
+            imagePath = "/images/big-sun.png"; // Imagen para Big Sun
         } else if (Resource.BRAIN.equals(resource.getType())) {
-            imagePath = "resources/images/brain.png"; // Imagen del cerebro
+            imagePath = "/images/brain.png"; // Imagen del cerebro
         } else if (Resource.THREE_BIG_SOL.equals(resource.getType())){
-            imagePath = "resources/images/three-big-sun.png"; // Imagen para THREE_BIG_SOL
+            imagePath = "/images/three-big-sun.png"; // Imagen para THREE_BIG_SOL
         }    
         else {
-            imagePath = "resources/images/default.png"; // Imagen por defecto
+            imagePath = "/images/default.png"; // Imagen por defecto
         }
     
-        ImageIcon icon = new ImageIcon(imagePath);
+        ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
         // Verificar si la imagen existe
         if (icon.getIconWidth() == -1) {
             // Imagen no encontrada, usar una imagen de placeholder
             System.err.println("Imagen no encontrada: " + imagePath);
-            imagePath = "resources/images/default.png"; // Ruta alternativa
-            icon = new ImageIcon(imagePath);
+            imagePath = "/images/default.png"; // Ruta alternativa
+            icon = new ImageIcon(getClass().getResource(imagePath));
         }
     
         Image scaledImage;
@@ -1792,7 +1792,7 @@ public class GardenMenu extends JFrame {
 
         // zombieData: [0]: Nombre, [1]: imagen estatica, [2]: card, [3]: gif animado
         String dragImagePath = zombieData.get(3);
-        ImageIcon icon = new ImageIcon(dragImagePath);
+        ImageIcon icon = new ImageIcon(getClass().getResource(dragImagePath));
 
         // Obtener la celda destino para determinar posición
         JPanel targetCell = gridCells[row][col];
@@ -1857,7 +1857,7 @@ public class GardenMenu extends JFrame {
         // plantData: [0]: Nombre, [1]: imagen estática, [2]: card, [3]: gif animado
         String plantImagePath = plantData.get(3); // Usar la imagen animada
 
-        ImageIcon icon = new ImageIcon(plantImagePath);
+        ImageIcon icon = new ImageIcon(getClass().getResource(plantImagePath));
 
         // Obtener la celda destino para determinar posición
         JPanel targetCell = gridCells[row][col];
