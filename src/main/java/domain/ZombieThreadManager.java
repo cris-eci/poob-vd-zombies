@@ -456,7 +456,7 @@ public class ZombieThreadManager {
                         List<String> plantInfo = GardenMenu.PLANTS_VIEW.get(3); // Índice 3 para PotatoMine
                         String explodedImagePath = plantInfo.get(5); // Sexta posición para explosión
 
-                        ImageIcon explodedIcon = new ImageIcon(explodedImagePath);
+                        ImageIcon explodedIcon = new ImageIcon(getClass().getResource(explodedImagePath));
                         if (explodedIcon.getIconWidth() == -1) {
                             System.err.println("No se pudo cargar la imagen de explosión: " + explodedImagePath);
                         } else {
@@ -594,7 +594,7 @@ public class ZombieThreadManager {
         List<String> plantInfo = GardenMenu.PLANTS_VIEW.get(3); // Índice 3 para PotatoMine
         String activatedGifPath = plantInfo.get(4); // Quinta posición para activación
 
-        ImageIcon activatedIcon = new ImageIcon(activatedGifPath);
+        ImageIcon activatedIcon = new ImageIcon(getClass().getResource(activatedGifPath));
         if (activatedIcon.getIconWidth() == -1) {
             System.err.println("No se pudo cargar la imagen activada: " + activatedGifPath);
             return;
@@ -796,7 +796,7 @@ public class ZombieThreadManager {
      * @return the JLabel representing the projectile
      */
     private JLabel createProjectileLabel(JPanel mainPanel, int startX, int startY) {
-        ImageIcon icon = new ImageIcon("resources/images/blackPea.png");
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/blackPea.png"));
         Image scaledImage = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
     

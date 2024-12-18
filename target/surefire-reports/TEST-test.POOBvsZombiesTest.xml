@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="test.POOBvsZombiesTest" time="0.073" tests="31" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="test.POOBvsZombiesTest" time="0.077" tests="31" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21\bin"/>
-    <property name="sun.java.command" value="C:\Users\Usuario\AppData\Local\Temp\surefire3381600883708631776\surefirebooter17066857718012157696.jar C:\Users\Usuario\AppData\Local\Temp\surefire3381600883708631776 2024-12-18T12-20-48_587-jvmRun1 surefire15680676281921437100tmp surefire_014870557890823422144tmp"/>
+    <property name="sun.java.command" value="C:\Users\Usuario\AppData\Local\Temp\surefire12390347700426267519\surefirebooter3946132857858133064.jar C:\Users\Usuario\AppData\Local\Temp\surefire12390347700426267519 2024-12-18T12-25-19_255-jvmRun1 surefire12736215609782522005tmp surefire_018230054511495334262tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\Usuario\desktop\POOB\finalProject\target\test-classes;C:\Users\Usuario\desktop\POOB\finalProject\target\classes;C:\Users\Usuario\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.7.0\junit-jupiter-engine-5.7.0.jar;C:\Users\Usuario\.m2\repository\org\apiguardian\apiguardian-api\1.1.0\apiguardian-api-1.1.0.jar;C:\Users\Usuario\.m2\repository\org\junit\platform\junit-platform-engine\1.7.0\junit-platform-engine-1.7.0.jar;C:\Users\Usuario\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Usuario\.m2\repository\org\junit\platform\junit-platform-commons\1.7.0\junit-platform-commons-1.7.0.jar;C:\Users\Usuario\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.7.0\junit-jupiter-api-5.7.0.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -30,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\Usuario\AppData\Local\Temp\surefire3381600883708631776\surefirebooter17066857718012157696.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Usuario\AppData\Local\Temp\surefire12390347700426267519\surefirebooter3946132857858133064.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.4+8-LTS-274"/>
@@ -58,35 +58,35 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="accordingPSShouldAddPendingExtraResourcesCorrectly" classname="test.POOBvsZombiesTest" time="0.026"/>
-  <testcase name="accordingPSShouldBeSingletonInstance" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldAddPendingExtraResourcesCorrectly" classname="test.POOBvsZombiesTest" time="0.033"/>
+  <testcase name="accordingPSShouldBeSingletonInstance" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldReturnNullWhenNoPlantAtPosition" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldCreatePlantInstances" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldSpawnPlantAndZombieCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldCreateZombieInstances" classname="test.POOBvsZombiesTest" time="0.001"/>
-  <testcase name="accordingPSShouldSetAndGetWinnerCorrectly" classname="test.POOBvsZombiesTest" time="0.003"/>
-  <testcase name="accordingPSShouldNotFindLawnmowerWhenNotPresent" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldSetAndGetWinnerCorrectly" classname="test.POOBvsZombiesTest" time="0.004"/>
+  <testcase name="accordingPSShouldNotFindLawnmowerWhenNotPresent" classname="test.POOBvsZombiesTest" time="0.002"/>
   <testcase name="accordingPSShouldReturnCorrectModality" classname="test.POOBvsZombiesTest" time="0.001"/>
-  <testcase name="accordingPSShouldRetrievePlantAtCorrectPosition" classname="test.POOBvsZombiesTest" time="0.001"/>
-  <testcase name="accordingPSShouldCalculateScoresCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldRetrievePlantAtCorrectPosition" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldCalculateScoresCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldNotAddInvalidEntitiesAndHandleExceptions" classname="test.POOBvsZombiesTest" time="0.002"/>
   <testcase name="accordingPSShouldThrowExceptionForInvalidZombieType" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldCalculateProgressCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldAddEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldFindFirstPlantInRowCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldReturnNullForInvalidPlantType" classname="test.POOBvsZombiesTest" time="0.001"/>
-  <testcase name="accordingPSShouldRetrievePlayerTwoCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldRetrievePlayerTwoCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldRetrievePlayerOneCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
-  <testcase name="accordingPSShouldUpdateScoresAfterRemovingEntities" classname="test.POOBvsZombiesTest" time="0"/>
-  <testcase name="accordingPSShouldRemoveEntityCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
-  <testcase name="accordingPSShouldRestoreGameStateWithResources" classname="test.POOBvsZombiesTest" time="0.002"/>
-  <testcase name="accordingPSShouldSaveAndLoadGameWithEntitiesCorrectly" classname="test.POOBvsZombiesTest" time="0.003"/>
-  <testcase name="accordingPSShouldReturnCorrectRoundTime" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldUpdateScoresAfterRemovingEntities" classname="test.POOBvsZombiesTest" time="0.001"/>
+  <testcase name="accordingPSShouldRemoveEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldRestoreGameStateWithResources" classname="test.POOBvsZombiesTest" time="0.003"/>
+  <testcase name="accordingPSShouldSaveAndLoadGameWithEntitiesCorrectly" classname="test.POOBvsZombiesTest" time="0.002"/>
+  <testcase name="accordingPSShouldReturnCorrectRoundTime" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldAddAndDeleteEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldDetermineWinnerCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
-  <testcase name="accordingPSShouldSaveAndLoadGameCorrectly" classname="test.POOBvsZombiesTest" time="0.004"/>
-  <testcase name="accordingPSShouldDetermineWinnerAfterScoreUpdate" classname="test.POOBvsZombiesTest" time="0.001"/>
-  <testcase name="accordingPSShouldDeleteEntityCorrectly" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldSaveAndLoadGameCorrectly" classname="test.POOBvsZombiesTest" time="0.002"/>
+  <testcase name="accordingPSShouldDetermineWinnerAfterScoreUpdate" classname="test.POOBvsZombiesTest" time="0"/>
+  <testcase name="accordingPSShouldDeleteEntityCorrectly" classname="test.POOBvsZombiesTest" time="0.001"/>
   <testcase name="accordingPSShouldReturnCorrectMatchTime" classname="test.POOBvsZombiesTest" time="0"/>
   <testcase name="accordingPSShouldCalculateScoresAfterAddingEntities" classname="test.POOBvsZombiesTest" time="0.001"/>
 </testsuite>
